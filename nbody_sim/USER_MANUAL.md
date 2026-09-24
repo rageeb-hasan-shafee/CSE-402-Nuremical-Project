@@ -89,6 +89,58 @@ Run it with:
 python run_accuracy_test.py
 ```
 
+### `onepn.py` — relativistic (1PN) extension
+
+Extends the base paper's Newtonian model using the idea from a second
+paper this project draws on:
+
+> T. Tatekawa, *Accelerating N-body simulation of self-gravitating
+> systems with limited first-order post-Newtonian approximation* (2018),
+> arXiv:1801.07986.
+
+That paper's key trick: computing the full first-order post-Newtonian
+(1PN, general-relativistic) correction for every *triple* of bodies
+costs `O(N³)`. But if one body is far more massive than the rest (a
+black hole — or, in our case, the Sun), the correction is only
+significant for interactions *with that one body*, so only those terms
+need to be kept, and the cost drops back to `O(N²)`.
+
+| Function | What it does |
+|---|---|
+| `onepn_correction(positions, velocities, masses, G, central_index)` | Returns the extra 1PN acceleration on every body due to the dominant mass at `central_index` (the standard test-particle/EIH formula). Zero for the central body itself and for body-body terms not involving it — both are negligible here, and dropping them keeps the `O(N²)` cost. |
+
+### `integrators.py`
+| Function | What it does |
+|---|---|
+| `rk4_step(positions, velocities, masses, dt, accel_fn)` | One classical 4th-order Runge-Kutta step for an arbitrary acceleration function `accel_fn(pos, vel, masses)`. Needed because the 1PN correction depends on velocity as well as position, so the Newtonian Hamiltonian's position/momentum split — the reason velocity Verlet is symplectic — no longer holds. This is exactly why Tatekawa (2018) also switches to RK4 for the 1PN case, trading away Verlet's bounded long-term energy error. |
+
+### `run_mercury_precession_test.py`
+Validates `onepn.py` against a famous real result: the general-relativistic
+contribution to Mercury's perihelion precession, **42.98 arcsec/century**
+— one of the classic historical tests of general relativity.
+
+An isolated Sun-Mercury Newtonian two-body orbit is a perfectly closed
+ellipse (no precession at all); adding the 1PN correction should make it
+precess at very close to that textbook rate.
+
+| Function | What it does |
+|---|---|
+| `eccentricity_vector(r, v, mu)` | Computes the Laplace–Runge–Lenz (eccentricity) vector, which points toward the orbit's perihelion — tracking its direction over time is how the precession is measured. |
+| `run(use_1pn)` | Integrates Sun+Mercury for 20 years with RK4 (with or without the 1PN correction), and returns the unwrapped perihelion-direction angle over time. |
+| `analytic_precession_rate(a, e, M_sun)` | The closed-form 1PN prediction, `6π·G·M / (c²·a·(1−e²))` per orbit, converted to arcsec/century, for comparison. |
+| `main()` | Runs both cases, prints the measured vs. analytic precession rate, and saves `mercury_precession.png`. |
+
+Run it with:
+```bash
+python run_mercury_precession_test.py
+```
+Expect output close to:
+```
+  Newtonian only : measured precession rate =    0.009 arcsec/century (expect ~0)
+  With 1PN term  : measured precession rate =   42.983 arcsec/century
+  Analytic 1PN prediction (6*pi*GM/(c^2 a(1-e^2))): 42.980 arcsec/century
+```
+
 ### `visualize.py`
 A local interactive viewer built with matplotlib widgets.
 
@@ -129,6 +181,7 @@ page.
 - **Full system** — Sun + all 8 planets + Moon.
 - **Inner planets** — Sun, Mercury, Venus, Earth, Moon, Mars only (easier to see up close).
 - **Sandbox** — just the Sun; add your own bodies (see below).
+- **Black hole cluster** — an intermediate-mass black hole plus 140 low-mass "stars" cold-collapsing from rest in a spherical shell (1 < r < 10, dimensionless N-body units, G = 1), the test model from Tatekawa (2018) Section 4. Watch the energy-drift sparkline: it stays small until two bodies pass close to each other, then jumps — the same close-encounter sensitivity the paper reports, and the reason it recommends a higher-order integrator (e.g. Hermite) for collisional systems. This scenario uses plain Newtonian gravity (no 1PN term) to keep it responsive in the browser; the 1PN Sun-term extension is validated separately in `run_mercury_precession_test.py`.
 
 **Interaction mode**
 - **View / pan** — drag empty space to pan the camera, scroll to zoom, click a body (on the canvas or in the list) to lock the camera onto it.
@@ -151,3 +204,12 @@ page.
   are not yet implemented; `accelerations()` in `simulation.py` is
   isolated specifically so those can be added without changing the
   integrator.
+- The 1PN relativistic extension (`onepn.py`) only includes the dominant
+  "BH-term" correction to a Sun-planet interaction; the smaller
+  three-body "Cross" terms from Tatekawa (2018) are omitted (negligible
+  for Mercury's precession). It has only been validated for a Sun+Mercury
+  two-body system, not wired into the full multi-planet simulation.
+- The web demo's black-hole-cluster scenario uses plain Newtonian
+  gravity, not the 1PN correction — it's illustrating the paper's
+  close-encounter/energy-error finding, which is a general N-body
+  integration issue, not specifically a relativistic one.
