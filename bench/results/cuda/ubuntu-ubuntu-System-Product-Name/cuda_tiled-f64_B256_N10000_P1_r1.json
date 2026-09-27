@@ -1,0 +1,18 @@
+{
+  "machine": "ubuntu-ubuntu-System-Product-Name",
+  "backend": "cuda",
+  "method": "cuda",
+  "variant": "tiled-f64",
+  "n": 10000,
+  "p": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "timings": {
+    "setup": 0.118483,
+    "loop": 0.860463,
+    "transfer": 7.95862e-05,
+    "total": 0.979025,
+    "ms_per_step": 8.60463
+  },
+  "extra": {"kernel": "tiled", "precision": "f64", "block_size": 256, "gpu": "NVIDIA GeForce RTX 5090", "sm": "12.0"}
+}

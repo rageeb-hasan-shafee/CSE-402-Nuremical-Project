@@ -1,0 +1,18 @@
+{
+  "machine": "ubuntu-ubuntu-System-Product-Name",
+  "backend": "cuda",
+  "method": "cuda",
+  "variant": "naive-f32",
+  "n": 2000,
+  "p": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "timings": {
+    "setup": 0.111682,
+    "loop": 0.0107813,
+    "transfer": 1.91825e-05,
+    "total": 0.122483,
+    "ms_per_step": 0.107813
+  },
+  "extra": {"kernel": "naive", "precision": "f32", "block_size": 256, "gpu": "NVIDIA GeForce RTX 5090", "sm": "12.0"}
+}

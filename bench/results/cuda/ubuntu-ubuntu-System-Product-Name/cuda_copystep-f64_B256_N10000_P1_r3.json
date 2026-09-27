@@ -1,0 +1,18 @@
+{
+  "machine": "ubuntu-ubuntu-System-Product-Name",
+  "backend": "cuda",
+  "method": "cuda",
+  "variant": "copystep-f64",
+  "n": 10000,
+  "p": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "timings": {
+    "setup": 0.120442,
+    "loop": 0.867419,
+    "transfer": 6.59227e-05,
+    "total": 0.987926,
+    "ms_per_step": 8.67419
+  },
+  "extra": {"kernel": "copystep", "precision": "f64", "block_size": 256, "gpu": "NVIDIA GeForce RTX 5090", "sm": "12.0"}
+}

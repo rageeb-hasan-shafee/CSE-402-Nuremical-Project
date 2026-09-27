@@ -1,0 +1,18 @@
+{
+  "machine": "unknown",
+  "backend": "cpp-serial",
+  "method": "scalar",
+  "variant": "default",
+  "n": 1000,
+  "p": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "timings": {
+    "setup": 0.00442461,
+    "loop": 0.188212,
+    "transfer": 0,
+    "total": 0.192636,
+    "ms_per_step": 1.88212
+  },
+  "extra": {"threads": 1}
+}

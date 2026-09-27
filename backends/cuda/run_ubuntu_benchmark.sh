@@ -7,6 +7,12 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$REPO_ROOT"
 
+# Auto-detect isolated CUDA toolkit on this device if present
+if [ -d "/mnt/models/script_checking/cuda-toolkit/bin" ]; then
+    export PATH=/mnt/models/script_checking/cuda-toolkit/bin:$PATH
+    export LD_LIBRARY_PATH=/mnt/models/script_checking/cuda-toolkit/lib64:$LD_LIBRARY_PATH
+fi
+
 echo "=========================================================="
 echo "   CSE-402 CUDA N-Body Simulation — Ubuntu Benchmark      "
 echo "=========================================================="
@@ -35,6 +41,7 @@ if command -v nvidia-smi &> /dev/null; then
     if [[ "$GPU_NAME" == *"V100"* ]]; then ARCH="sm_70"; fi
     if [[ "$GPU_NAME" == *"30"* || "$GPU_NAME" == *"A10"* ]]; then ARCH="sm_86"; fi
     if [[ "$GPU_NAME" == *"40"* ]]; then ARCH="sm_89"; fi
+    if [[ "$GPU_NAME" == *"50"* ]]; then ARCH="sm_120"; fi
 fi
 echo "       Using NVCC Flag: -arch=$ARCH"
 
