@@ -1,0 +1,7 @@
+# Build/test tools for the parallel phases (install on top of requirements.txt)
+-r requirements.txt
+cython>=3.0        # OpenMP backend (Phase 2)
+setuptools>=70     # builds the Cython extension
+pytest>=8          # backend correctness tests
+# mpi4py>=4.0      # Phase 3: needs a system MPI first -> `brew install open-mpi`, then uncomment
+# cupy-cuda12x     # Phase 4: NVIDIA GPU only (Colab / lab machine), not installable on macOS

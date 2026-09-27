@@ -1,0 +1,109 @@
+# ---------------------------------------------------------------
+# Project-specific
+# ---------------------------------------------------------------
+# Local implementation notes / guides (not shared)
+docs/
+
+# Simulation outputs and benchmark data
+results/
+output/
+outputs/
+benchmarks/results/
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.mp4
+*.gif
+
+# ---------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Packaging / build
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+pip-wheel-metadata/
+
+# Compiled extensions (Cython / C-API). When a .pyx module is added, also
+# ignore its generated .c file by name, e.g. nbody_sim/parallel/forces_omp.c
+*.so
+*.pyd
+cython_debug/
+
+# Testing / coverage / type checkers
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.hypothesis/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------
+# C / C++ / CUDA / MPI builds
+# ---------------------------------------------------------------
+*.o
+*.obj
+*.a
+*.lib
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+*.ptx
+*.cubin
+*.fatbin
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+compile_commands.json
+
+# ---------------------------------------------------------------
+# Editors / IDEs
+# ---------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/settings.local.json
+
+# ---------------------------------------------------------------
+# OS files
+# ---------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ---------------------------------------------------------------
+# Logs / temp / secrets
+# ---------------------------------------------------------------
+*.log
+*.tmp
+*.bak
+.env
+.env.*

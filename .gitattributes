@@ -1,0 +1,18 @@
+# Normalise line endings so Windows / macOS / Linux commits don't fight.
+* text=auto eol=lf
+
+# Windows-only scripts need CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary files: never touch
+*.pdf binary
+*.png binary
+*.jpg binary
+*.gif binary
+*.mp4 binary
+*.npy binary
+*.npz binary
+*.so  binary
+*.pyd binary

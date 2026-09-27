@@ -248,7 +248,7 @@
 
 <header>
   <h1>Orbital Verlet</h1>
-  <span class="cite">A velocity-Verlet N-body integrator, after <b>Zhu (2020)</b> and <b>Tatekawa (2018)</b>, live in the browser.</span>
+  <span class="cite">A velocity-Verlet N-body integrator, after <b>Zhu (2020)</b>, live in the browser.</span>
 </header>
 
 <main>
@@ -285,7 +285,6 @@
         <button data-scenario="full" class="toggle" aria-pressed="true">Full system</button>
         <button data-scenario="inner" class="toggle" aria-pressed="false">Inner planets</button>
         <button data-scenario="sandbox" class="toggle" aria-pressed="false">Sandbox</button>
-        <button data-scenario="cluster" class="toggle" aria-pressed="false">Black hole cluster</button>
       </div>
       <p class="help" id="scenarioHelp" style="margin-top:.6rem;"></p>
     </div>
@@ -323,42 +322,23 @@
   "use strict";
   const MSUN_PER_MEARTH = 3.0034895e-6;
 
-  // Mutable "physics unit system" for the current scenario -- the solar-
-  // system scenarios use AU / day / solar masses; the black-hole cluster
-  // scenario uses the dimensionless N-body convention G=1 (Tatekawa 2018),
-  // since it isn't meant to represent any particular physical system.
-  let G = 0.01720209895 ** 2; // AU^3 Msun^-1 day^-2 (Gaussian), overwritten per scenario
-  let SOFTENING2 = 0.015 ** 2;
-  let massBase = MSUN_PER_MEARTH;   // "1 unit" on the new-body mass slider
-  let massUnitLabel = "M⊕";
+  // Physics unit system: AU / day / solar masses (matches nbody_sim/constants.py).
+  const G = 0.01720209895 ** 2; // AU^3 Msun^-1 day^-2 (Gaussian)
+  const SOFTENING2 = 0.015 ** 2;
+  const massBase = MSUN_PER_MEARTH;   // "1 unit" on the new-body mass slider
+  const massUnitLabel = "M⊕";
 
-  const SOLAR_CFG = {
-    softening2: 0.015 ** 2, G: 0.01720209895 ** 2,
-    massBase: MSUN_PER_MEARTH, massUnitLabel: "M⊕",
+  const cfg = {
     massSliderMin: -1, massSliderMax: 3.3,
     dtMin: 0.02, dtMax: 2, dtDefault: 0.5,
     spMin: 0.5, spMax: 40, spDefault: 4,
     pxPerUnitDefault: 26, rings: [1, 5, 10, 20, 30],
-    timeUnit: "d", dimensionless: false, flingVelScale: 0.05,
-    footer: "Newtonian gravity · G in AU³ M☉⁻¹ day⁻² · O(N²) force sum",
+    timeUnit: "d", flingVelScale: 0.05,
   };
-  const N_CLUSTER_STARS = 140;
-  const CLUSTER_CFG = {
-    softening2: 0.05 ** 2, G: 1,
-    massBase: 1 / N_CLUSTER_STARS, massUnitLabel: "m★",
-    massSliderMin: -1, massSliderMax: 2,
-    dtMin: 0.001, dtMax: 0.05, dtDefault: 0.01,
-    spMin: 0.05, spMax: 5, spDefault: 0.4,
-    pxPerUnitDefault: 40, rings: [1, 5, 10],
-    timeUnit: "t", dimensionless: true, flingVelScale: 0.15,
-    footer: "Dimensionless N-body units (G = 1) · limited-1PN BH term omitted here · O(N²) force sum",
-  };
-  const SCENARIO_CFG = { full: SOLAR_CFG, inner: SOLAR_CFG, sandbox: SOLAR_CFG, cluster: CLUSTER_CFG };
   const SCENARIO_HELP = {
     full: "The Sun, all 8 planets, and the Moon, from real J2000 initial conditions.",
     inner: "Sun through Mars (plus the Moon) only, easier to see up close.",
     sandbox: "Just the Sun — fling your own bodies into orbit around it.",
-    cluster: `An intermediate-mass black hole plus ${N_CLUSTER_STARS} low-mass stars, cold-collapsing from rest in a spherical shell — the test model of Tatekawa (2018). Watch the energy-drift readout below jump whenever two bodies pass close to each other.`,
   };
 
   const FULL_SYSTEM = [
@@ -382,36 +362,10 @@
     if (kind === "sandbox"){
       return [cloneBody(FULL_SYSTEM[0])];
     }
-    if (kind === "cluster"){
-      return makeClusterStars(N_CLUSTER_STARS);
-    }
     return FULL_SYSTEM.map(cloneBody);
   }
   function cloneBody(b){
-    return {name:b.name, mass:b.mass, pos:b.pos.slice(), vel:b.vel.slice(), color:b.color, isStar:!!b.isStar, isBH:!!b.isBH};
-  }
-
-  // Cold spherical collapse: one massive object (mass = 100x a single
-  // star) plus N equal-mass low-mass stars, uniformly distributed by
-  // volume in the shell 1 < r < 10, all starting at rest -- the test
-  // model of Tatekawa (2018) Section 4, at a browser-friendly N.
-  function makeClusterStars(nStars){
-    const mStar = 1 / nStars;   // total star mass normalised to 1
-    const mBH = 100 * mStar;    // paper's M = 100 m
-    const bodies = [
-      {name:"IMBH", mass:mBH, pos:[0,0,0], vel:[0,0,0], color:"#120a1f", isStar:false, isBH:true},
-    ];
-    for (let i=0;i<nStars;i++){
-      const r = Math.cbrt(1 + Math.random()*999);   // uniform-in-volume, r in [1,10]
-      const cosT = 2*Math.random()-1, phi = 2*Math.PI*Math.random();
-      const sinT = Math.sqrt(1-cosT*cosT);
-      const pos = [r*sinT*Math.cos(phi), r*sinT*Math.sin(phi), r*cosT];
-      const hue = 190 + Math.random()*60;
-      bodies.push({name:`star ${i+1}`, mass:mStar, pos, vel:[0,0,0],
-                   color:`hsl(${hue} 55% 78%)`, isStar:false, isBH:false});
-    }
-    recenterBarycentre(bodies);
-    return bodies;
+    return {name:b.name, mass:b.mass, pos:b.pos.slice(), vel:b.vel.slice(), color:b.color, isStar:!!b.isStar};
   }
 
   // ---------- physics state ----------
@@ -456,18 +410,6 @@
     return ke+pe;
   }
 
-  function recenterBarycentre(list){
-    let M=0, px=[0,0,0], vx=[0,0,0];
-    for (const b of list){
-      M += b.mass;
-      for (let k=0;k<3;k++){ px[k]+=b.mass*b.pos[k]; vx[k]+=b.mass*b.vel[k]; }
-    }
-    for (let k=0;k<3;k++){ px[k]/=M; vx[k]/=M; }
-    for (const b of list){
-      for (let k=0;k<3;k++){ b.pos[k]-=px[k]; b.vel[k]-=vx[k]; }
-    }
-  }
-
   function step(dt){
     for (let i=0;i<bodies.length;i++){
       const b=bodies[i], a=acc[i];
@@ -486,15 +428,7 @@
     simTimeDays += dt;
   }
 
-  let cfg = SOLAR_CFG;
-
   function loadScenario(kind){
-    cfg = SCENARIO_CFG[kind];
-    G = cfg.G;
-    SOFTENING2 = cfg.softening2;
-    massBase = cfg.massBase;
-    massUnitLabel = cfg.massUnitLabel;
-
     bodies = makeScenario(kind);
     acc = accelerations(bodies);
     simTimeDays = 0;
@@ -513,9 +447,7 @@
     massSlider.min = cfg.massSliderMin; massSlider.max = cfg.massSliderMax; massSlider.value = 0;
     massSlider.dispatchEvent(new Event("input"));
 
-    document.getElementById("footerNote").textContent = cfg.footer;
     document.getElementById("scenarioHelp").textContent = SCENARIO_HELP[kind] || "";
-    resetBtn.textContent = kind === "cluster" ? "Reset (re-collapse)" : "Reset to J2000";
 
     buildBodyList();
   }
@@ -553,7 +485,6 @@
 
   function bodyRadiusPx(b){
     if (b.isStar) return 7.5;
-    if (b.isBH) return 7;
     const base = Math.cbrt(Math.max(b.mass,1e-12)/massBase);
     return Math.min(Math.max(base*1.15+1.6, 2), 9);
   }
@@ -609,13 +540,6 @@
         grad.addColorStop(1,"rgba(253,184,19,0)");
         ctx.fillStyle = grad;
         ctx.beginPath(); ctx.arc(x,y,r*4.2,0,Math.PI*2); ctx.fill();
-      } else if (b.isBH){
-        const grad = ctx.createRadialGradient(x,y,0,x,y,r*5);
-        grad.addColorStop(0,"rgba(139,92,246,0.55)");
-        grad.addColorStop(0.45,"rgba(91,140,255,0.20)");
-        grad.addColorStop(1,"rgba(91,140,255,0)");
-        ctx.fillStyle = grad;
-        ctx.beginPath(); ctx.arc(x,y,r*5,0,Math.PI*2); ctx.fill();
       }
       ctx.beginPath();
       ctx.fillStyle = b.color;
@@ -690,9 +614,7 @@
   function updateHud(){
     const last = driftHistory.length ? driftHistory[driftHistory.length-1] : 0;
     const cls = Math.abs(last) < 0.01 ? "drift-good" : (Math.abs(last) < 0.1 ? "drift-warn" : "drift-bad");
-    const timeLine = cfg.dimensionless
-      ? `<div class="t">t = ${simTimeDays.toFixed(3)} (N-body units)</div>`
-      : `<div class="t">t = ${(simTimeDays/365.25).toFixed(2)} yr <span style="color:var(--text-faint)">(${simTimeDays.toFixed(1)} d)</span></div>`;
+    const timeLine = `<div class="t">t = ${(simTimeDays/365.25).toFixed(2)} yr <span style="color:var(--text-faint)">(${simTimeDays.toFixed(1)} d)</span></div>`;
     hud.innerHTML = timeLine +
       `bodies: ${bodies.length}<br>` +
       `energy drift: <span class="${cls}">${last>=0?"+":""}${last.toFixed(5)}%</span>`;
@@ -747,14 +669,13 @@
   const dtSlider = document.getElementById("dt");
   const dtVal = document.getElementById("dtVal");
   dtSlider.addEventListener("input", () => {
-    const digits = cfg.dimensionless ? 4 : 2;
-    dtVal.textContent = (+dtSlider.value).toFixed(digits)+" "+cfg.timeUnit;
+    dtVal.textContent = (+dtSlider.value).toFixed(2)+" "+cfg.timeUnit;
   });
 
   const speedSlider = document.getElementById("speed");
   const spVal = document.getElementById("spVal");
   speedSlider.addEventListener("input", () => {
-    spVal.textContent = (+speedSlider.value).toFixed(cfg.dimensionless?2:1)+" "+cfg.timeUnit+"/frame";
+    spVal.textContent = (+speedSlider.value).toFixed(1)+" "+cfg.timeUnit+"/frame";
   });
 
   let currentScenario = "full";
@@ -848,7 +769,7 @@
       const mass = massUnits*massBase;
       const hue = Math.floor(Math.random()*360);
       bodies.push({name:"Body "+(bodies.length+1), mass, pos:[sx,sy,0], vel:[dvx,dvy,0],
-                   color:`hsl(${hue} 75% 65%)`, isStar:false, isBH:false});
+                   color:`hsl(${hue} 75% 65%)`, isStar:false});
       trails.push([]);
       trailVisible.push(true);
       acc = accelerations(bodies);

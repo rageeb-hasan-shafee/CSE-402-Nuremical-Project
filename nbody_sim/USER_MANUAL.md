@@ -22,14 +22,79 @@ conditions, same gravitational constant, same integrator):
 
 ## 1. Installation
 
-Requires Python 3.9+.
+Requires **Python 3.11** (pinned in `.python-version`). The virtual
+environment always lives at `nbody_sim/.venv`. It is git-ignored, so every
+machine builds its own.
 
+### 1.1 Install Python 3.11
+
+| OS | Command |
+|---|---|
+| macOS | `brew install python@3.11` |
+| Ubuntu / Debian | `sudo apt install python3.11 python3.11-venv python3.11-tk` (older Ubuntu: add `ppa:deadsnakes/ppa` first) |
+| Fedora | `sudo dnf install python3.11 python3.11-tkinter` |
+| Windows | Install 3.11 from python.org (tick *"Add python.exe to PATH"*), or `winget install Python.Python.3.11` |
+
+### 1.2 Create the environment
+
+macOS / Linux:
 ```bash
 cd nbody_sim
-python3 -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+python3.11 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip
+.venv/bin/python -m pip install -r requirements-dev.txt   # includes requirements.txt
 ```
+
+Windows (PowerShell or cmd):
+```powershell
+cd nbody_sim
+py -3.11 -m venv .venv
+.venv\Scripts\python -m pip install --upgrade pip
+.venv\Scripts\python -m pip install -r requirements-dev.txt
+```
+
+To activate for an interactive shell:
+
+| Shell | Command |
+|---|---|
+| macOS / Linux (bash, zsh) | `source .venv/bin/activate` |
+| Windows PowerShell | `.venv\Scripts\Activate.ps1` (if blocked, run once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`) |
+| Windows cmd | `.venv\Scripts\activate.bat` |
+
+After activating, plain `python` means the venv's Python on every OS.
+
+To rebuild from scratch, delete the `.venv` folder and repeat 1.2, keeping
+the same name.
+
+### 1.3 Run
+
+With the venv active, from inside `nbody_sim/` (same commands on every OS):
+```bash
+python run_accuracy_test.py            # → accuracy_energy_error.png
+python run_mercury_precession_test.py  # → mercury_precession.png, ~15 s
+python visualize.py                    # interactive window
+```
+
+- Output PNGs are written to the **current directory**, so run the scripts
+  from inside `nbody_sim/`.
+- `visualize.py` needs a GUI backend: native on macOS; Tk on Windows (bundled
+  with python.org) and Linux (the `python3.11-tk` package above). On a headless
+  server or over SSH, set `MPLBACKEND=Agg` to get only the PNGs
+  (PowerShell: `$env:MPLBACKEND="Agg"`).
+- The web demo needs no install: open `web_demo/orbital_verlet.html` in any
+  browser.
+
+### 1.4 Toolchains for the parallel versions (only when needed)
+
+| Needed for | macOS | Linux (Ubuntu) | Windows |
+|---|---|---|---|
+| OpenMP (Cython) | `brew install libomp` | built into gcc: `sudo apt install build-essential` | *Visual Studio Build Tools* → "Desktop development with C++" |
+| MPI (mpi4py) | `brew install open-mpi` | `sudo apt install openmpi-bin libopenmpi-dev` | Microsoft MPI: install **both** `msmpisetup.exe` and `msmpisdk.msi` |
+| CUDA (CuPy) | not supported (no NVIDIA GPU) | NVIDIA driver, then `pip install "cupy-cuda12x[ctk]"` | NVIDIA driver, then `pip install "cupy-cuda12x[ctk]"` |
+
+Then `pip install mpi4py` inside the venv. MPI runs use the same syntax
+everywhere: `mpiexec -n 4 python <script>.py`. Without a local NVIDIA GPU,
+use Google Colab (Runtime → T4 GPU) for CUDA.
 
 ---
 
@@ -181,7 +246,6 @@ page.
 - **Full system** — Sun + all 8 planets + Moon.
 - **Inner planets** — Sun, Mercury, Venus, Earth, Moon, Mars only (easier to see up close).
 - **Sandbox** — just the Sun; add your own bodies (see below).
-- **Black hole cluster** — an intermediate-mass black hole plus 140 low-mass "stars" cold-collapsing from rest in a spherical shell (1 < r < 10, dimensionless N-body units, G = 1), the test model from Tatekawa (2018) Section 4. Watch the energy-drift sparkline: it stays small until two bodies pass close to each other, then jumps — the same close-encounter sensitivity the paper reports, and the reason it recommends a higher-order integrator (e.g. Hermite) for collisional systems. This scenario uses plain Newtonian gravity (no 1PN term) to keep it responsive in the browser; the 1PN Sun-term extension is validated separately in `run_mercury_precession_test.py`.
 
 **Interaction mode**
 - **View / pan** — drag empty space to pan the camera, scroll to zoom, click a body (on the canvas or in the list) to lock the camera onto it.
@@ -209,7 +273,3 @@ page.
   three-body "Cross" terms from Tatekawa (2018) are omitted (negligible
   for Mercury's precession). It has only been validated for a Sun+Mercury
   two-body system, not wired into the full multi-planet simulation.
-- The web demo's black-hole-cluster scenario uses plain Newtonian
-  gravity, not the 1PN correction — it's illustrating the paper's
-  close-encounter/energy-error finding, which is a general N-body
-  integration issue, not specifically a relativistic one.
