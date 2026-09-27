@@ -177,7 +177,8 @@ def generate_markdown_report(machine, results_dir, scalar_timings, steps):
     if sm_ver:
         lines.append(f"* **Compute Capability:** `SM {sm_ver}`")
     lines.append(f"* **Machine Identifier:** `{machine}`")
-    lines.append(f"* **Scalar CPU Baseline:** Tested on host machine (`nbody_serial.exe`)")
+    serial_name = "nbody_serial.exe" if sys.platform.startswith("win") else "nbody_serial"
+    lines.append(f"* **Scalar CPU Baseline:** Tested on host machine (`{serial_name}`)")
     lines.append(f"* **Benchmark Date:** `{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}`")
     lines.append(f"* **Integration Scheme:** Velocity Verlet, $\\Delta t = 0.1$ days, `{steps}` steps")
     lines.append(f"")
