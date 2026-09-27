@@ -4,11 +4,21 @@
 # Local implementation notes / guides (not shared)
 docs/
 
-# Simulation outputs and benchmark data
-results/
+# Simulation temporary outputs (transient trajectory dumps)
+out/
 output/
 outputs/
-benchmarks/results/
+
+# Benchmark results and reports (tracked for repository benchmarks)
+!bench/results/
+!bench/results/**
+!results/
+!results/**
+!benchmarks/results/
+!benchmarks/results/**
+!*.json
+
+# Binary data & media
 *.npy
 *.npz
 *.h5

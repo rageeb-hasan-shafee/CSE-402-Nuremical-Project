@@ -1,0 +1,18 @@
+{
+  "machine": "shadhin-gtx1660s",
+  "backend": "cuda",
+  "method": "cuda",
+  "variant": "copystep-f64",
+  "n": 10000,
+  "p": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "timings": {
+    "setup": 0.14926,
+    "loop": 2.57239,
+    "transfer": 0.0002106,
+    "total": 2.72186,
+    "ms_per_step": 25.7239
+  },
+  "extra": {"kernel": "copystep", "precision": "f64", "block_size": 256, "gpu": "NVIDIA GeForce GTX 1660 SUPER", "sm": "7.5"}
+}

@@ -1,0 +1,18 @@
+{
+  "machine": "shadhin-gtx1660s",
+  "backend": "cuda",
+  "method": "cuda",
+  "variant": "naive-f32",
+  "n": 100,
+  "p": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "timings": {
+    "setup": 0.17079,
+    "loop": 0.00138445,
+    "transfer": 8.97e-05,
+    "total": 0.172264,
+    "ms_per_step": 0.0138445
+  },
+  "extra": {"kernel": "naive", "precision": "f32", "block_size": 256, "gpu": "NVIDIA GeForce GTX 1660 SUPER", "sm": "7.5"}
+}

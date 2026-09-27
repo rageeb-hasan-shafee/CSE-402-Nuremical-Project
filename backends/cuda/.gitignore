@@ -1,0 +1,6 @@
+nbody_cuda
+nbody_cuda.exe
+*.o
+out/
+build/
+*.zip

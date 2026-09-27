@@ -1,0 +1,18 @@
+{
+  "machine": "shadhin-gtx1660s",
+  "backend": "cpp-serial",
+  "method": "scalar",
+  "variant": "default",
+  "n": 10000,
+  "p": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "timings": {
+    "setup": 0.411019,
+    "loop": 41.1105,
+    "transfer": 0,
+    "total": 41.5215,
+    "ms_per_step": 411.105
+  },
+  "extra": {"threads": 1}
+}

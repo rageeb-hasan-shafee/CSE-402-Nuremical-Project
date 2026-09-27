@@ -1,0 +1,18 @@
+{
+  "machine": "shadhin-gtx1660s",
+  "backend": "cuda",
+  "method": "cuda",
+  "variant": "tiled-f64",
+  "n": 10000,
+  "p": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "timings": {
+    "setup": 0.140643,
+    "loop": 2.55659,
+    "transfer": 0.0002193,
+    "total": 2.69745,
+    "ms_per_step": 25.5659
+  },
+  "extra": {"kernel": "tiled", "precision": "f64", "block_size": 512, "gpu": "NVIDIA GeForce GTX 1660 SUPER", "sm": "7.5"}
+}
