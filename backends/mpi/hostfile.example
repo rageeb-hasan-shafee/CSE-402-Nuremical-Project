@@ -1,0 +1,5 @@
+# Open MPI hostfile for a cluster run. Copy to backends/mpi/hostfile (git-ignored) and edit.
+# One line per machine: <hostname or IP> slots=<number of ranks to place there, usually its core count>
+# The first machine is the one you run mpiexec on.
+node1 slots=8
+node2 slots=8

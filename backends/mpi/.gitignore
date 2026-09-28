@@ -1,0 +1,4 @@
+# local scratch: verification outputs, generated test ICs, plots
+out/
+# your real cluster hostfile (commit only hostfile.example)
+hostfile
