@@ -3,365 +3,818 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSE 402: N-Body Simulation — Supervisor Oral Defense & Live Demo Dashboard</title>
+  <title>CSE 402: N-Body Simulation — Supervisor Oral Defense & Live Demonstration Hub</title>
+  
+  <!-- Inter Font & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  
+  <!-- KaTeX with Auto-Render Extension -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
   <style>
     :root {
-      --bg: #0d1117;
-      --surface: #161b22;
-      --surface-border: #30363d;
-      --text: #e6edf3;
-      --text-muted: #8b949e;
-      --accent: #58a6ff;
-      --accent-green: #3fb950;
-      --accent-orange: #d29922;
-      --accent-purple: #bc8cff;
-      --accent-red: #f85149;
+      --bg: #090d13;
+      --surface: #111620;
+      --surface-card: #161d2a;
+      --border: #232d3f;
+      --border-focus: #3b82f6;
+      --text: #e2e8f0;
+      --text-muted: #8b9bb4;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --accent-red: #ef4444;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-    body { background: var(--bg); color: var(--text); line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
-    header { background: var(--surface); border-bottom: 1px solid var(--surface-border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .header-title h1 { font-size: 1.35rem; color: #fff; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-    .header-title p { font-size: 0.85rem; color: var(--text-muted); }
-    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-    .badge-pass { background: rgba(63, 185, 80, 0.15); color: var(--accent-green); border: 1px solid rgba(63, 185, 80, 0.3); }
-    .badge-accent { background: rgba(88, 166, 255, 0.15); color: var(--accent); border: 1px solid rgba(88, 166, 255, 0.3); }
 
-    /* Nav Tabs */
-    nav { background: #13171f; border-bottom: 1px solid var(--surface-border); display: flex; padding: 0 2rem; gap: 0.5rem; overflow-x: auto; }
-    .tab-btn { background: none; border: none; color: var(--text-muted); padding: 0.85rem 1.25rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 0.5rem; }
-    .tab-btn:hover { color: var(--text); }
-    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-sans); line-height: 1.55; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-    main { flex: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+    /* Top Navigation Header */
+    header { background: rgba(17, 22, 32, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0.9rem 2rem; position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+    .header-left { display: flex; align-items: center; gap: 1rem; }
+    .logo-badge { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: #fff; font-weight: 700; font-size: 0.85rem; padding: 0.35rem 0.65rem; border-radius: 6px; letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.15); }
+    .header-titles h1 { font-size: 1.15rem; font-weight: 700; color: #f8fafc; letter-spacing: -0.2px; }
+    .header-titles p { font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono); }
+    .header-badges { display: flex; gap: 0.6rem; align-items: center; }
+    .status-pill { font-size: 0.75rem; font-weight: 600; padding: 0.25rem 0.7rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 0.4rem; }
+    .pill-green { background: rgba(16, 185, 129, 0.12); color: var(--accent-green); border: 1px solid rgba(16, 185, 129, 0.25); }
+    .pill-blue { background: rgba(59, 130, 246, 0.12); color: var(--accent); border: 1px solid rgba(59, 130, 246, 0.25); }
+
+    /* Tab Bar */
+    nav.nav-tabs { background: #0c1017; border-bottom: 1px solid var(--border); display: flex; padding: 0 2rem; gap: 0.25rem; overflow-x: auto; }
+    .tab-btn { background: none; border: none; color: var(--text-muted); padding: 0.8rem 1.1rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s ease; white-space: nowrap; display: flex; align-items: center; gap: 0.45rem; }
+    .tab-btn:hover { color: #f8fafc; background: rgba(255,255,255,0.02); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(59, 130, 246, 0.05); }
+
+    /* Content Area */
+    main { flex: 1; padding: 1.75rem 2rem; max-width: 1440px; margin: 0 auto; width: 100%; }
     .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .tab-content.active { display: block; animation: tabFade 0.2s ease-in-out; }
+    @keyframes tabFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* Cards & Layout */
-    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
-    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
-    .card { background: var(--surface); border: 1px solid var(--surface-border); border-radius: 8px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-    .card h2 { font-size: 1.15rem; margin-bottom: 1rem; color: #fff; display: flex; align-items: center; gap: 0.5rem; border-bottom: 1px solid var(--surface-border); padding-bottom: 0.6rem; }
-    .card h3 { font-size: 1rem; margin: 1rem 0 0.5rem; color: var(--accent); }
+    /* Layout Grids & Cards */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem; }
+    .card { background: var(--surface-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.35rem; margin-bottom: 1.25rem; }
+    .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.65rem; }
+    .card-header h2 { font-size: 1.05rem; font-weight: 600; color: #f8fafc; display: flex; align-items: center; gap: 0.5rem; }
+    .card h3 { font-size: 0.92rem; font-weight: 600; color: var(--accent); margin: 0.9rem 0 0.4rem; }
+    p, li { font-size: 0.88rem; color: #cbd5e1; }
+    ul, ol { padding-left: 1.3rem; margin-top: 0.4rem; }
+    li { margin-bottom: 0.35rem; }
+
+    /* Code & Pre */
+    code, pre { font-family: var(--font-mono); }
+    .code-inline { background: rgba(255,255,255,0.06); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.82rem; color: #93c5fd; }
+    .math-callout { background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 0.9rem 1.1rem; border-radius: 6px; margin: 0.75rem 0; overflow-x: auto; }
+    .terminal-box { background: #070a0f; border: 1px solid var(--border); border-radius: 6px; padding: 1rem; font-family: var(--font-mono); font-size: 0.82rem; color: #4ade80; line-height: 1.6; white-space: pre-wrap; margin: 0.75rem 0; max-height: 280px; overflow-y: auto; }
 
     /* Tables */
-    table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.88rem; }
-    th, td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--surface-border); }
-    th { background: rgba(255,255,255,0.03); color: var(--text-muted); font-weight: 600; }
-    tr:hover td { background: rgba(255,255,255,0.02); }
+    table.data-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-top: 0.5rem; }
+    table.data-table th, table.data-table td { padding: 0.6rem 0.8rem; text-align: left; border-bottom: 1px solid var(--border); }
+    table.data-table th { background: rgba(15, 23, 42, 0.9); color: var(--text-muted); font-weight: 600; font-family: var(--font-mono); }
+    table.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    table.data-table td.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
-    /* Interactive controls */
-    .controls-bar { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; background: rgba(255,255,255,0.02); padding: 0.8rem 1rem; border-radius: 6px; border: 1px solid var(--surface-border); margin-bottom: 1.5rem; }
-    .ctrl-group { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
-    select, button { background: var(--surface); color: var(--text); border: 1px solid var(--surface-border); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; outline: none; }
-    select:focus, button:focus { border-color: var(--accent); }
-    button.btn-primary { background: #238636; border-color: rgba(240,246,252,0.1); color: #fff; font-weight: 600; }
-    button.btn-primary:hover { background: #2ea043; }
+    /* Controls Bar */
+    .controls-panel { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: center; background: rgba(15, 23, 42, 0.6); padding: 0.7rem 1rem; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 1rem; }
+    .control-group { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--text-muted); }
+    select, button, input[type="text"], input[type="number"] { background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.82rem; font-family: var(--font-sans); outline: none; transition: border-color 0.15s; }
+    select:focus, input[type="text"]:focus, input[type="number"]:focus { border-color: var(--border-focus); }
+    button { cursor: pointer; font-weight: 500; }
+    button:hover { background: #1f293d; color: #fff; }
+    button.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    button.btn-primary:hover { background: var(--accent-hover); }
 
     /* Canvas Simulation */
-    #orbitCanvas { background: #050811; border-radius: 6px; border: 1px solid var(--surface-border); width: 100%; height: 420px; display: block; }
-    .sim-readout { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-muted); margin-top: 0.5rem; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .canvas-container { position: relative; width: 100%; height: 500px; background: #030712; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+    #orbitCanvas { width: 100%; height: 100%; display: block; cursor: grab; }
+    #orbitCanvas:active { cursor: grabbing; }
+    .canvas-overlay { position: absolute; top: 12px; left: 14px; background: rgba(9, 13, 19, 0.75); backdrop-filter: blur(8px); border: 1px solid var(--border); border-radius: 6px; padding: 0.5rem 0.8rem; font-family: var(--font-mono); font-size: 0.78rem; pointer-events: none; }
+    .canvas-overlay div { line-height: 1.4; color: #cbd5e1; }
+    .canvas-help { position: absolute; bottom: 12px; right: 14px; font-size: 0.72rem; color: #64748b; font-family: var(--font-mono); background: rgba(9, 13, 19, 0.6); padding: 0.25rem 0.5rem; border-radius: 4px; pointer-events: none; }
 
-    /* Q&A Accordion */
-    .qa-item { border: 1px solid var(--surface-border); border-radius: 6px; margin-bottom: 0.75rem; background: rgba(255,255,255,0.01); overflow: hidden; }
-    .qa-q { padding: 0.85rem 1.2rem; cursor: pointer; font-weight: 600; color: #fff; display: flex; justify-content: space-between; align-items: center; }
-    .qa-q:hover { background: rgba(255,255,255,0.03); }
-    .qa-a { padding: 0 1.2rem 1rem; font-size: 0.9rem; color: #c9d1d9; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 0.8rem; display: none; line-height: 1.6; }
-    .qa-item.open .qa-a { display: block; }
-    .qa-tag { font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 4px; font-weight: bold; margin-left: 0.5rem; }
-    .tag-openmp { background: #1f78b4; color: #fff; }
-    .tag-mpi { background: #d95f02; color: #fff; }
-    .tag-cuda { background: #1b9e77; color: #fff; }
-    .tag-numerics { background: #7570b3; color: #fff; }
+    /* Q&A Interactive Items */
+    .qa-filters { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .filter-pill { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+    .filter-pill:hover, .filter-pill.active { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border-color: rgba(59, 130, 246, 0.4); }
+    .qa-card { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 0.65rem; background: var(--surface); transition: border-color 0.15s; overflow: hidden; }
+    .qa-card.open { border-color: rgba(59, 130, 246, 0.4); }
+    .qa-header { padding: 0.75rem 1rem; cursor: pointer; font-size: 0.88rem; font-weight: 600; color: #f1f5f9; display: flex; justify-content: space-between; align-items: center; user-select: none; }
+    .qa-header:hover { background: rgba(255,255,255,0.02); }
+    .qa-tag { font-size: 0.7rem; font-family: var(--font-mono); font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 4px; }
+    .qa-body { padding: 0.8rem 1rem 1rem; font-size: 0.85rem; color: #cbd5e1; border-top: 1px solid var(--border); background: rgba(15, 23, 42, 0.4); display: none; line-height: 1.6; }
+    .qa-card.open .qa-body { display: block; }
+    
+    /* Metrics Summary Badges */
+    .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+    .metric-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 0.85rem 1rem; }
+    .metric-tile .label { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+    .metric-tile .value { font-size: 1.35rem; font-weight: 700; color: #f8fafc; font-family: var(--font-mono); margin: 0.2rem 0; }
+    .metric-tile .desc { font-size: 0.72rem; color: var(--accent-green); }
+
+    /* Presentation Slide Deck View */
+    .deck-container { max-width: 1000px; margin: 0 auto; }
+    .deck-slide { background: var(--surface-card); border: 1px solid var(--border); border-radius: 10px; padding: 2.2rem; min-height: 520px; display: flex; flex-direction: column; justify-content: space-between; position: relative; }
+    .deck-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 1.2rem; }
+    .slide-num { font-size: 0.82rem; font-family: var(--font-mono); color: var(--text-muted); }
   </style>
 </head>
 <body>
 
+  <!-- Top Header -->
   <header>
-    <div class="header-title">
-      <h1>🪐 N-Body Solar System HPC Simulation</h1>
-      <p>Group C_G8 &bull; Supervisor Oral Defense &amp; Live Demonstration Dashboard (Week 14)</p>
+    <div class="header-left">
+      <div class="logo-badge">CSE 402</div>
+      <div class="header-titles">
+        <h1>N-Body Solar System HPC Simulation — Group C_G8</h1>
+        <p>Supervisor Oral Defense &amp; Live Demonstration Hub &bull; Week 14 Evaluation</p>
+      </div>
     </div>
-    <div style="display: flex; gap: 0.6rem; align-items: center;">
-      <span class="badge badge-pass">✓ All Backends Verified (&lt; 1e-10)</span>
-      <span class="badge badge-accent">854+ Benchmark Runs</span>
+    <div class="header-badges">
+      <span class="status-pill pill-green">✓ M1 Verification Gate Passed (&lt; 10⁻¹⁰)</span>
+      <span class="status-pill pill-blue">1,274 Total Benchmark Runs</span>
     </div>
   </header>
 
-  <nav>
-    <button class="tab-btn active" onclick="showTab('tab-summary')">📑 1. Project Summary &amp; Math</button>
-    <button class="tab-btn" onclick="showTab('tab-architecture')">🏗️ 2. System Architecture &amp; Team</button>
-    <button class="tab-btn" onclick="showTab('tab-live-demo')">🚀 3. Live Simulation Demo</button>
-    <button class="tab-btn" onclick="showTab('tab-benchmarks')">📈 4. Comparative Benchmark Explorer</button>
-    <button class="tab-btn" onclick="showTab('tab-qa')">🎓 5. Supervisor Defense Q&amp;A Prep</button>
+  <!-- Main Navigation Tabs -->
+  <nav class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-slides')">📽️ 1. Defense Slides</button>
+    <button class="tab-btn" onclick="switchTab('tab-simulation')">🪐 2. Live Orbit Simulation (60 FPS)</button>
+    <button class="tab-btn" onclick="switchTab('tab-runner')">⚡ 3. Live Process Runner</button>
+    <button class="tab-btn" onclick="switchTab('tab-benchmarks')">📊 4. Interactive Benchmark Explorer</button>
+    <button class="tab-btn" onclick="switchTab('tab-architecture')">🏗️ 5. Architecture &amp; Contributions</button>
+    <button class="tab-btn" onclick="switchTab('tab-qa')">🎓 6. Supervisor Defense Q&amp;A</button>
   </nav>
 
   <main>
-    <!-- TAB 1: SUMMARY & MATH -->
-    <section id="tab-summary" class="tab-content active">
-      <div class="grid-2">
-        <div class="card">
-          <h2>Base Paper &amp; Problem Formulation</h2>
-          <p><strong>Base Research Paper:</strong> Tailin Zhu (2020), <em>N-body Simulations of the Solar System with CPU-based Parallel Methods</em>, School of Physics, University of Bristol.</p>
-          <p style="margin-top: 0.5rem;"><strong>The Numerical Task:</strong> Direct all-pairs gravitational integration of the Solar System (Sun, 8 planets, Moon) scaled up to tens of thousands of bodies using synthetic Main Asteroid Belt particles ($a \in [2.1, 3.3]\text{ AU}$).</p>
-          
-          <h3>Direct Gravitational Summation</h3>
-          <div style="background: rgba(0,0,0,0.3); padding: 0.8rem; border-radius: 6px; font-family: monospace; font-size: 0.95rem; margin: 0.5rem 0;">
-            a_p = ∑_{j ≠ p} G * m_j * (r_j - r_p) / (||r_j - r_p||² + ε²)^(3/2)
-          </div>
-          <p style="font-size: 0.85rem; color: var(--text-muted);">Units: Length in AU, Time in days, Mass in Solar Masses ($M_\odot$), $G = 2.9591220828559 \times 10^{-4}\text{ AU}^3 M_\odot^{-1}\text{ day}^{-2}$. Plummer softening $\epsilon = 0$ (point-mass Newtonian gravity).</p>
+    <!-- ===================================================================== -->
+    <!-- TAB 1: DEFENSE SLIDE DECK (KEYNOTE MODE)                               -->
+    <!-- ===================================================================== -->
+    <section id="tab-slides" class="tab-content active">
+      <div class="deck-container">
+        <!-- Slide 1 -->
+        <div class="deck-slide" id="slide-1">
+          <div>
+            <div style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Slide 1 &bull; Problem Formulation</div>
+            <h2 style="font-size: 1.6rem; color: #f8fafc; font-weight: 700; margin-bottom: 0.8rem;">Direct All-Pairs Gravitational N-Body Simulation</h2>
+            <p style="font-size: 0.95rem; margin-bottom: 1rem;"><strong>Base Research Reference:</strong> Tailin Zhu (2020), <em>N-body Simulations of the Solar System with CPU-based Parallel Methods</em>, School of Physics, University of Bristol.</p>
+            
+            <div class="math-callout">
+              $$\mathbf{a}_i = \sum_{j \neq i}^N G \cdot m_j \cdot \frac{\mathbf{r}_j - \mathbf{r}_i}{\left(\|\mathbf{r}_j - \mathbf{r}_i\|^2 + \epsilon^2\right)^{3/2}}$$
+            </div>
 
-          <h3>Relativistic Extension (1PN Perihelion Precession)</h3>
-          <p>Based on Tatekawa (2018), we incorporate the dominant 1st-order Post-Newtonian (1PN) General Relativity correction. This reproduces the historical textbook test of General Relativity:</p>
-          <ul style="padding-left: 1.2rem; font-size: 0.88rem; margin-top: 0.4rem; color: var(--text-muted);">
-            <li><strong>Measured Mercury Precession:</strong> <span style="color: var(--accent-green); font-weight: bold;">42.983 arcsec/century</span></li>
-            <li><strong>Analytic Einstein 1PN Prediction:</strong> <span style="color: #fff;">42.980 arcsec/century</span></li>
-            <li><strong>Newtonian Baseline:</strong> 0.009 arcsec/century (closed ellipse, ~0 drift)</li>
-          </ul>
+            <ul style="font-size: 0.9rem; line-height: 1.7; margin-top: 1rem;">
+              <li><strong>Physical System:</strong> Exact orbital dynamics of the Solar System (Sun, 8 major planets, Moon) scaled to tens of thousands of bodies with synthetic <strong>Main Asteroid Belt</strong> bodies ($a \in [2.1, 3.3]\text{ AU}$).</li>
+              <li><strong>Gaussian Astronomical Units:</strong> Length in $\text{AU}$, time in days, mass in Solar Masses ($M_\odot$), $G \approx 2.9591220828559 \times 10^{-4}\text{ AU}^3 M_\odot^{-1}\text{ day}^{-2}$.</li>
+              <li><strong>Computational Complexity:</strong> Exact $O(N^2)$ direct summation without tree approximations (Plummer softening $\epsilon = 0.0$ for point masses).</li>
+            </ul>
+          </div>
+          <div class="deck-nav">
+            <button onclick="prevSlide()" disabled>← Previous</button>
+            <span class="slide-num">Slide 1 of 5 (Press ← / → keys to navigate)</span>
+            <button class="btn-primary" onclick="nextSlide()">Next Slide →</button>
+          </div>
         </div>
 
-        <div class="card">
-          <h2>Velocity Verlet Symplectic Integrator</h2>
-          <p>Why did Tailin Zhu (2020) and our project select <strong>Second-Order Velocity Verlet</strong> instead of Runge-Kutta 4 (RK4) or Euler?</p>
+        <!-- Slide 2 -->
+        <div class="deck-slide" id="slide-2" style="display: none;">
+          <div>
+            <div style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Slide 2 &bull; Numerical Methods &amp; Relativity</div>
+            <h2 style="font-size: 1.6rem; color: #f8fafc; font-weight: 700; margin-bottom: 0.8rem;">Symplectic Integration &amp; General Relativity Precession</h2>
+            
+            <div class="grid-2" style="margin-top: 1rem; margin-bottom: 0.5rem;">
+              <div style="background: rgba(15, 23, 42, 0.6); padding: 1rem; border-radius: 6px; border: 1px solid var(--border);">
+                <h3 style="margin-top: 0; color: #93c5fd;">Symplectic Velocity Verlet</h3>
+                $$\mathbf{r}_{k+1} = \mathbf{r}_k + \mathbf{v}_k \Delta t + \frac{1}{2}\mathbf{a}_k \Delta t^2$$
+                $$\mathbf{v}_{k+1} = \mathbf{v}_k + \frac{1}{2}(\mathbf{a}_k + \mathbf{a}_{k+1})\Delta t$$
+                <p style="font-size: 0.82rem; margin-top: 0.5rem;">Preserves phase-space volume (Liouville's theorem). Bounded energy oscillations ($|\Delta E / E_0| < 10^{-7}$) with only <strong>1 force evaluation per step</strong> ($4\times$ faster than RK4).</p>
+              </div>
+
+              <div style="background: rgba(15, 23, 42, 0.6); padding: 1rem; border-radius: 6px; border: 1px solid var(--border);">
+                <h3 style="margin-top: 0; color: #93c5fd;">1PN Post-Newtonian GR Correction</h3>
+                $$\Delta \mathbf{a}_{1\text{PN}} = \frac{G M_\odot}{c^2 r^3}\left[\left(\frac{4GM_\odot}{r} - v^2\right)\mathbf{r} + 4(\mathbf{r}\cdot\mathbf{v})\mathbf{v}\right]$$
+                <p style="font-size: 0.82rem; margin-top: 0.5rem;">Reproduces Mercury's anomalous perihelion precession: Analytic Einsteinian $= 42.980''/\text{century}$; our simulation measures <strong style="color: var(--accent-green);">42.983''/century</strong> ($0.007\%$ error).</p>
+              </div>
+            </div>
+          </div>
+          <div class="deck-nav">
+            <button onclick="prevSlide()">← Previous</button>
+            <span class="slide-num">Slide 2 of 5</span>
+            <button class="btn-primary" onclick="nextSlide()">Next Slide →</button>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="deck-slide" id="slide-3" style="display: none;">
+          <div>
+            <div style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Slide 3 &bull; Architecture &amp; Group Allocation</div>
+            <h2 style="font-size: 1.6rem; color: #f8fafc; font-weight: 700; margin-bottom: 0.8rem;">Heterogeneous Paradigms &amp; Contribution Breakdown</h2>
+            
+            <p style="font-size: 0.9rem; margin-bottom: 1rem;">Unified under standardized <strong>Contract v1</strong> (`common/CONTRACT.md`) with automated M1 verification gate ($\text{error} < 10^{-10}$):</p>
+            
+            <div class="grid-2">
+              <div style="background: rgba(15, 23, 42, 0.6); padding: 0.9rem; border-radius: 6px; border: 1px solid var(--border);">
+                <div style="font-weight: 600; color: #f8fafc;">Siam &bull; Shared-Memory CPU OpenMP</div>
+                <div style="font-size: 0.8rem; color: var(--accent); font-family: var(--font-mono);">Target: Intel Core i5-1340P (4P + 8E cores, 16T)</div>
+                <p style="font-size: 0.82rem; margin-top: 0.3rem;">Contract v1 spec, C++ OpenMP engine with 4 variants (`static`, `dynamic`, `simd`, `newton3`), 346 benchmark runs.</p>
+              </div>
+
+              <div style="background: rgba(15, 23, 42, 0.6); padding: 0.9rem; border-radius: 6px; border: 1px solid var(--border);">
+                <div style="font-weight: 600; color: #f8fafc;">Mansib &bull; Distributed-Memory Multi-Process MPI</div>
+                <div style="font-size: 0.8rem; color: var(--accent-amber); font-family: var(--font-mono);">Target: Apple M4 MacBook Air (10-Core ARM)</div>
+                <p style="font-size: 0.82rem; margin-top: 0.3rem;">Python MPI backend (`mpi4py`), collective `allgather` ring vs `master-worker` dispatcher, Amdahl serial fraction analysis.</p>
+              </div>
+
+              <div style="background: rgba(15, 23, 42, 0.6); padding: 0.9rem; border-radius: 6px; border: 1px solid var(--border);">
+                <div style="font-weight: 600; color: #f8fafc;">Shadhin &bull; Massively Parallel GPU Acceleration</div>
+                <div style="font-size: 0.8rem; color: var(--accent-green); font-family: var(--font-mono);">Target: NVIDIA GeForce RTX 5090 (Blackwell SM 12.0)</div>
+                <p style="font-size: 0.82rem; margin-top: 0.3rem;">CUDA kernels (`naive`, `tiled`, `unroll-tiled`), 256-thread shared memory caching, FP32/FP64 ratio analysis, PCIe bus control.</p>
+              </div>
+
+              <div style="background: rgba(15, 23, 42, 0.6); padding: 0.9rem; border-radius: 6px; border: 1px solid var(--border);">
+                <div style="font-weight: 600; color: #f8fafc;">Fahad &bull; Final Consolidation &amp; Evaluation Platform</div>
+                <div style="font-size: 0.8rem; color: var(--accent-purple); font-family: var(--font-mono);">Target: AMD Ryzen 5 5600G (6C/12T Zen 3)</div>
+                <p style="font-size: 0.82rem; margin-top: 0.3rem;">Resolved divergent branch conflicts, Windows MS-MPI environment, dual-anchoring methodology, master benchmark compilation, defense platform.</p>
+              </div>
+            </div>
+          </div>
+          <div class="deck-nav">
+            <button onclick="prevSlide()">← Previous</button>
+            <span class="slide-num">Slide 3 of 5</span>
+            <button class="btn-primary" onclick="nextSlide()">Next Slide →</button>
+          </div>
+        </div>
+
+        <!-- Slide 4 -->
+        <div class="deck-slide" id="slide-4" style="display: none;">
+          <div>
+            <div style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Slide 4 &bull; Scientific Benchmark Insights</div>
+            <h2 style="font-size: 1.6rem; color: #f8fafc; font-weight: 700; margin-bottom: 0.8rem;">Key Empirical Findings Across 1,274 Runs</h2>
+            
+            <ul style="font-size: 0.9rem; line-height: 1.7;">
+              <li><strong>Zhu (2020) Fig. 4 Replication (Small-$N$ Barrier Latency):</strong> At $N=100$, 1 thread takes $0.035\text{ ms}$, while 12 threads take $0.070\text{ ms}$ ($2\times$ slower). Thread creation and barrier synchronization overhead exceed the arithmetic payload; multi-threading must only be engaged for $N \ge 500$.</li>
+              <li><strong>Intel Raptor Lake vs AMD Zen 3 Work Scheduling:</strong> On Intel i5-1340P (asymmetric 4P+8E cores), `dynamic` schedule gives a <strong>$1.45\times$ speedup</strong> over `static` by balancing P-cores. On AMD Ryzen 5600G (6 symmetric Zen 3 cores), `static` performs identically with zero chunk-scheduling overhead.</li>
+              <li><strong>Newton's 3rd Law 50% Operation Cut:</strong> Enforcing $\mathbf{F}_{ij} = -\mathbf{F}_{ji}$ slashes pairwise calculations from $N(N-1)$ to $\frac{N(N-1)}{2}$, accelerating Intel i5 by $1.8\times$ ($24.48\text{ ms}$ at $N=5,000$).</li>
+              <li><strong>RTX 5090 Shared Memory Caching &amp; FP32 ALU Gain:</strong> Shared memory tiling ($B=256$) reduces global VRAM memory traffic by $256\times$. Because consumer GPUs allocate fewer FP64 ALUs, single-precision (`tiled-f32`) runs <strong>$28\times$ faster</strong> than FP64 ($0.556\text{ ms/step}$ at $N=10,000$, $>600\times$ faster than serial CPU).</li>
+            </ul>
+          </div>
+          <div class="deck-nav">
+            <button onclick="prevSlide()">← Previous</button>
+            <span class="slide-num">Slide 4 of 5</span>
+            <button class="btn-primary" onclick="nextSlide()">Next Slide →</button>
+          </div>
+        </div>
+
+        <!-- Slide 5 -->
+        <div class="deck-slide" id="slide-5" style="display: none;">
+          <div>
+            <div style="font-size: 0.78rem; font-family: var(--font-mono); color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; font-weight: 600;">Slide 5 &bull; Live Evaluation &amp; Demonstration Hub</div>
+            <h2 style="font-size: 1.6rem; color: #f8fafc; font-weight: 700; margin-bottom: 0.8rem;">Live Demonstration &amp; Interactive Defense Verification</h2>
+            
+            <p style="font-size: 0.95rem; margin-bottom: 1.2rem;">Ready for immediate hands-on walkthrough during individual supervisor questioning:</p>
+
+            <div class="grid-3">
+              <div style="background: rgba(15, 23, 42, 0.6); padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border);">
+                <h3 style="color: #93c5fd; margin-top: 0;">🪐 Live Orbit Simulation (Tab 2)</h3>
+                <p style="font-size: 0.82rem;">60 FPS Canvas with zoom/pan and fading particle trails. 6 playable physical scenarios including the <strong>Verlet vs Euler duel</strong> and <strong>Figure-8 choreography</strong>.</p>
+                <button class="btn-primary" style="margin-top: 0.8rem;" onclick="switchTab('tab-simulation')">Open Simulation →</button>
+              </div>
+
+              <div style="background: rgba(15, 23, 42, 0.6); padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border);">
+                <h3 style="color: #93c5fd; margin-top: 0;">⚡ Live Subprocess Runner (Tab 3)</h3>
+                <p style="font-size: 0.82rem;">Spawns compiled C++ OpenMP and MS-MPI child processes live on this laptop, streaming real console stdout and verifying Contract v1 in real time.</p>
+                <button class="btn-primary" style="margin-top: 0.8rem;" onclick="switchTab('tab-runner')">Open Runner →</button>
+              </div>
+
+              <div style="background: rgba(15, 23, 42, 0.6); padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border);">
+                <h3 style="color: #93c5fd; margin-top: 0;">📊 Benchmark Explorer (Tab 4)</h3>
+                <p style="font-size: 0.82rem;">Interactive Chart.js graphs supporting instant switching between <strong>Native Host Anchor</strong> and <strong>Universal Desktop CPU Anchor</strong> across 1,274 runs.</p>
+                <button class="btn-primary" style="margin-top: 0.8rem;" onclick="switchTab('tab-benchmarks')">Open Explorer →</button>
+              </div>
+            </div>
+          </div>
+          <div class="deck-nav">
+            <button onclick="prevSlide()">← Previous</button>
+            <span class="slide-num">Slide 5 of 5</span>
+            <button disabled>End of Slide Deck</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 2: LIVE 60 FPS ORBIT SIMULATION (CANVAS)                          -->
+    <!-- ===================================================================== -->
+    <section id="tab-simulation" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>🪐 Live Orbital Dynamics Simulation Engine</h2>
+          <span class="status-pill pill-blue">Symplectic Velocity Verlet Integrator</span>
+        </div>
+
+        <!-- Controls Toolbar -->
+        <div class="controls-panel">
+          <button id="btnPlayPause" class="btn-primary" onclick="toggleSim()">⏸ Pause</button>
+          <button onclick="resetSim()">↺ Reset Simulation</button>
           
-          <div style="margin: 0.8rem 0; padding: 0.8rem; background: rgba(88, 166, 255, 0.05); border-left: 3px solid var(--accent); border-radius: 4px;">
-            <p><strong>1. Drift:</strong> $r_{k+1} = r_k + v_k \Delta t + \frac{1}{2} a_k \Delta t^2$</p>
-            <p><strong>2. Force Evaluation:</strong> Recompute $a_{k+1} = a(r_{k+1})$</p>
-            <p><strong>3. Kick:</strong> $v_{k+1} = v_k + \frac{1}{2} (a_k + a_{k+1}) \Delta t$</p>
+          <div class="control-group">
+            <label>Scenario:</label>
+            <select id="selScenario" onchange="loadScenario(this.value)">
+              <option value="inner" selected>Inner Solar System (Sun through Mars)</option>
+              <option value="full">Full Solar System (Sun through Neptune + Moon)</option>
+              <option value="duel">⚖️ Duel: Symplectic Verlet vs Naive Euler (Earth Spiral)</option>
+              <option value="figure8">♾️ Figure-8 Three-Body Choreography</option>
+              <option value="asteroids">☄️ Jupiter &amp; Main Asteroid Belt (300 Bodies)</option>
+              <option value="precession">🪐 Mercury 1PN General Relativity Precession</option>
+            </select>
           </div>
 
-          <h3>Why Velocity Verlet is Mathematically Superior</h3>
-          <table>
+          <div class="control-group">
+            <label>Speed (dt):</label>
+            <select id="selSpeed" onchange="updateSpeed(this.value)">
+              <option value="0.2">0.2× (Slow, High Precision)</option>
+              <option value="1.0" selected>1.0× (Real-time Standard)</option>
+              <option value="3.0">3.0× (Fast)</option>
+              <option value="10.0">10.0× (Orbital Sweep)</option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <label>Trails:</label>
+            <select id="selTrails" onchange="simTrailsLength = parseInt(this.value)">
+              <option value="60">Short</option>
+              <option value="180" selected>Medium</option>
+              <option value="500">Long</option>
+              <option value="99999">Infinite</option>
+            </select>
+          </div>
+
+          <button onclick="resetCamera()">⊙ Center View</button>
+        </div>
+
+        <!-- Simulation Viewport -->
+        <div class="canvas-container" id="canvasContainer">
+          <canvas id="orbitCanvas" width="1200" height="500"></canvas>
+          <div class="canvas-overlay" id="simTelemetry">
+            <div><strong id="dispScenarioTitle">Inner Solar System</strong></div>
+            <div id="dispSimTime">Simulated Time: 0.0 days</div>
+            <div id="dispEnergy">Energy Drift |ΔE/E₀|: 0.000e-00 (Symplectic Bounded)</div>
+            <div id="dispBodyCount">Active Bodies: 5</div>
+          </div>
+          <div class="canvas-help">Drag to Pan &bull; Scroll to Zoom &bull; 60 FPS</div>
+        </div>
+
+        <div style="margin-top: 1rem; font-size: 0.83rem; color: var(--text-muted); display: flex; justify-content: space-between;">
+          <span>Integrator: <strong>Velocity Verlet (Drift-Kick-Drift)</strong> &bull; Symplectic 2nd-order map</span>
+          <span>Hamiltonian Phase Space: <strong>Preserved (Liouville's Theorem)</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 3: LIVE SUBPROCESS RUNNER (API TO REAL C++/MPI PROCESSES)          -->
+    <!-- ===================================================================== -->
+    <section id="tab-runner" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>⚡ Live Subprocess Process Runner</h2>
+          <span class="status-pill pill-green">Local AMD Ryzen 5 5600G Execution</span>
+        </div>
+
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.2rem;">
+          Trigger live compiled binary execution directly during supervisor questioning. The local Python server executes the process, measures exact loop execution time, and validates Contract v1 compliance.
+        </p>
+
+        <div class="grid-2">
+          <!-- Controls Panel -->
+          <div style="background: var(--surface); padding: 1.2rem; border-radius: 6px; border: 1px solid var(--border);">
+            <h3 style="margin-top: 0; color: #f8fafc;">Execution Parameters</h3>
+            
+            <div style="margin-bottom: 0.8rem;">
+              <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Target Backend:</label>
+              <select id="runBackend" style="width: 100%;" onchange="updateVariantOptions()">
+                <option value="openmp" selected>C++ OpenMP (nbody_omp.exe)</option>
+                <option value="mpi">MS-MPI Python (nbody_mpi.py)</option>
+                <option value="serial">C++ Standalone Serial (nbody_serial.exe)</option>
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 0.8rem;">
+              <div>
+                <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Bodies (N):</label>
+                <select id="runN" style="width: 100%;">
+                  <option value="100">N = 100 (Instant check)</option>
+                  <option value="500">N = 500 (Zhu threshold)</option>
+                  <option value="1000" selected>N = 1,000 (Standard benchmark)</option>
+                  <option value="2000">N = 2,000 (Multi-core scaling)</option>
+                  <option value="5000">N = 5,000 (HPC stress test)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Time Steps:</label>
+                <select id="runSteps" style="width: 100%;">
+                  <option value="20">20 steps (Quick)</option>
+                  <option value="50">50 steps</option>
+                  <option value="100" selected>100 steps (Standard)</option>
+                  <option value="200">200 steps</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.2rem;">
+              <div>
+                <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Threads / Ranks (P):</label>
+                <select id="runWorkers" style="width: 100%;">
+                  <option value="1">1 worker (Serial baseline)</option>
+                  <option value="2">2 workers</option>
+                  <option value="4">4 workers</option>
+                  <option value="6" selected>6 workers (6 Physical Cores)</option>
+                  <option value="8">8 workers</option>
+                  <option value="12">12 workers (12 SMT Threads)</option>
+                </select>
+              </div>
+
+              <div>
+                <label style="font-size: 0.82rem; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">Algorithmic Variant:</label>
+                <select id="runVariant" style="width: 100%;">
+                  <option value="static" selected>static (Equal work sharing)</option>
+                  <option value="dynamic">dynamic (Work chunk balance)</option>
+                  <option value="simd">simd (AVX2 vectorization)</option>
+                  <option value="newton3">newton3 (50% FLOP reduction)</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="btnExecuteRun" class="btn-primary" style="width: 100%; padding: 0.65rem;" onclick="triggerLiveRun()">
+              ⚡ Execute Live Process on Ryzen 5600G
+            </button>
+          </div>
+
+          <!-- Console & Output Panel -->
+          <div style="background: var(--surface); padding: 1.2rem; border-radius: 6px; border: 1px solid var(--border); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <h3 style="margin: 0; color: #f8fafc;">Live Process Output (stdout)</h3>
+              <span id="runBadge" class="status-pill pill-blue">Idle</span>
+            </div>
+
+            <div id="terminalOutput" class="terminal-box" style="flex: 1;">
+$ Ready to spawn live child process.
+Select parameters and click "Execute Live Process".
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.8rem;">
+              <div style="background: rgba(15, 23, 42, 0.7); padding: 0.6rem 0.8rem; border-radius: 4px; border: 1px solid var(--border);">
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Measured Latency</div>
+                <div id="readoutLatency" style="font-size: 1.1rem; font-weight: 700; color: #f8fafc; font-family: var(--font-mono);">—</div>
+              </div>
+              <div style="background: rgba(15, 23, 42, 0.7); padding: 0.6rem 0.8rem; border-radius: 4px; border: 1px solid var(--border);">
+                <div style="font-size: 0.72rem; color: var(--text-muted);">Execution Time</div>
+                <div id="readoutElapsed" style="font-size: 1.1rem; font-weight: 700; color: var(--accent-green); font-family: var(--font-mono);">—</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 4: INTERACTIVE BENCHMARK EXPLORER                                 -->
+    <!-- ===================================================================== -->
+    <section id="tab-benchmarks" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>📊 Interactive Cross-Paradigm Benchmark Explorer</h2>
+          <div class="control-group">
+            <label>Grounding Baseline Anchor:</label>
+            <select id="selAnchor" onchange="renderCharts()">
+              <option value="ryzen" selected>AMD Ryzen 5 5600G C++ Scalar (Universal Anchor)</option>
+              <option value="i5">Intel Core i5-1340P C++ Scalar</option>
+              <option value="native">Native Host Relative (Single-Core on same chip)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="metric-grid">
+          <div class="metric-tile">
+            <div class="label">Total Runs Ingested</div>
+            <div class="value">1,274</div>
+            <div class="desc">Across 4 distinct microarchitectures</div>
+          </div>
+          <div class="metric-tile">
+            <div class="label">Max Measured CPU Speedup</div>
+            <div class="value">14.1×</div>
+            <div class="desc">OpenMP 16T newton3 vs i5 Serial (N=5000)</div>
+          </div>
+          <div class="metric-tile">
+            <div class="label">Max GPU Acceleration</div>
+            <div class="value">609.4×</div>
+            <div class="desc">RTX 5090 tiled-f32 vs Ryzen Serial (N=10k)</div>
+          </div>
+          <div class="metric-tile">
+            <div class="label">Zhu (2020) Small-N Latency</div>
+            <div class="value">2.0× Slower</div>
+            <div class="desc">OpenMP 12T vs 1T at N=100 (Barrier cost)</div>
+          </div>
+        </div>
+
+        <!-- Main Chart: Execution Time vs N (Log-Log) -->
+        <div style="background: var(--surface); padding: 1rem; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <h3 style="margin: 0; color: #f8fafc;">Execution Time vs. Problem Size N (Log-Log Scale)</h3>
+            <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Click legend badges to toggle series</span>
+          </div>
+          <div style="height: 380px;">
+            <canvas id="chartScaling"></canvas>
+          </div>
+        </div>
+
+        <!-- Dual Chart Row -->
+        <div class="grid-2">
+          <!-- Chart 2: OpenMP Thread Scaling -->
+          <div style="background: var(--surface); padding: 1rem; border-radius: 6px; border: 1px solid var(--border);">
+            <h3 style="margin-top: 0; color: #f8fafc;">OpenMP Strong Scaling (Intel Raptor Lake vs. AMD Zen 3)</h3>
+            <div style="height: 280px;">
+              <canvas id="chartOpenMP"></canvas>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;">Intel i5-1340P has 4 P-cores + 8 E-cores; dynamic scheduling balances asymmetric cores (1.45× faster than static). AMD Ryzen 5600G has 6 symmetric Zen 3 cores with linear scaling up to 6 cores.</p>
+          </div>
+
+          <!-- Chart 3: MPI Scaling & Communication Share -->
+          <div style="background: var(--surface); padding: 1rem; border-radius: 6px; border: 1px solid var(--border);">
+            <h3 style="margin-top: 0; color: #f8fafc;">MPI Scaling &amp; Communication Overhead (Apple M4)</h3>
+            <div style="height: 280px;">
+              <canvas id="chartMPI"></canvas>
+            </div>
+            <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.5rem;">At $N=10,000$, position exchange communication is only 2.1% of loop time ($3.29\times$ speedup at 8 ranks). At $N=100$, communication overhead reaches 66%, degrading scaling.</p>
+          </div>
+        </div>
+
+        <!-- Master Data Table -->
+        <div style="margin-top: 1.5rem;">
+          <h3 style="color: #f8fafc;">Master Cross-Paradigm Performance Table (Measured Medians)</h3>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>N Bodies</th>
+                  <th>AMD Ryzen Serial</th>
+                  <th>Intel i5 Serial</th>
+                  <th>OpenMP 12T (Ryzen)</th>
+                  <th>OpenMP 16T (newton3)</th>
+                  <th>MPI 10P (Apple M4)</th>
+                  <th>RTX 5090 (Tiled FP64)</th>
+                  <th>RTX 5090 (Tiled FP32)</th>
+                  <th>Max Speedup</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="num"><strong>100</strong></td>
+                  <td class="num">0.036 ms</td>
+                  <td class="num">0.147 ms</td>
+                  <td class="num">0.138 ms</td>
+                  <td class="num">1.195 ms</td>
+                  <td class="num">0.091 ms</td>
+                  <td class="num">0.094 ms</td>
+                  <td class="num" style="color: var(--accent-green); font-weight: 600;">0.012 ms</td>
+                  <td class="num"><strong>2.9×</strong></td>
+                </tr>
+                <tr>
+                  <td class="num"><strong>500</strong></td>
+                  <td class="num">0.850 ms</td>
+                  <td class="num">3.818 ms</td>
+                  <td class="num">0.328 ms</td>
+                  <td class="num">—</td>
+                  <td class="num">1.308 ms</td>
+                  <td class="num">0.435 ms</td>
+                  <td class="num" style="color: var(--accent-green); font-weight: 600;">0.034 ms</td>
+                  <td class="num"><strong>24.7×</strong></td>
+                </tr>
+                <tr>
+                  <td class="num"><strong>1,000</strong></td>
+                  <td class="num">3.491 ms</td>
+                  <td class="num">15.862 ms</td>
+                  <td class="num">1.737 ms</td>
+                  <td class="num">3.390 ms</td>
+                  <td class="num">4.328 ms</td>
+                  <td class="num">0.865 ms</td>
+                  <td class="num" style="color: var(--accent-green); font-weight: 600;">0.063 ms</td>
+                  <td class="num"><strong>55.3×</strong></td>
+                </tr>
+                <tr>
+                  <td class="num"><strong>2,000</strong></td>
+                  <td class="num">13.899 ms</td>
+                  <td class="num">59.999 ms</td>
+                  <td class="num">3.178 ms</td>
+                  <td class="num">—</td>
+                  <td class="num">17.466 ms</td>
+                  <td class="num">1.725 ms</td>
+                  <td class="num" style="color: var(--accent-green); font-weight: 600;">0.118 ms</td>
+                  <td class="num"><strong>117.8×</strong></td>
+                </tr>
+                <tr>
+                  <td class="num"><strong>5,000</strong></td>
+                  <td class="num">85.669 ms</td>
+                  <td class="num">371.009 ms</td>
+                  <td class="num">18.406 ms</td>
+                  <td class="num">26.326 ms</td>
+                  <td class="num">127.661 ms</td>
+                  <td class="num">4.306 ms</td>
+                  <td class="num" style="color: var(--accent-green); font-weight: 600;">0.281 ms</td>
+                  <td class="num"><strong>304.4×</strong></td>
+                </tr>
+                <tr>
+                  <td class="num"><strong>10,000</strong></td>
+                  <td class="num">338.946 ms</td>
+                  <td class="num">1,500.005 ms</td>
+                  <td class="num">66.783 ms</td>
+                  <td class="num">—</td>
+                  <td class="num">483.054 ms</td>
+                  <td class="num">34.333 ms</td>
+                  <td class="num" style="color: var(--accent-green); font-weight: 600;">0.556 ms</td>
+                  <td class="num"><strong>609.4×</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 5: ARCHITECTURE & GROUP ROLES                                     -->
+    <!-- ===================================================================== -->
+    <section id="tab-architecture" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>High-Performance System Architecture</h2>
+          <span class="status-pill pill-blue">Contract v1 Architecture</span>
+        </div>
+
+        <div class="grid-3">
+          <div style="background: var(--surface); padding: 1.1rem; border-radius: 6px; border: 1px solid var(--border);">
+            <h3 style="margin-top: 0; color: #93c5fd;">Structure-of-Arrays (SoA)</h3>
+            <p style="font-size: 0.82rem; margin-top: 0.4rem;">Particles are stored in separate contiguous arrays (`x`, `y`, `z`, `m`). This allows CPU and GPU memory controllers to stream 64-byte cache lines directly into vector registers (AVX2 / SIMD) with zero wasted bandwidth.</p>
+          </div>
+
+          <div style="background: var(--surface); padding: 1.1rem; border-radius: 6px; border: 1px solid var(--border);">
+            <h3 style="margin-top: 0; color: #93c5fd;">Zero Dynamic Allocations</h3>
+            <p style="font-size: 0.82rem; margin-top: 0.4rem;">All buffers (`pos`, `vel`, `acc`, `temp`) are allocated once during initialization. In the time-stepping loop, buffers are updated in-place or swapped via $O(1)$ pointer swaps to eliminate OS memory manager stalls.</p>
+          </div>
+
+          <div style="background: var(--surface); padding: 1.1rem; border-radius: 6px; border: 1px solid var(--border);">
+            <h3 style="margin-top: 0; color: #93c5fd;">Strict Contract v1 I/O</h3>
+            <p style="font-size: 0.82rem; margin-top: 0.4rem;">All backends adhere to the standardized CLI: `--input`, `--steps`, `--dt`, `--workers`, `--variant`, and `--output-json`, enabling unified verification against golden reference states.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <h3 style="color: #f8fafc; margin-bottom: 0.6rem;">Individual Group Contribution Breakdown</h3>
+          <table class="data-table">
             <thead>
-              <tr><th>Property</th><th>Velocity Verlet</th><th>Classical RK4</th></tr>
+              <tr>
+                <th>Member</th>
+                <th>Assigned Focus</th>
+                <th>Target Hardware</th>
+                <th>Key Deliverables</th>
+              </tr>
             </thead>
             <tbody>
-              <tr><td><strong>Symplectic?</strong></td><td><strong style="color: var(--accent-green);">YES</strong> (Preserves phase-space 2-form)</td><td><span style="color: var(--accent-red);">NO</span> (Non-symplectic)</td></tr>
-              <tr><td><strong>Long-term Energy Drift</strong></td><td><strong>Bounded oscillation</strong> (Zero secular drift)</td><td>Accumulates secular error over orbits</td></tr>
-              <tr><td><strong>Force Calls per Step</strong></td><td><strong style="color: var(--accent-green);">1 evaluation</strong></td><td><span style="color: var(--accent-orange);">4 evaluations</span> ($4\times$ compute cost)</td></tr>
-              <tr><td><strong>Time-reversibility</strong></td><td>Symmetric under $t \to -t$</td><td>Asymmetric</td></tr>
+              <tr>
+                <td><strong>Siam</strong></td>
+                <td>Shared-Memory CPU OpenMP</td>
+                <td>Intel Core i5-1340P (4P+8E cores)</td>
+                <td>OpenMP engine, 4 variants (`static`, `dynamic`, `simd`, `newton3`), Amdahl scaling curves.</td>
+              </tr>
+              <tr>
+                <td><strong>Mansib</strong></td>
+                <td>Distributed-Memory Multi-Process MPI</td>
+                <td>Apple M4 Silicon (10-Core ARM)</td>
+                <td>Python MPI backend (`mpi4py`), collective `allgather` ring vs `master-worker` dispatcher.</td>
+              </tr>
+              <tr>
+                <td><strong>Shadhin</strong></td>
+                <td>Massively Parallel GPU Acceleration</td>
+                <td>NVIDIA GeForce RTX 5090</td>
+                <td>CUDA engine, 256-thread shared memory tiling, FP32/FP64 ALU precision analysis.</td>
+              </tr>
+              <tr>
+                <td><strong>Fahad</strong></td>
+                <td>Final Consolidation &amp; Evaluation Platform</td>
+                <td>AMD Ryzen 5 5600G (6C/12T)</td>
+                <td>Merged divergent branches under Contract v1, MS-MPI setup, dual-anchoring methodology, master benchmark report, and oral defense platform.</td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- TAB 2: ARCHITECTURE & TEAM -->
-    <section id="tab-architecture" class="tab-content">
-      <div class="card" style="margin-bottom: 1.5rem;">
-        <h2>System Architecture &amp; High-Performance Design</h2>
-        <div class="grid-3" style="margin-top: 1rem;">
-          <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 6px; border: 1px solid var(--surface-border);">
-            <h3 style="color: #fff; margin-top: 0;">1. Structure-of-Arrays (SoA)</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Instead of Body objects (`struct { x,y,z,m }`), particles are stored in contiguous parallel buffers (`vector<double> x, y, z, m`). Allows CPU/GPU hardware prefetchers to stream 64-byte cache lines directly into AVX2/SIMD registers with 0% wasted memory bandwidth.</p>
-          </div>
-          <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 6px; border: 1px solid var(--surface-border);">
-            <h3 style="color: #fff; margin-top: 0;">2. Zero Allocation in Inner Loop</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Dynamic memory allocation (`malloc`, `new`, `std::vector::resize`) inside the simulation loop causes severe kernel thrashing. Buffer pointers (`ax`, `bx`) are allocated once during setup and swapped via $\mathcal{O}(1)$ pointer swaps at each time step.</p>
-          </div>
-          <div style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 6px; border: 1px solid var(--surface-border);">
-            <h3 style="color: #fff; margin-top: 0;">3. Shared Contract v1 I/O</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.4rem;">Strict standardization (`common/CONTRACT.md`) ensures all backends accept identical CLI parameters (`--input`, `--steps`, `--dt`, `--workers`, `--variant`) and output identical schema v1 telemetry JSONs, enabling automated verification via `bench/check_result.py`.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h2>Group C_G8 Individual Contribution Breakdown</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Member</th>
-              <th>Assigned Focus</th>
-              <th>Target Architecture</th>
-              <th>Specific Core Deliverables</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>Fahad</strong><br><span style="font-size: 0.75rem; color: var(--text-muted);">Integration Lead</span></td>
-              <td>Integration &amp; Validation Lead, Serial Baseline &amp; UI</td>
-              <td>AMD Ryzen 5 5600G (6C/12T)</td>
-              <td>Unified repository integration, standalone C++ scalar baseline (`backends/serial`), MS-MPI setup, cross-architecture benchmarking, supervisor defense dashboard.</td>
-            </tr>
-            <tr>
-              <td><strong>Siam</strong></td>
-              <td>Shared-Memory CPU Multi-Threading</td>
-              <td>Intel Core i5-1340P (4P+8E cores)</td>
-              <td>Contract v1 specification, OpenMP engine with 4 variants (`static`, `dynamic` P/E-core balancer, `simd` AVX2 reduction, `newton3` 50% FLOP cut), 346 benchmark runs.</td>
-            </tr>
-            <tr>
-              <td><strong>Mansib</strong></td>
-              <td>Distributed-Memory Multi-Process</td>
-              <td>Apple M4 MacBook Air (10-Core ARM)</td>
-              <td>MPI backend (`mpi4py` + Open MPI), `allgather` ring exchange vs `master-worker` centralized dispatcher, automated local sweep runner, Amdahl serial fraction report.</td>
-            </tr>
-            <tr>
-              <td><strong>Shadhin</strong></td>
-              <td>Massively Parallel GPU Acceleration</td>
-              <td>NVIDIA GeForce RTX 5090 (SM 12.0)</td>
-              <td>CUDA engine (`nbody_cuda.cu`) with 256-thread shared memory tiling, FP64 vs FP32 precision analysis, PCIe bus copy bottleneck (`copystep`), Ubuntu automation suite.</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- TAB 3: LIVE SIMULATION DEMO -->
-    <section id="tab-live-demo" class="tab-content">
-      <div class="card" style="margin-bottom: 1.5rem;">
-        <h2>Live Orbit Simulation Demo (Velocity Verlet Canvas)</h2>
-        <div class="controls-bar">
-          <button id="btnPlayPause" class="btn-primary" onclick="toggleSim()">▶ Pause</button>
-          <button onclick="resetSim()">↺ Reset to J2000</button>
-          <div class="ctrl-group">
-            <label>Time Step (dt):</label>
-            <select id="selDt" onchange="updateSimDt()">
-              <option value="0.05">0.05 days (High accuracy)</option>
-              <option value="0.1" selected>0.10 days (Standard)</option>
-              <option value="0.5">0.50 days (Fast)</option>
-              <option value="1.0">1.00 days (Coarse)</option>
-            </select>
-          </div>
-          <div class="ctrl-group">
-            <label>Scenario:</label>
-            <select id="selScenario" onchange="changeScenario()">
-              <option value="full">Full Solar System (Sun + 8 Planets + Moon)</option>
-              <option value="inner">Inner Planets (Close-up View)</option>
-            </select>
-          </div>
-        </div>
-
-        <canvas id="orbitCanvas" width="1200" height="420"></canvas>
-        <div class="sim-readout">
-          <span id="readoutTime">Simulated Elapsed Time: 0.0 days</span>
-          <span id="readoutEnergy">Energy Conservation Drift: +0.0000% (Bounded)</span>
-          <span>Integrator: Symplectic Velocity Verlet</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: BENCHMARK EXPLORER -->
-    <section id="tab-benchmarks" class="tab-content">
-      <div class="card" style="margin-bottom: 1.5rem;">
-        <h2>Interactive Cross-Paradigm Benchmark Explorer</h2>
-        <div class="controls-bar">
-          <div class="ctrl-group">
-            <label><strong>Grounding Baseline Anchor:</strong></label>
-            <select id="selAnchor" onchange="refreshCharts()">
-              <option value="ryzen" selected>AMD Ryzen 5 5600G C++ Scalar (Universal Anchor)</option>
-              <option value="i5">Intel Core i5-1340P C++ Scalar</option>
-              <option value="native">Native Host Relative (Chip's own serial baseline)</option>
-            </select>
-          </div>
-          <div class="ctrl-group">
-            <label>Metric:</label>
-            <select id="selMetric" onchange="refreshCharts()">
-              <option value="time" selected>Execution Time (ms / step - Log Scale)</option>
-              <option value="speedup">Speed-Up Factor (Relative to Anchor)</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="height: 480px; position: relative;">
-          <canvas id="chartComparison"></canvas>
-        </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="card">
-          <h2>OpenMP Scaling: AMD Zen 3 vs. Intel Raptor Lake</h2>
-          <div style="height: 320px;">
-            <canvas id="chartOpenMP"></canvas>
-          </div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.6rem;">Intel Core i5-1340P has 4 fast P-cores and 8 slower E-cores, making dynamic scheduling 1.45× faster. AMD Ryzen 5 5600G has 6 identical P-cores showing near-linear scaling up to 6 threads.</p>
-        </div>
-
-        <div class="card">
-          <h2>MPI Process Scaling &amp; Comm Share (Apple M4)</h2>
-          <div style="height: 320px;">
-            <canvas id="chartMPI"></canvas>
-          </div>
-          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.6rem;">At $N=10,000$, communication overhead consumes only 2.1% of loop time, enabling $3.29\times$ speedup across 8 ranks. At $N=100$, communication overhead reaches 66%, degrading scaling.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 5: SUPERVISOR DEFENSE CHEAT SHEET -->
+    <!-- ===================================================================== -->
+    <!-- TAB 6: SUPERVISOR DEFENSE Q&A PREP                                    -->
+    <!-- ===================================================================== -->
     <section id="tab-qa" class="tab-content">
       <div class="card">
-        <h2>Supervisor Oral Defense Q&amp;A Prep &amp; Technical Cheat Sheet</h2>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.2rem;">Curated technical questions tailored for individual group members based on course evaluation requirements.</p>
+        <div class="card-header">
+          <h2>Supervisor Defense Q&amp;A Cheat Sheet</h2>
+          <input type="text" id="qaSearch" placeholder="🔍 Search questions (e.g. symplectic, barrier, FP32)..." onkeyup="filterQA()" style="width: 320px;">
+        </div>
 
-        <div class="qa-item open">
-          <div class="qa-q" onclick="toggleQA(this)">
+        <div class="qa-filters">
+          <span class="filter-pill active" onclick="filterByTag('all', this)">All Questions</span>
+          <span class="filter-pill" onclick="filterByTag('numerics', this)">Numerical Methods</span>
+          <span class="filter-pill" onclick="filterByTag('openmp', this)">OpenMP &amp; Architecture</span>
+          <span class="filter-pill" onclick="filterByTag('cuda', this)">CUDA &amp; Hardware</span>
+          <span class="filter-pill" onclick="filterByTag('mpi', this)">MPI Distributed</span>
+        </div>
+
+        <!-- QA Item 1 -->
+        <div class="qa-card open" data-tag="numerics">
+          <div class="qa-header" onclick="toggleQA(this)">
             <span>Q1: Why did you use Velocity Verlet instead of Euler or Runge-Kutta 4 (RK4)?</span>
-            <span class="qa-tag tag-numerics">NUMERICAL METHODS</span>
+            <span class="qa-tag" style="background: rgba(139, 92, 246, 0.2); color: #c4b5fd;">NUMERICAL METHODS</span>
           </div>
-          <div class="qa-a">
-            <strong>Key Defense Answer:</strong> Velocity Verlet is a <em>symplectic integrator</em>. Hamiltonian systems preserve phase-space volume (Liouville's theorem). Standard non-symplectic integrators like Euler or RK4 continuously bleed or inject energy into orbital trajectories, causing planets to either spiral into the Sun or fly outward into space over thousands of orbits. Velocity Verlet keeps energy bounded in an exact oscillating band. Furthermore, Velocity Verlet requires only <strong>1 force evaluation per time step</strong> (compared to 4 evaluations in RK4), making it $4\times$ faster while strictly conserving the Hamiltonian.
+          <div class="qa-body">
+            <strong>Key Defense Answer:</strong> Velocity Verlet is a <em>symplectic integrator</em>. Hamiltonian systems preserve phase-space volume (Liouville's theorem). Standard non-symplectic integrators like Euler or RK4 continuously bleed or inject energy into orbital trajectories, causing planets to either spiral into the Sun or fly outward into space over thousands of orbits. Velocity Verlet keeps energy bounded in an exact oscillating band ($|\Delta E / E_0| < 10^{-7}$). Furthermore, Velocity Verlet requires only <strong>1 force evaluation per time step</strong> (compared to 4 evaluations in RK4), making it $4\times$ faster while strictly conserving the Hamiltonian.
           </div>
         </div>
 
-        <div class="qa-item">
-          <div class="qa-q" onclick="toggleQA(this)">
+        <!-- QA Item 2 -->
+        <div class="qa-card" data-tag="openmp">
+          <div class="qa-header" onclick="toggleQA(this)">
             <span>Q2: Why does OpenMP run SLOWER than single-core serial execution at N = 100?</span>
-            <span class="qa-tag tag-openmp">OPENMP / SCALING</span>
+            <span class="qa-tag" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd;">OPENMP LATENCY</span>
           </div>
-          <div class="qa-a">
-            <strong>Key Defense Answer:</strong> This empirical finding replicates <strong>Figure 4 of Tailin Zhu (2020)</strong>. At $N=100$, the entire force calculation takes merely $\approx 0.035\text{ ms}$ on a modern CPU. The hardware overhead of spawning threads, synchronizing thread-pool barriers at `#pragma omp parallel`, and thread migration between CPU caches takes significantly longer than the actual floating-point math! Parallelization only delivers speedup when computational payload exceeds synchronization latency ($N \ge 500$).
+          <div class="qa-body">
+            <strong>Key Defense Answer:</strong> This empirical finding replicates <strong>Figure 4 of Tailin Zhu (2020)</strong>. At $N=100$, computing all forces takes only $\approx 0.035\text{ ms}$. The operating system and OpenMP runtime overhead of spawning threads, synchronizing barrier threads at `#pragma omp parallel`, and moving data across CPU caches takes significantly longer than the arithmetic payload. Parallel speedup only manifests once computational workload exceeds synchronization overhead ($N \ge 500$).
           </div>
         </div>
 
-        <div class="qa-item">
-          <div class="qa-q" onclick="toggleQA(this)">
+        <!-- QA Item 3 -->
+        <div class="qa-card" data-tag="openmp">
+          <div class="qa-header" onclick="toggleQA(this)">
             <span>Q3: Why does `dynamic` scheduling beat `static` on Intel i5-1340P, but not on AMD Ryzen?</span>
-            <span class="qa-tag tag-openmp">MICROARCHITECTURE</span>
+            <span class="qa-tag" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd;">MICROARCHITECTURE</span>
           </div>
-          <div class="qa-a">
-            <strong>Key Defense Answer:</strong> Intel's 13th Gen i5-1340P is a <em>hybrid asymmetric architecture</em> with 4 fast Performance-cores and 8 slower Efficient-cores. Under `static` schedule, each thread receives an identical $N/P$ body chunk. The fast P-cores finish early and sit idle at the OpenMP barrier waiting for the E-cores to catch up. Under `dynamic` schedule with chunk size 16, P-cores consume chunks faster, balancing the asymmetric cores and achieving a $1.45\times$ speedup! In contrast, the AMD Ryzen 5 5600G has 6 identical symmetric Zen 3 cores, so static work-sharing is already balanced with zero chunk-scheduling overhead.
+          <div class="qa-body">
+            <strong>Key Defense Answer:</strong> Intel's 13th Gen i5-1340P is an <em>asymmetric hybrid architecture</em> with 4 fast Performance-cores and 8 slower Efficient-cores. Under `static` schedule, each thread receives an identical $N/P$ body chunk. The fast P-cores finish early and sit idle at the OpenMP barrier waiting for the slow E-cores to catch up. Under `dynamic` schedule with chunk size 16, P-cores consume chunks faster, balancing the asymmetric cores and achieving a <strong>$1.45\times$ speedup</strong>. In contrast, the AMD Ryzen 5 5600G has 6 identical symmetric Zen 3 cores, so static work-sharing is inherently balanced with zero chunk-scheduling overhead.
           </div>
         </div>
 
-        <div class="qa-item">
-          <div class="qa-q" onclick="toggleQA(this)">
+        <!-- QA Item 4 -->
+        <div class="qa-card" data-tag="openmp">
+          <div class="qa-header" onclick="toggleQA(this)">
             <span>Q4: How does Newton's 3rd Law (`newton3`) cut floating-point operations by 50%?</span>
-            <span class="qa-tag tag-openmp">ALGORITHMS</span>
+            <span class="qa-tag" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd;">ALGORITHMS</span>
           </div>
-          <div class="qa-a">
-            <strong>Key Defense Answer:</strong> By Newton's third law, the force exerted by body $j$ on body $p$ is equal and opposite ($\vec{F}_{jp} = -\vec{F}_{pj}$). Instead of running an $N \times N$ double loop, `newton3` loops over pairs where $j > p$ ($\approx \frac{N(N-1)}{2}$ interactions), halving the number of distance calculations and square roots. To avoid data races between parallel threads updating the same body, each thread accumulates forces into thread-private buffers which are reduced at the end of the step.
+          <div class="qa-body">
+            <strong>Key Defense Answer:</strong> By Newton's third law, the force exerted by body $j$ on body $i$ is equal and opposite ($\mathbf{F}_{ji} = -\mathbf{F}_{ij}$). Instead of looping over all $N \times N$ pairs, `newton3` loops only over $j > i$ ($\approx \frac{N(N-1)}{2}$ interactions), halving the number of distance calculations and square roots. To avoid data races between parallel threads updating the same body, each thread accumulates forces into thread-private buffers which are reduced at the end of the step.
           </div>
         </div>
 
-        <div class="qa-item">
-          <div class="qa-q" onclick="toggleQA(this)">
+        <!-- QA Item 5 -->
+        <div class="qa-card" data-tag="cuda">
+          <div class="qa-header" onclick="toggleQA(this)">
             <span>Q5: How does Shared Memory Tiling accelerate CUDA GPU execution?</span>
-            <span class="qa-tag tag-cuda">CUDA GPU</span>
+            <span class="qa-tag" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">CUDA GPU</span>
           </div>
-          <div class="qa-a">
+          <div class="qa-body">
             <strong>Key Defense Answer:</strong> In naive CUDA N-body, every thread repeatedly fetches $N$ body coordinates from high-latency global GPU VRAM ($O(N^2)$ global memory transactions). In our `tiled` kernel, threads in a 256-thread block cooperatively load a tile of 256 bodies into ultra-fast on-chip `__shared__` memory (SRAM) with `__syncthreads()`. All 256 threads then calculate forces against this cached tile simultaneously. This cuts global VRAM bandwidth traffic by a factor of $B = 256\times$, eliminating the memory bus bottleneck.
           </div>
         </div>
 
-        <div class="qa-item">
-          <div class="qa-q" onclick="toggleQA(this)">
-            <span>Q6: Why is single-precision (FP32) so much faster than double-precision (FP64) on RTX 5090?</span>
-            <span class="qa-tag tag-cuda">HARDWARE ACCELERATION</span>
+        <!-- QA Item 6 -->
+        <div class="qa-card" data-tag="cuda">
+          <div class="qa-header" onclick="toggleQA(this)">
+            <span>Q6: Why is single-precision (FP32) 28× faster than double-precision (FP64) on RTX 5090?</span>
+            <span class="qa-tag" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">HARDWARE ACCELERATION</span>
           </div>
-          <div class="qa-a">
-            <strong>Key Defense Answer:</strong> Consumer GeForce GPUs (including the RTX 5090) are engineered primarily for graphics, AI, and single-precision workloads, possessing a hardware FP64-to-FP32 ALU ratio of 1:64 or 1:32 (unlike data center chips like the NVIDIA A100 or H100 which have 1:2 FP64 ratios). Therefore, `tiled-f32` achieves up to **$28\times$ higher throughput** than `tiled-f64`, completing 10,000 bodies in just $0.556\text{ ms/step}$!
+          <div class="qa-body">
+            <strong>Key Defense Answer:</strong> Consumer GeForce GPUs (including the RTX 5090) are engineered primarily for graphics, AI, and single-precision workloads, possessing a hardware FP64-to-FP32 ALU ratio of 1:64 or 1:32 (unlike data center chips like the NVIDIA A100/H100 which have 1:2 FP64 ratios). Therefore, `tiled-f32` achieves up to <strong>$28\times$ higher throughput</strong> than `tiled-f64`, completing 10,000 bodies in just $0.556\text{ ms/step}$!
           </div>
         </div>
 
-        <div class="qa-item">
-          <div class="qa-q" onclick="toggleQA(this)">
+        <!-- QA Item 7 -->
+        <div class="qa-card" data-tag="mpi">
+          <div class="qa-header" onclick="toggleQA(this)">
             <span>Q7: In MPI, what is the trade-off between `allgather` and `master-worker`?</span>
-            <span class="qa-tag tag-mpi">MPI / DISTRIBUTED</span>
+            <span class="qa-tag" style="background: rgba(245, 158, 11, 0.2); color: #fde68a;">MPI DISTRIBUTED</span>
           </div>
-          <div class="qa-a">
+          <div class="qa-body">
             <strong>Key Defense Answer:</strong> In `allgather`, every rank owns $N/P$ bodies, updates their positions, and all ranks exchange their updated slices simultaneously via `MPI_Allgatherv`. In `master-worker`, rank 0 gathers all positions via `MPI_Gatherv` and then broadcasts the full state to all workers via `MPI_Bcast`. For high process counts, `master-worker` suffers from a communication bottleneck at rank 0, whereas `allgather` leverages decentralized parallel network topologies.
           </div>
         </div>
@@ -370,294 +823,604 @@
   </main>
 
   <script>
-    // Tab switching
-    function showTab(tabId) {
+    // =========================================================================
+    // 1. KATEX AUTO-RENDER
+    // =========================================================================
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof renderMathInElement === "function") {
+        renderMathInElement(document.body, {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false}
+          ],
+          throwOnError: false
+        });
+      }
+      initCanvas();
+      initSlideNav();
+
+      if (window.location.hash) {
+        const targetId = window.location.hash.substring(1);
+        if (document.getElementById(targetId)) switchTab(targetId);
+      }
+    });
+
+    // =========================================================================
+    // 2. TAB SWITCHING
+    // =========================================================================
+    function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      event.currentTarget.classList.add('active');
-      if (tabId === 'tab-live-demo' && !simRunning) {
-        startSim();
+      
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+      
+      const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes(tabId));
+      if (btn) btn.classList.add('active');
+
+      if (tabId === 'tab-simulation') {
+        resizeCanvas();
+        if (!simRunning) toggleSim();
+        else drawSim();
+      } else if (tabId === 'tab-benchmarks') {
+        setTimeout(renderCharts, 50);
       }
     }
 
-    function toggleQA(el) {
-      el.parentElement.classList.toggle('open');
+    // =========================================================================
+    // 3. PRESENTATION SLIDE NAVIGATION
+    // =========================================================================
+    let currentSlide = 1;
+    const totalSlides = 5;
+
+    function showSlide(num) {
+      if (num < 1 || num > totalSlides) return;
+      currentSlide = num;
+      for (let i = 1; i <= totalSlides; i++) {
+        const s = document.getElementById(`slide-${i}`);
+        if (s) s.style.display = (i === num) ? 'flex' : 'none';
+      }
+    }
+    function nextSlide() { showSlide(currentSlide + 1); }
+    function prevSlide() { showSlide(currentSlide - 1); }
+
+    function initSlideNav() {
+      document.addEventListener("keydown", function(e) {
+        const activeTab = document.querySelector('.tab-content.active');
+        if (activeTab && activeTab.id === 'tab-slides') {
+          if (e.key === "ArrowRight" || e.key === "PageDown") nextSlide();
+          else if (e.key === "ArrowLeft" || e.key === "PageUp") prevSlide();
+        }
+      });
     }
 
-    // Interactive Benchmark Data & Chart rendering
-    const BENCH_DATA = {
-      ns: [100, 500, 1000, 2000, 5000, 10000, 20000, 50000],
-      anchors: {
-        ryzen: [0.036, 0.850, 3.491, 13.899, 85.669, 338.946, null, null],
-        i5: [0.147, 3.818, 15.862, 59.999, 371.009, 1500.005, null, null],
-      },
-      series: [
-        { label: "AMD Ryzen 5600G (Serial C++)", color: "#d95f02", type: "line", data: [0.036, 0.850, 3.491, 13.899, 85.669, 338.946, null, null], host: "ryzen" },
-        { label: "Intel Core i5-1340P (Serial C++)", color: "#7570b3", type: "line", data: [0.147, 3.818, 15.862, 59.999, 371.009, 1500.005, null, null], host: "i5" },
-        { label: "OpenMP 12T (Ryzen 5600G)", color: "#e7298a", type: "line", data: [0.138, 0.328, 1.737, 3.178, 18.406, 66.783, null, null], host: "ryzen" },
-        { label: "OpenMP 16T static (Intel i5)", color: "#1f78b4", type: "line", data: [0.70, 1.59, 4.75, 16.10, 44.20, 109.9, null, null], host: "i5" },
-        { label: "OpenMP 16T newton3 (Intel i5)", color: "#33a02c", type: "line", data: [1.195, 0.95, 3.390, 9.85, 26.326, 68.20, null, null], host: "i5" },
-        { label: "MPI 10P allgather (Apple M4)", color: "#e6ab02", type: "line", data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054, null, null], host: "m4" },
-        { label: "MPI 6P allgather (Ryzen 5600G)", color: "#ff7f00", type: "line", data: [0.162, 3.397, 13.251, 48.717, 294.642, null, null, null], host: "ryzen" },
-        { label: "CUDA RTX 5090 (Tiled FP64)", color: "#1b9e77", type: "line", data: [0.094, 0.435, 0.865, 1.725, 4.306, 34.333, 17.20, 85.95], host: "cuda" },
-        { label: "CUDA RTX 5090 (Tiled FP32)", color: "#66a61e", type: "line", data: [0.012, 0.034, 0.063, 0.118, 0.281, 0.556, 1.11, 3.09], host: "cuda" }
-      ]
-    };
-
-    let chartComp = null;
-    let chartOmp = null;
-    let chartMpi = null;
-
-    function initCharts() {
-      const ctx = document.getElementById('chartComparison').getContext('2d');
-      chartComp = new Chart(ctx, {
-        type: 'line',
-        data: { labels: BENCH_DATA.ns, datasets: [] },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: { type: 'logarithmic', title: { display: true, text: 'Number of Bodies (N)' }, grid: { color: '#222' } },
-            y: { type: 'logarithmic', title: { display: true, text: 'Execution Time (ms / step)' }, grid: { color: '#222' } }
-          },
-          plugins: { legend: { position: 'right' } }
-        }
-      });
-
-      // OpenMP Thread Scaling Chart
-      const ctxOmp = document.getElementById('chartOpenMP').getContext('2d');
-      chartOmp = new Chart(ctxOmp, {
-        type: 'line',
-        data: {
-          labels: [1, 2, 4, 6, 8, 12, 16],
-          datasets: [
-            { label: "Intel Core i5-1340P (N=5000)", borderColor: "#1f78b4", data: [1.0, 1.95, 3.58, 5.10, 8.45, 10.8, 15.3], tension: 0.2 },
-            { label: "AMD Ryzen 5600G (N=5000)", borderColor: "#e7298a", data: [1.0, 1.94, 3.65, 5.20, 5.80, 6.20, null], tension: 0.2 },
-            { label: "Ideal Linear Speedup", borderColor: "#666", borderDash: [5, 5], data: [1, 2, 4, 6, 8, 12, 16] }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            x: { title: { display: true, text: 'Threads (P)' }, grid: { color: '#222' } },
-            y: { title: { display: true, text: 'Speed-Up Factor' }, grid: { color: '#222' } }
-          }
-        }
-      });
-
-      // MPI Scaling Chart
-      const ctxMpi = document.getElementById('chartMPI').getContext('2d');
-      chartMpi = new Chart(ctxMpi, {
-        type: 'line',
-        data: {
-          labels: [1, 2, 4, 6, 8, 10],
-          datasets: [
-            { label: "Speedup (N=10,000)", borderColor: "#e6ab02", data: [1.0, 1.51, 1.98, 2.62, 3.29, 3.25], yAxisID: 'y' },
-            { label: "Comm Share % (N=10,000)", borderColor: "#f85149", borderDash: [4, 4], data: [0.0, 0.3, 0.4, 2.6, 2.1, 6.0], yAxisID: 'y1' }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: {
-            y: { type: 'linear', position: 'left', title: { display: true, text: 'Speed-Up' }, grid: { color: '#222' } },
-            y1: { type: 'linear', position: 'right', title: { display: true, text: 'Comm Overhead (%)' }, grid: { drawOnChartArea: false } }
-          }
-        }
-      });
-
-      refreshCharts();
-    }
-
-    function refreshCharts() {
-      const anchorType = document.getElementById('selAnchor').value;
-      const metric = document.getElementById('selMetric').value;
-
-      const datasets = [];
-      const anchorData = anchorType === 'ryzen' ? BENCH_DATA.anchors.ryzen : BENCH_DATA.anchors.i5;
-
-      BENCH_DATA.series.forEach(s => {
-        let plotData = [];
-        if (metric === 'time') {
-          plotData = s.data;
-        } else {
-          // Speedup
-          plotData = s.data.map((val, idx) => {
-            if (val === null) return null;
-            let ref = (anchorType === 'native') ? (s.host === 'i5' ? BENCH_DATA.anchors.i5[idx] : BENCH_DATA.anchors.ryzen[idx]) : anchorData[idx];
-            return ref ? parseFloat((ref / val).toFixed(2)) : null;
-          });
-        }
-
-        datasets.push({
-          label: s.label,
-          data: plotData,
-          borderColor: s.color,
-          backgroundColor: s.color,
-          borderWidth: 2,
-          pointRadius: 4,
-          tension: 0.15
-        });
-      });
-
-      chartComp.data.datasets = datasets;
-      chartComp.options.scales.y.title.text = metric === 'time' ? 'Execution Time (ms / step)' : `Speed-Up Factor (vs ${anchorType.toUpperCase()} Anchor)`;
-      chartComp.update();
-    }
-
-    // 2D Canvas Orbital Simulation
+    // =========================================================================
+    // 4. LIVE 60 FPS ORBIT SIMULATION ENGINE (CANVAS)
+    // =========================================================================
     const canvas = document.getElementById('orbitCanvas');
     const ctx = canvas.getContext('2d');
-    let simRunning = true;
-    let simDt = 0.1;
+    const G = 2.9591220828559e-4; // AU^3 / (M_sun * day^2)
+
+    let simRunning = false;
+    let simDt = 0.5;
     let simTime = 0.0;
-    let e0 = null;
+    let simTrailsLength = 180;
+    let simBodies = [];
+    let initialEnergy = null;
+    let currentScenario = 'inner';
 
-    const G_CONST = 2.9591220828559e-4;
-    let bodies = [];
+    // Camera State (Pan & Zoom)
+    let camX = 0;
+    let camY = 0;
+    let camZoom = 1.0;
+    let isDragging = false;
+    let dragStartX = 0, dragStartY = 0;
 
-    function initBodies() {
-      bodies = [
-        { name: "Sun", m: 1.0, x: 0, y: 0, vx: 0, vy: 0, color: "#ffcc00", r: 8, trail: [] },
-        { name: "Mercury", m: 1.66e-7, x: 0.387, y: 0, vx: 0, vy: 0.0276, color: "#a6a6a6", r: 3, trail: [] },
-        { name: "Venus", m: 2.45e-6, x: 0.723, y: 0, vx: 0, vy: 0.0202, color: "#e3bb76", r: 4, trail: [] },
-        { name: "Earth", m: 3.00e-6, x: 1.000, y: 0, vx: 0, vy: 0.0172, color: "#4fa3e3", r: 4.5, trail: [] },
-        { name: "Mars", m: 3.23e-7, x: 1.524, y: 0, vx: 0, vy: 0.0140, color: "#e05338", r: 3.5, trail: [] },
-        { name: "Jupiter", m: 9.54e-4, x: 5.204, y: 0, vx: 0, vy: 0.00755, color: "#d99b68", r: 7, trail: [] },
-        { name: "Saturn", m: 2.85e-4, x: 9.582, y: 0, vx: 0, vy: 0.00557, color: "#e8c878", r: 6, trail: [] }
-      ];
-      simTime = 0.0;
-      e0 = calculateEnergy();
+    function resizeCanvas() {
+      const container = document.getElementById('canvasContainer');
+      if (container && container.clientWidth > 0) {
+        canvas.width = container.clientWidth;
+        canvas.height = container.clientHeight || 500;
+      } else {
+        canvas.width = 1200;
+        canvas.height = 500;
+      }
+    }
+    window.addEventListener('resize', () => { resizeCanvas(); drawSim(); });
+
+    function initCanvas() {
+      resizeCanvas();
+
+      canvas.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        dragStartX = e.clientX - camX;
+        dragStartY = e.clientY - camY;
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        camX = e.clientX - dragStartX;
+        camY = e.clientY - dragStartY;
+        if (!simRunning) drawSim();
+      });
+      window.addEventListener('mouseup', () => { isDragging = false; });
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+        camZoom = Math.min(Math.max(camZoom * zoomFactor, 0.05), 15.0);
+        if (!simRunning) drawSim();
+      });
+
+      loadScenario('inner');
     }
 
-    function calculateEnergy() {
+    function resetCamera() {
+      camX = 0;
+      camY = 0;
+      if (currentScenario === 'inner' || currentScenario === 'duel') camZoom = 1.2;
+      else if (currentScenario === 'full') camZoom = 0.18;
+      else if (currentScenario === 'asteroids') camZoom = 0.35;
+      else if (currentScenario === 'figure8') camZoom = 2.2;
+      else camZoom = 1.0;
+      drawSim();
+    }
+
+    function loadScenario(type) {
+      currentScenario = type;
+      simTime = 0.0;
+      simBodies = [];
+
+      if (type === 'inner') {
+        document.getElementById('dispScenarioTitle').innerText = 'Inner Solar System (Sun, Merc, Ven, Earth, Mars)';
+        simBodies = [
+          { name: "Sun", mass: 1.0, x: 0, y: 0, vx: 0, vy: 0, radius: 8, color: "#ffcc00", trail: [] },
+          { name: "Mercury", mass: 1.66e-7, x: 0.387, y: 0, vx: 0, vy: 0.0276, radius: 3, color: "#94a3b8", trail: [] },
+          { name: "Venus", mass: 2.45e-6, x: 0.723, y: 0, vx: 0, vy: 0.0202, radius: 4, color: "#fde047", trail: [] },
+          { name: "Earth", mass: 3.00e-6, x: 1.000, y: 0, vx: 0, vy: 0.0172, radius: 4, color: "#38bdf8", trail: [] },
+          { name: "Mars", mass: 3.23e-7, x: 1.524, y: 0, vx: 0, vy: 0.0140, radius: 3.5, color: "#f87171", trail: [] }
+        ];
+      } else if (type === 'full') {
+        document.getElementById('dispScenarioTitle').innerText = 'Full Solar System (Sun through Neptune + Moon)';
+        simBodies = [
+          { name: "Sun", mass: 1.0, x: 0, y: 0, vx: 0, vy: 0, radius: 8, color: "#ffcc00", trail: [] },
+          { name: "Mercury", mass: 1.66e-7, x: 0.387, y: 0, vx: 0, vy: 0.0276, radius: 2.5, color: "#94a3b8", trail: [] },
+          { name: "Venus", mass: 2.45e-6, x: 0.723, y: 0, vx: 0, vy: 0.0202, radius: 3, color: "#fde047", trail: [] },
+          { name: "Earth", mass: 3.00e-6, x: 1.000, y: 0, vx: 0, vy: 0.0172, radius: 3.5, color: "#38bdf8", trail: [] },
+          { name: "Mars", mass: 3.23e-7, x: 1.524, y: 0, vx: 0, vy: 0.0140, radius: 3, color: "#f87171", trail: [] },
+          { name: "Jupiter", mass: 9.55e-4, x: 5.204, y: 0, vx: 0, vy: 0.0075, radius: 6, color: "#fb923c", trail: [] },
+          { name: "Saturn", mass: 2.86e-4, x: 9.582, y: 0, vx: 0, vy: 0.0055, radius: 5.5, color: "#facc15", trail: [] },
+          { name: "Uranus", mass: 4.37e-5, x: 19.20, y: 0, vx: 0, vy: 0.0039, radius: 4.5, color: "#818cf8", trail: [] },
+          { name: "Neptune", mass: 5.15e-5, x: 30.05, y: 0, vx: 0, vy: 0.0031, radius: 4.5, color: "#60a5fa", trail: [] }
+        ];
+      } else if (type === 'duel') {
+        document.getElementById('dispScenarioTitle').innerText = 'Duel: Symplectic Verlet (Cyan) vs. Forward Euler (Red Drift)';
+        simBodies = [
+          { name: "Sun", mass: 1.0, x: 0, y: 0, vx: 0, vy: 0, radius: 8, color: "#ffcc00", trail: [] },
+          { name: "Earth (Verlet)", mass: 3.0e-6, x: 1.0, y: 0, vx: 0, vy: 0.0172, radius: 5, color: "#38bdf8", trail: [], integrator: 'verlet' },
+          { name: "Earth (Euler)", mass: 3.0e-6, x: 1.0, y: 0, vx: 0, vy: 0.0172, radius: 5, color: "#ef4444", trail: [], integrator: 'euler' }
+        ];
+      } else if (type === 'figure8') {
+        document.getElementById('dispScenarioTitle').innerText = 'Figure-8 Three-Body Choreography (Moore 1993)';
+        const m = 1.0;
+        const x1 = -0.97000436, y1 = 0.24308753;
+        const vx3 = 2 * 0.46620531, vy3 = 2 * 0.43236573;
+        simBodies = [
+          { name: "Body A", mass: m, x: x1, y: y1, vx: -vx3/2, vy: -vy3/2, radius: 5, color: "#38bdf8", trail: [] },
+          { name: "Body B", mass: m, x: -x1, y: -y1, vx: -vx3/2, vy: -vy3/2, radius: 5, color: "#f87171", trail: [] },
+          { name: "Body C", mass: m, x: 0, y: 0, vx: vx3, vy: vy3, radius: 5, color: "#34d399", trail: [] }
+        ];
+      } else if (type === 'asteroids') {
+        document.getElementById('dispScenarioTitle').innerText = 'Jupiter & Main Asteroid Belt (300 Perturbed Bodies)';
+        simBodies = [
+          { name: "Sun", mass: 1.0, x: 0, y: 0, vx: 0, vy: 0, radius: 8, color: "#ffcc00", trail: [] },
+          { name: "Jupiter", mass: 9.55e-4, x: 5.204, y: 0, vx: 0, vy: 0.0075, radius: 6, color: "#fb923c", trail: [] }
+        ];
+        for (let i = 0; i < 300; i++) {
+          const a = 2.1 + Math.random() * 1.2;
+          const theta = Math.random() * Math.PI * 2;
+          const v = Math.sqrt(G / a);
+          simBodies.push({
+            name: `Ast-${i}`, mass: 1e-12,
+            x: a * Math.cos(theta), y: a * Math.sin(theta),
+            vx: -v * Math.sin(theta), vy: v * Math.cos(theta),
+            radius: 1.2, color: "rgba(147, 197, 253, 0.6)", trail: []
+          });
+        }
+      } else if (type === 'precession') {
+        document.getElementById('dispScenarioTitle').innerText = 'Mercury 1PN Relativistic Precession';
+        simBodies = [
+          { name: "Sun", mass: 1.0, x: 0, y: 0, vx: 0, vy: 0, radius: 8, color: "#ffcc00", trail: [] },
+          { name: "Mercury (e=0.3)", mass: 1.66e-7, x: 0.387 * (1 - 0.3), y: 0, vx: 0, vy: 0.035, radius: 4, color: "#fde047", trail: [], gr: true }
+        ];
+      }
+
+      computeAccelerations();
+      initialEnergy = calcEnergy();
+      resetCamera();
+    }
+
+    function computeAccelerations() {
+      const n = simBodies.length;
+      for (let i = 0; i < n; i++) {
+        simBodies[i].ax = 0;
+        simBodies[i].ay = 0;
+      }
+      for (let i = 0; i < n; i++) {
+        const bi = simBodies[i];
+        for (let j = i + 1; j < n; j++) {
+          const bj = simBodies[j];
+          const dx = bj.x - bi.x;
+          const dy = bj.y - bi.y;
+          const distSq = dx * dx + dy * dy + 1e-8;
+          const dist3 = Math.pow(distSq, 1.5);
+          
+          const fx = G * dx / dist3;
+          const fy = G * dy / dist3;
+
+          bi.ax += fx * bj.mass;
+          bi.ay += fy * bj.mass;
+          bj.ax -= fx * bi.mass;
+          bj.ay -= fy * bi.mass;
+        }
+      }
+    }
+
+    function calcEnergy() {
       let ke = 0, pe = 0;
-      for (let i = 0; i < bodies.length; ++i) {
-        ke += 0.5 * bodies[i].m * (bodies[i].vx ** 2 + bodies[i].vy ** 2);
-        for (let j = i + 1; j < bodies.length; ++j) {
-          const dx = bodies[j].x - bodies[i].x;
-          const dy = bodies[j].y - bodies[i].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist > 0) pe -= G_CONST * bodies[i].m * bodies[j].m / dist;
+      const n = simBodies.length;
+      for (let i = 0; i < n; i++) {
+        const bi = simBodies[i];
+        ke += 0.5 * bi.mass * (bi.vx * bi.vx + bi.vy * bi.vy);
+        for (let j = i + 1; j < n; j++) {
+          const bj = simBodies[j];
+          const dist = Math.hypot(bj.x - bi.x, bj.y - bi.y) + 1e-8;
+          pe -= G * bi.mass * bj.mass / dist;
         }
       }
       return ke + pe;
     }
 
-    function computeAccelerations() {
-      const ax = new Float64Array(bodies.length);
-      const ay = new Float64Array(bodies.length);
-      for (let i = 0; i < bodies.length; ++i) {
-        for (let j = 0; j < bodies.length; ++j) {
-          if (i === j) continue;
-          const dx = bodies[j].x - bodies[i].x;
-          const dy = bodies[j].y - bodies[i].y;
-          const r2 = dx * dx + dy * dy;
-          const r = Math.sqrt(r2);
-          const f = G_CONST * bodies[j].m / (r2 * r);
-          ax[i] += f * dx;
-          ay[i] += f * dy;
+    function stepSim() {
+      const n = simBodies.length;
+      const dt = simDt;
+
+      for (let i = 0; i < n; i++) {
+        const b = simBodies[i];
+        if (b.integrator === 'euler') {
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+          b.vx += b.ax * dt;
+          b.vy += b.ay * dt;
+        } else {
+          b.x += b.vx * dt + 0.5 * b.ax * dt * dt;
+          b.y += b.vy * dt + 0.5 * b.ay * dt * dt;
+          b.prev_ax = b.ax;
+          b.prev_ay = b.ay;
+        }
+
+        b.trail.push({ x: b.x, y: b.y });
+        if (b.trail.length > simTrailsLength) b.trail.shift();
+      }
+
+      computeAccelerations();
+
+      for (let i = 0; i < n; i++) {
+        const b = simBodies[i];
+        if (b.integrator !== 'euler') {
+          b.vx += 0.5 * (b.prev_ax + b.ax) * dt;
+          b.vy += 0.5 * (b.prev_ay + b.ay) * dt;
         }
       }
-      return { ax, ay };
-    }
 
-    function stepVelocityVerlet(dt) {
-      const { ax: ax0, ay: ay0 } = computeAccelerations();
-      // Drift
-      for (let i = 0; i < bodies.length; ++i) {
-        bodies[i].x += bodies[i].vx * dt + 0.5 * ax0[i] * dt * dt;
-        bodies[i].y += bodies[i].vy * dt + 0.5 * ay0[i] * dt * dt;
-      }
-      const { ax: ax1, ay: ay1 } = computeAccelerations();
-      // Kick
-      for (let i = 0; i < bodies.length; ++i) {
-        bodies[i].vx += 0.5 * (ax0[i] + ax1[i]) * dt;
-        bodies[i].vy += 0.5 * (ay0[i] + ay1[i]) * dt;
-        // Trail
-        bodies[i].trail.push({ x: bodies[i].x, y: bodies[i].y });
-        if (bodies[i].trail.length > 80) bodies[i].trail.shift();
-      }
       simTime += dt;
     }
 
     function drawSim() {
+      if (!canvas.width || !canvas.height) resizeCanvas();
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const scale = 36; // pixels per AU
 
-      // Draw trails
-      bodies.forEach(b => {
-        if (b.trail.length > 1) {
+      const centerX = canvas.width / 2 + camX;
+      const centerY = canvas.height / 2 + camY;
+      const baseScale = (canvas.height / 3.0) * camZoom;
+
+      // Sun Glow
+      if (simBodies.length > 0 && simBodies[0].name === "Sun") {
+        const sunX = centerX + simBodies[0].x * baseScale;
+        const sunY = centerY + simBodies[0].y * baseScale;
+        const grad = ctx.createRadialGradient(sunX, sunY, 4, sunX, sunY, 35 * camZoom);
+        grad.addColorStop(0, "rgba(255, 204, 0, 0.4)");
+        grad.addColorStop(1, "rgba(255, 204, 0, 0)");
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(sunX, sunY, 35 * camZoom, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Fading Trails
+      for (const b of simBodies) {
+        if (b.trail.length < 2) continue;
+        for (let j = 1; j < b.trail.length; j++) {
+          const alpha = (j / b.trail.length) * 0.75;
+          ctx.strokeStyle = b.color.startsWith('#') ? b.color + Math.floor(alpha * 255).toString(16).padStart(2, '0') : b.color;
+          ctx.lineWidth = Math.max(1.0, 1.6 * (j / b.trail.length));
           ctx.beginPath();
-          ctx.strokeStyle = b.color + "55";
-          ctx.lineWidth = 1.2;
-          ctx.moveTo(cx + b.trail[0].x * scale, cy + b.trail[0].y * scale);
-          for (let p of b.trail) {
-            ctx.lineTo(cx + p.x * scale, cy + p.y * scale);
-          }
+          ctx.moveTo(centerX + b.trail[j-1].x * baseScale, centerY + b.trail[j-1].y * baseScale);
+          ctx.lineTo(centerX + b.trail[j].x * baseScale, centerY + b.trail[j].y * baseScale);
           ctx.stroke();
         }
-      });
+      }
 
-      // Draw bodies
-      bodies.forEach(b => {
-        const px = cx + b.x * scale;
-        const py = cy + b.y * scale;
-        ctx.beginPath();
-        ctx.arc(px, py, b.r, 0, 2 * Math.PI);
+      // Draw Bodies
+      for (const b of simBodies) {
+        const sx = centerX + b.x * baseScale;
+        const sy = centerY + b.y * baseScale;
+
         ctx.fillStyle = b.color;
-        ctx.shadowColor = b.color;
-        ctx.shadowBlur = b.name === "Sun" ? 15 : 4;
+        ctx.beginPath();
+        ctx.arc(sx, sy, Math.max(1.5, b.radius * Math.min(Math.max(camZoom, 0.4), 2.0)), 0, Math.PI * 2);
         ctx.fill();
-        ctx.shadowBlur = 0;
 
-        ctx.fillStyle = "#888";
-        ctx.font = "10px sans-serif";
-        ctx.fillText(b.name, px + b.r + 3, py + 3);
-      });
+        if (b.mass > 1e-8 && camZoom > 0.3) {
+          ctx.fillStyle = "#94a3b8";
+          ctx.font = "10px Inter, sans-serif";
+          ctx.fillText(b.name, sx + 7, sy + 3);
+        }
+      }
+
+      // Telemetry
+      document.getElementById('dispSimTime').innerText = `Simulated Time: ${simTime.toFixed(1)} days`;
+      document.getElementById('dispBodyCount').innerText = `Active Bodies: ${simBodies.length}`;
+      if (initialEnergy !== null && Math.abs(initialEnergy) > 1e-12) {
+        const curE = calcEnergy();
+        const de = Math.abs((curE - initialEnergy) / initialEnergy);
+        document.getElementById('dispEnergy').innerText = `Energy Drift |ΔE/E₀|: ${de.toExponential(3)} (${de < 1e-4 ? 'Bounded' : 'Diverging!'})`;
+      }
     }
 
+    let animFrame = null;
     function simLoop() {
       if (simRunning) {
-        for (let i = 0; i < 4; ++i) stepVelocityVerlet(simDt);
+        stepSim();
         drawSim();
-        document.getElementById('readoutTime').innerText = `Simulated Elapsed Time: ${simTime.toFixed(1)} days (${(simTime / 365.25).toFixed(2)} years)`;
-        const eCurrent = calculateEnergy();
-        const driftPct = ((eCurrent - e0) / Math.abs(e0)) * 100.0;
-        document.getElementById('readoutEnergy').innerText = `Energy Conservation Drift: ${driftPct >= 0 ? '+' : ''}${driftPct.toFixed(6)}% (Bounded Symplectic)`;
+        animFrame = requestAnimationFrame(simLoop);
       }
-      requestAnimationFrame(simLoop);
     }
 
     function toggleSim() {
       simRunning = !simRunning;
-      document.getElementById('btnPlayPause').innerText = simRunning ? "▶ Pause" : "▶ Resume";
+      const btn = document.getElementById('btnPlayPause');
+      if (simRunning) {
+        btn.innerText = "⏸ Pause";
+        btn.classList.add('btn-primary');
+        simLoop();
+      } else {
+        btn.innerText = "▶ Resume";
+        btn.classList.remove('btn-primary');
+        if (animFrame) cancelAnimationFrame(animFrame);
+      }
     }
 
     function resetSim() {
-      initBodies();
+      loadScenario(currentScenario);
       drawSim();
     }
 
-    function updateSimDt() {
-      simDt = parseFloat(document.getElementById('selDt').value);
+    function updateSpeed(val) {
+      simDt = 0.5 * parseFloat(val);
     }
 
-    function changeScenario() {
-      resetSim();
+    // =========================================================================
+    // 5. LIVE PROCESS RUNNER (SUBPROCESS CALLS VIA LOCAL API)
+    // =========================================================================
+    function updateVariantOptions() {
+      const b = document.getElementById('runBackend').value;
+      const v = document.getElementById('runVariant');
+      v.innerHTML = "";
+      if (b === 'openmp') {
+        v.innerHTML = '<option value="static" selected>static (Equal work sharing)</option>' +
+                      '<option value="dynamic">dynamic (Work chunk balance)</option>' +
+                      '<option value="simd">simd (AVX2 vectorization)</option>' +
+                      '<option value="newton3">newton3 (50% FLOP reduction)</option>';
+      } else if (b === 'mpi') {
+        v.innerHTML = '<option value="allgather" selected>allgather (Decentralized ring)</option>' +
+                      '<option value="master-worker">master-worker (Central dispatcher)</option>';
+      } else {
+        v.innerHTML = '<option value="static" selected>static (Scalar reference)</option>';
+      }
     }
 
-    // Initialize on load
-    window.addEventListener('DOMContentLoaded', () => {
-      initBodies();
-      drawSim();
-      simLoop();
-      initCharts();
-    });
+    function triggerLiveRun() {
+      const b = document.getElementById('runBackend').value;
+      const n = document.getElementById('runN').value;
+      const steps = document.getElementById('runSteps').value;
+      const workers = document.getElementById('runWorkers').value;
+      const variant = document.getElementById('runVariant').value;
+
+      const btn = document.getElementById('btnExecuteRun');
+      const badge = document.getElementById('runBadge');
+      const term = document.getElementById('terminalOutput');
+
+      btn.disabled = true;
+      badge.innerText = "Running...";
+      badge.className = "status-pill pill-green";
+      term.innerText = `$ Spawning live child process on Ryzen 5600G...\nExecuting: backend=${b} N=${n} steps=${steps} workers=${workers} variant=${variant}\n`;
+
+      const t0 = performance.now();
+      const query = `backend=${b}&n=${n}&steps=${steps}&workers=${workers}&variant=${variant}`;
+      
+      fetch(`/api/run?${query}`)
+        .then(res => res.json())
+        .then(data => {
+          btn.disabled = false;
+          const totalMs = (performance.now() - t0).toFixed(0);
+          badge.innerText = data.success ? "Success (Contract v1)" : "Failed";
+          badge.className = data.success ? "status-pill pill-green" : "status-pill pill-red";
+
+          term.innerText = `$ ${data.cmd}\n\n${data.stdout}`;
+          if (data.stderr) term.innerText += `\nSTDERR:\n${data.stderr}`;
+
+          document.getElementById('readoutElapsed').innerText = `${data.elapsed_s.toFixed(3)} s`;
+          
+          let msStep = "—";
+          if (data.telemetry && data.telemetry.timings && data.telemetry.timings.loop) {
+            msStep = (data.telemetry.timings.loop / steps * 1000).toFixed(3) + " ms";
+          } else if (data.telemetry && data.telemetry.t_loop_s) {
+            msStep = (data.telemetry.t_loop_s / steps * 1000).toFixed(3) + " ms";
+          }
+          document.getElementById('readoutLatency').innerText = msStep;
+        })
+        .catch(err => {
+          btn.disabled = false;
+          badge.innerText = "Server Error";
+          badge.className = "status-pill pill-blue";
+          term.innerText += `\n[Note: Local server not reachable on port 8000. Launch via run_defense.bat or python bench/defense_server.py to execute live subprocesses.]`;
+        });
+    }
+
+    // =========================================================================
+    // 6. CHART.JS INTERACTIVE BENCHMARK EXPLORER
+    // =========================================================================
+    let chartScaling = null;
+    let chartOmp = null;
+    let chartMpi = null;
+
+    const BENCH_DATA = {
+      ns: [100, 500, 1000, 2000, 5000, 10000],
+      anchors: {
+        ryzen: [0.036, 0.850, 3.491, 13.899, 85.669, 338.946],
+        i5: [0.147, 3.818, 15.862, 59.999, 371.009, 1500.005]
+      },
+      series: [
+        { label: "AMD Ryzen 5 5600G (C++ Serial)", color: "#f97316", data: [0.036, 0.850, 3.491, 13.899, 85.669, 338.946] },
+        { label: "Intel Core i5-1340P (C++ Serial)", color: "#8b5cf6", data: [0.147, 3.818, 15.862, 59.999, 371.009, 1500.005] },
+        { label: "OpenMP 12T (Ryzen 5600G)", color: "#ec4899", data: [0.138, 0.328, 1.737, 3.178, 18.406, 66.783] },
+        { label: "OpenMP 16T newton3 (Intel i5)", color: "#10b981", data: [1.195, 0.950, 3.390, 9.850, 26.326, 68.200] },
+        { label: "MPI 10P allgather (Apple M4)", color: "#f59e0b", data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054] },
+        { label: "MPI 6P allgather (Ryzen 5600G)", color: "#eab308", data: [0.162, 3.397, 13.251, 48.717, 294.642, null] },
+        { label: "CUDA RTX 5090 (Tiled FP64)", color: "#06b6d4", data: [0.094, 0.435, 0.865, 1.725, 4.306, 34.333] },
+        { label: "CUDA RTX 5090 (Tiled FP32)", color: "#22c55e", data: [0.012, 0.034, 0.063, 0.118, 0.281, 0.556] }
+      ]
+    };
+
+    function renderCharts() {
+      // 1. Scaling Chart
+      const ctxS = document.getElementById('chartScaling')?.getContext('2d');
+      if (ctxS) {
+        if (chartScaling) chartScaling.destroy();
+        chartScaling = new Chart(ctxS, {
+          type: 'line',
+          data: {
+            labels: BENCH_DATA.ns,
+            datasets: BENCH_DATA.series.map(s => ({
+              label: s.label,
+              data: s.data,
+              borderColor: s.color,
+              backgroundColor: s.color,
+              borderWidth: 2,
+              pointRadius: 4,
+              tension: 0.15
+            }))
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { type: 'logarithmic', title: { display: true, text: 'Number of Bodies (N)' }, grid: { color: '#1e293b' } },
+              y: {
+                type: 'logarithmic',
+                title: { display: true, text: 'Execution Time (ms / step)' },
+                grid: { color: '#1e293b' },
+                ticks: {
+                  callback: function(value) { return value + " ms"; }
+                }
+              }
+            },
+            plugins: {
+              legend: { position: 'bottom', labels: { boxWidth: 12, padding: 15, font: { size: 11 } } },
+              tooltip: {
+                callbacks: {
+                  label: function(c) { return `${c.dataset.label}: ${c.raw} ms/step`; }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // 2. OpenMP Thread Scaling
+      const ctxO = document.getElementById('chartOpenMP')?.getContext('2d');
+      if (ctxO) {
+        if (chartOmp) chartOmp.destroy();
+        chartOmp = new Chart(ctxO, {
+          type: 'line',
+          data: {
+            labels: [1, 2, 4, 6, 8, 12, 16],
+            datasets: [
+              { label: "Intel Core i5-1340P (N=5000)", borderColor: "#3b82f6", data: [1.0, 1.95, 3.58, 5.10, 8.45, 10.8, 14.1], tension: 0.2 },
+              { label: "AMD Ryzen 5 5600G (N=5000)", borderColor: "#ec4899", data: [1.0, 1.94, 3.65, 4.65, 5.20, 5.80, null], tension: 0.2 },
+              { label: "Ideal Linear Speedup", borderColor: "#475569", borderDash: [4, 4], data: [1, 2, 4, 6, 8, 12, 16], pointRadius: 0 }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              x: { title: { display: true, text: 'Threads (P)' }, grid: { color: '#1e293b' } },
+              y: { title: { display: true, text: 'Speedup Factor' }, grid: { color: '#1e293b' } }
+            },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
+          }
+        });
+      }
+
+      // 3. MPI Scaling Chart
+      const ctxM = document.getElementById('chartMPI')?.getContext('2d');
+      if (ctxM) {
+        if (chartMpi) chartMpi.destroy();
+        chartMpi = new Chart(ctxM, {
+          type: 'line',
+          data: {
+            labels: [1, 2, 4, 6, 8, 10],
+            datasets: [
+              { label: "Speedup (N=10,000)", borderColor: "#f59e0b", data: [1.0, 1.51, 1.98, 2.62, 3.29, 3.25], yAxisID: 'y' },
+              { label: "Communication %", borderColor: "#ef4444", borderDash: [4, 4], data: [0.0, 0.3, 0.4, 2.6, 2.1, 6.0], yAxisID: 'y1' }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { type: 'linear', position: 'left', title: { display: true, text: 'Speedup' }, grid: { color: '#1e293b' } },
+              y1: { type: 'linear', position: 'right', title: { display: true, text: 'Comm %' }, grid: { drawOnChartArea: false } }
+            },
+            plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }
+          }
+        });
+      }
+    }
+
+    // =========================================================================
+    // 7. Q&A INTERACTION & SEARCH
+    // =========================================================================
+    function toggleQA(el) {
+      el.parentElement.classList.toggle('open');
+    }
+
+    function filterByTag(tag, pill) {
+      document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      document.querySelectorAll('.qa-card').forEach(c => {
+        if (tag === 'all' || c.getAttribute('data-tag') === tag) c.style.display = 'block';
+        else c.style.display = 'none';
+      });
+    }
+
+    function filterQA() {
+      const q = document.getElementById('qaSearch').value.toLowerCase();
+      document.querySelectorAll('.qa-card').forEach(c => {
+        const text = c.innerText.toLowerCase();
+        c.style.display = text.includes(q) ? 'block' : 'none';
+      });
+    }
   </script>
 </body>
 </html>
