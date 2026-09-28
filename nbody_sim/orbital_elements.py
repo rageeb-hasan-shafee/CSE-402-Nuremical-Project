@@ -107,6 +107,33 @@ def _rotate_to_ecliptic(x_orb, y_orb, vx_orb, vy_orb, om_node, inc, arg_peri):
     return np.array([x, y, z]), np.array([vx, vy, vz])
 
 
+def elements_to_state(a, e, inc, om_node, arg_peri, M, mu=G):
+    """Orbital elements (angles in RADIANS) -> heliocentric pos [AU], vel [AU/day]."""
+    E = _solve_kepler(M, e)
+    x_orb = a * (np.cos(E) - e)
+    y_orb = a * np.sqrt(1.0 - e ** 2) * np.sin(E)
+    n = np.sqrt(mu / a ** 3)
+    E_dot = n / (1.0 - e * np.cos(E))
+    vx_orb = -a * np.sin(E) * E_dot
+    vy_orb = a * np.sqrt(1.0 - e ** 2) * np.cos(E) * E_dot
+    return _rotate_to_ecliptic(x_orb, y_orb, vx_orb, vy_orb, om_node, inc, arg_peri)
+
+
+def asteroid_belt(n, seed=42):
+    """Contract §C2: n synthetic main-belt asteroids (Zhu 2020 mass range)."""
+    rng = np.random.default_rng(seed)
+    a = rng.uniform(2.1, 3.3, n)
+    e = np.clip(rng.rayleigh(0.07, n), 0.0, 0.3)
+    inc = np.radians(np.abs(rng.normal(0.0, 8.0, n)))
+    om_node, arg_peri, M = rng.uniform(0.0, 2 * np.pi, (3, n))
+    masses = rng.uniform(1e12, 3e17, n) / KG_PER_MSUN
+    pos = np.empty((n, 3))
+    vel = np.empty((n, 3))
+    for k in range(n):
+        pos[k], vel[k] = elements_to_state(a[k], e[k], inc[k], om_node[k], arg_peri[k], M[k])
+    return masses, pos, vel
+
+
 def planet_state_vector(name, T_centuries=0.0, mu_sun=None):
     """Heliocentric ecliptic position [AU] and velocity [AU/day] of a major
     planet at T_centuries Julian centuries past J2000.0."""
@@ -125,20 +152,10 @@ def planet_state_vector(name, T_centuries=0.0, mu_sun=None):
     arg_peri = np.radians(w_bar - om_node)
     om_node = np.radians(om_node)
 
-    E = _solve_kepler(M, e)
-
-    x_orb = a * (np.cos(E) - e)
-    y_orb = a * np.sqrt(1 - e ** 2) * np.sin(E)
-
     if mu_sun is None:
         mu_sun = G  # GM with M in solar masses (planet mass negligible)
-    n = np.sqrt(mu_sun / a ** 3)  # mean motion, rad/day
-    E_dot = n / (1 - e * np.cos(E))
-    vx_orb = -a * np.sin(E) * E_dot
-    vy_orb = a * np.sqrt(1 - e ** 2) * np.cos(E) * E_dot
 
-    pos, vel = _rotate_to_ecliptic(x_orb, y_orb, vx_orb, vy_orb, om_node, i, arg_peri)
-    return pos, vel
+    return elements_to_state(a, e, i, om_node, arg_peri, M, mu_sun)
 
 
 def moon_state_vector_geocentric():
@@ -156,21 +173,13 @@ def moon_state_vector_geocentric():
     M = np.radians(135.27)
 
     mu_earth = G * (_MASSES_KG["Earth"] / KG_PER_MSUN)
-    E = _solve_kepler(M, e)
-    x_orb = a * (np.cos(E) - e)
-    y_orb = a * np.sqrt(1 - e ** 2) * np.sin(E)
-    n = np.sqrt(mu_earth / a ** 3)
-    E_dot = n / (1 - e * np.cos(E))
-    vx_orb = -a * np.sin(E) * E_dot
-    vy_orb = a * np.sqrt(1 - e ** 2) * np.cos(E) * E_dot
-
-    return _rotate_to_ecliptic(x_orb, y_orb, vx_orb, vy_orb, om_node, i, arg_peri)
+    return elements_to_state(a, e, i, om_node, arg_peri, M, mu_earth)
 
 
 PLANETS = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
 
 
-def build_solar_system(include_moon=True, bodies=None):
+def build_solar_system(include_moon=True, bodies=None, n_asteroids=0, seed=42):
     """Return (names, masses[Msun], positions[AU] (N,3), velocities[AU/day] (N,3), colors).
 
     Barycentric-ish setup: the Sun starts at the origin at rest, then all
@@ -201,6 +210,15 @@ def build_solar_system(include_moon=True, bodies=None):
     masses = np.array(masses_kg) / KG_PER_MSUN
     positions = np.array(positions)
     velocities = np.array(velocities)
+    colors = [_COLORS[n] for n in names]
+
+    if n_asteroids > 0:
+        a_m, a_pos, a_vel = asteroid_belt(n_asteroids, seed=seed)
+        names.extend([f"A{i+1:05d}" for i in range(n_asteroids)])
+        masses = np.concatenate([masses, a_m])
+        positions = np.vstack([positions, a_pos])
+        velocities = np.vstack([velocities, a_vel])
+        colors.extend(["#888888"] * n_asteroids)
 
     # Shift to the barycentric frame (zero total momentum) for a stable,
     # non-drifting simulation.
@@ -210,5 +228,4 @@ def build_solar_system(include_moon=True, bodies=None):
     positions = positions - com_pos
     velocities = velocities - com_vel
 
-    colors = [_COLORS[n] for n in names]
     return names, masses, positions, velocities, colors
