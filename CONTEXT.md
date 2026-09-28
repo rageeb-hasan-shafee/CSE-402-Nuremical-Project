@@ -77,3 +77,12 @@ _Avoid_: Reference time, base run, baseline clock
 **Correctness Gate (M1)**:
 The verification check requiring relative position and velocity errors between any parallel backend and the golden reference trajectory to stay below $10^{-10}$.
 _Avoid_: Sanity check, tolerance test, unit validation
+
+**Forward Euler Baseline**:
+A first-order, non-symplectic integrator that updates velocity and position with uncoupled gradients, serving as an educational negative control to demonstrate catastrophic energy drift and orbital decay.
+_Avoid_: Simple Euler, basic integrator, naive stepping
+
+**Dual-Anchoring Methodology**:
+The dual-normalization evaluation framework that reports intra-architecture speedup using the Native Host Anchor ($T_{\text{host}}(1)$) and cross-hardware absolute throughput using the Universal Desktop CPU Anchor ($T_{\text{Ryzen}}(1)$).
+_Avoid_: Double baseline, cross comparison, mixed normalization
+
