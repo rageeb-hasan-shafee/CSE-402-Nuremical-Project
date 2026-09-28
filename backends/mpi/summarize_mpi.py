@@ -257,7 +257,7 @@ def write_report(stats, meta, machine, plots, path):
           "- **Amdahl s**: if a fraction s of the work cannot be parallelised, the speed-up can never exceed 1/s.", "",
           "Reproduce: `python backends/mpi/sweep_local.py --machine " + machine +
           "` then `python backends/mpi/summarize_mpi.py --machine " + machine + " --report`.", ""]
-    path.write_text("\n".join(L))
+    path.write_text("\n".join(L), encoding="utf-8")
 
 
 def main():

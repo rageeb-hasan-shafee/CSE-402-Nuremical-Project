@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "backend": "py-mpi",
+  "variant": "allgather",
+  "lang": "python",
+  "n_bodies": 500,
+  "workers": 8,
+  "steps": 100,
+  "dt": 0.1,
+  "t_setup_s": 0.0022390000000000014,
+  "t_loop_s": 0.131384,
+  "t_force_s": 0.09845899999999999,
+  "t_comm_s": 0.040521999999999975,
+  "t_transfer_s": 0.0,
+  "machine": "mansib-m4",
+  "extra": {
+    "t_comm_mean_s": 0.03721662500000001,
+    "bodies_per_rank_min": 62,
+    "bodies_per_rank_max": 63,
+    "mpi_vendor": "Open MPI 5.0.11",
+    "processor_names": [
+      "Nuruls-MacBook-Air.local"
+    ],
+    "n_hosts": 1
+  }
+}
