@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "backend": "py-mpi",
+  "variant": "allgather",
+  "lang": "python",
+  "n_bodies": 100,
+  "workers": 12,
+  "steps": 100,
+  "dt": 0.1,
+  "t_setup_s": 0.0009679000013420591,
+  "t_loop_s": 0.3017351999988023,
+  "t_force_s": 0.014462799996181275,
+  "t_comm_s": 0.2898795999990398,
+  "t_transfer_s": 0.0,
+  "machine": "fahad-ryzen-5600g",
+  "extra": {
+    "t_comm_mean_s": 0.28872439166858993,
+    "bodies_per_rank_min": 8,
+    "bodies_per_rank_max": 9,
+    "mpi_vendor": "Microsoft MPI 10.1.0",
+    "processor_names": [
+      "DESKTOP-MFJJ68D"
+    ],
+    "n_hosts": 1
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "backend": "cpp-serial",
+  "variant": "static",
+  "lang": "cpp",
+  "n_bodies": 2000,
+  "workers": 1,
+  "steps": 100,
+  "dt": 0.10000000000000001,
+  "t_setup_s": 0.014212500,
+  "t_loop_s": 1.375651100,
+  "t_force_s": 1.374822600,
+  "t_comm_s": 0.000000000,
+  "t_transfer_s": 0.000000000,
+  "machine": "fahad-ryzen-5600g",
+  "extra": {}
+}

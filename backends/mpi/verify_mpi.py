@@ -60,6 +60,13 @@ def main():
         report(1, "numpy", False, str(exc))
         return finish()
     try:
+        import os, sys
+        if sys.platform == "win32":
+            for _p in (r"E:\system\scoop\apps\msmpi\10.1.1", r"C:\Program Files\Microsoft MPI\Bin"):
+                if os.path.exists(_p):
+                    os.add_dll_directory(_p)
+                    if _p not in os.environ.get("PATH", ""):
+                        os.environ["PATH"] = _p + os.pathsep + os.environ.get("PATH", "")
         from mpi4py import MPI
         report(1, f"mpi4py {__import__('mpi4py').__version__} ({MPI.get_vendor()[0]})", True)
     except ImportError as exc:

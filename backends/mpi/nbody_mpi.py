@@ -20,6 +20,11 @@ import sys
 for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "VECLIB_MAXIMUM_THREADS"):
     os.environ.setdefault(_v, "1")
 
+if sys.platform == "win32":
+    for _p in (r"E:\system\scoop\apps\msmpi\10.1.1", r"C:\Program Files\Microsoft MPI\Bin", r"C:\Program Files\Microsoft MPI"):
+        if os.path.exists(_p):
+            os.add_dll_directory(_p)
+
 import numpy as np  # noqa: E402
 from mpi4py import MPI  # noqa: E402
 
