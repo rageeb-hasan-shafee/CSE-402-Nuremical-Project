@@ -23,23 +23,40 @@ import numpy as np
 from constants import G
 
 
-def accelerations(positions, masses, softening=0.0):
+def accelerations_rows(positions, masses, lo, hi, softening=0.0):
+    """Accelerations on bodies lo..hi-1 from ALL bodies. Shape (hi-lo, 3)."""
+    diff = positions[None, :, :] - positions[lo:hi, None, :]  # (hi-lo, N, 3)
+    d2 = np.sum(diff ** 2, axis=-1) + softening ** 2
+    rows = np.arange(hi - lo)
+    d2[rows, lo + rows] = np.inf  # self-term -> inf**-1.5 = 0
+    inv_r3 = d2 ** -1.5
+    return G * np.sum(masses[None, :, None] * inv_r3[:, :, None] * diff, axis=1)
+
+
+def accelerations(positions, masses, softening=0.0, chunk=512):
     """Vectorised O(N^2) gravitational acceleration for every body.
 
     positions : (N, 3) array [AU]
     masses    : (N,) array [Msun]
     softening : Plummer softening length [AU] to avoid singularities on
                 close encounters (0 disables it).
+    chunk     : Row chunk size to avoid allocating huge (N,N,3) temporaries.
 
     Returns (N, 3) array of accelerations [AU/day^2].
     """
-    diff = positions[None, :, :] - positions[:, None, :]  # r_j - r_p, shape (N,N,3)
-    dist2 = np.sum(diff ** 2, axis=-1) + softening ** 2
-    np.fill_diagonal(dist2, 1.0)  # avoid div-by-zero on the diagonal
-    inv_dist3 = dist2 ** -1.5
-    np.fill_diagonal(inv_dist3, 0.0)  # a body exerts no force on itself
+    n = len(masses)
+    if n <= chunk:
+        diff = positions[None, :, :] - positions[:, None, :]  # r_j - r_p, shape (N,N,3)
+        dist2 = np.sum(diff ** 2, axis=-1) + softening ** 2
+        np.fill_diagonal(dist2, 1.0)  # avoid div-by-zero on the diagonal
+        inv_dist3 = dist2 ** -1.5
+        np.fill_diagonal(inv_dist3, 0.0)  # a body exerts no force on itself
+        return G * np.sum(masses[None, :, None] * inv_dist3[:, :, None] * diff, axis=1)
 
-    acc = G * np.sum(masses[None, :, None] * inv_dist3[:, :, None] * diff, axis=1)
+    acc = np.empty((n, 3))
+    for lo in range(0, n, chunk):
+        hi = min(lo + chunk, n)
+        acc[lo:hi] = accelerations_rows(positions, masses, lo, hi, softening)
     return acc
 
 

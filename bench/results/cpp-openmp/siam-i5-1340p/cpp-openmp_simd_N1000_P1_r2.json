@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "backend": "cpp-openmp",
+  "variant": "simd",
+  "lang": "cpp",
+  "n_bodies": 1000,
+  "workers": 1,
+  "steps": 20,
+  "dt": 0.10000000000000001,
+  "t_setup_s": 0.015332200,
+  "t_loop_s": 0.295619900,
+  "t_force_s": 0.294011900,
+  "t_comm_s": 0.000000000,
+  "t_transfer_s": 0.000000000,
+  "machine": "siam-i5-1340p",
+  "extra": {}
+}

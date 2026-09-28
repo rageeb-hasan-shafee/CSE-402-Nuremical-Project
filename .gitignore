@@ -5,10 +5,14 @@
 docs/
 
 # Simulation outputs and benchmark data
-results/
+/results/
 output/
 outputs/
 benchmarks/results/
+data/ic/*
+!data/ic/ic_N100_s42.csv
+!data/ic/ic_N1000_s42.csv
+backends/*/build/
 *.npy
 *.npz
 *.h5
