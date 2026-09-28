@@ -1,18 +1,28 @@
 # ---------------------------------------------------------------
 # Project-specific
 # ---------------------------------------------------------------
-# Local implementation notes / guides (not shared)
-docs/
+# Documentation & Architecture Decision Records
+!docs/adr/
+!docs/adr/**
 
-# Simulation outputs and benchmark data
-/results/
+# Simulation temporary outputs (transient trajectory dumps)
+out/
 output/
 outputs/
-benchmarks/results/
+
+# Benchmark results and reports (tracked for repository benchmarks)
+!bench/results/
+!bench/results/**
+!*.json
+
+# Data files
 data/ic/*
-!data/ic/ic_N100_s42.csv
-!data/ic/ic_N1000_s42.csv
+!data/ic/*.csv
+
+# Build outputs & executables
 backends/*/build/
+backends/serial/nbody_serial
+py-mpi.zip
 *.npy
 *.npz
 *.h5

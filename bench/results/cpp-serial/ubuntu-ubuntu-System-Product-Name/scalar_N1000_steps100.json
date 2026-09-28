@@ -1,0 +1,18 @@
+{
+  "machine": "ubuntu-ubuntu-System-Product-Name",
+  "backend": "cpp-serial",
+  "method": "scalar",
+  "variant": "default",
+  "n": 1000,
+  "p": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "timings": {
+    "setup": 0.00459637,
+    "loop": 0.188321,
+    "transfer": 0,
+    "total": 0.192917,
+    "ms_per_step": 1.88321
+  },
+  "extra": {"threads": 1}
+}
