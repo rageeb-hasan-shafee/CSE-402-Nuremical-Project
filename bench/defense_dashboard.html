@@ -216,7 +216,7 @@
       padding: 0.85rem 1.25rem;
       display: flex;
       flex-wrap: wrap;
-      gap: 1.2rem;
+      gap: 1rem;
       align-items: center;
       justify-content: space-between;
       background: var(--surface-1);
@@ -232,7 +232,7 @@
       background: var(--surface-3);
       color: var(--text);
       border: 1px solid var(--border);
-      padding: 0.45rem 0.9rem;
+      padding: 0.45rem 0.85rem;
       border-radius: 6px;
       font-size: 0.82rem;
       font-weight: 600;
@@ -256,7 +256,7 @@
     .ctl-item {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.55rem;
       font-size: 0.82rem;
       color: var(--text-muted);
     }
@@ -283,19 +283,29 @@
     .ctl-slider-box {
       display: flex;
       align-items: center;
-      gap: 0.6rem;
+      gap: 0.45rem;
     }
     .ctl-slider-box input[type="range"] {
-      width: 90px;
+      width: 80px;
       accent-color: var(--accent-cyan);
       cursor: pointer;
     }
-    .ctl-slider-val {
+    .ctl-num-input {
+      width: 58px;
+      background: var(--surface-2);
+      color: var(--accent-cyan);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 0.25rem 0.4rem;
       font-family: var(--font-mono);
       font-size: 0.78rem;
-      color: var(--accent-cyan);
-      min-width: 32px;
-      text-align: right;
+      font-weight: 600;
+      text-align: center;
+      outline: none;
+    }
+    .ctl-num-input:focus {
+      border-color: var(--accent-cyan);
+      background: #1c2b44;
     }
     .realtime-tag {
       font-family: var(--font-mono);
@@ -303,7 +313,7 @@
       color: var(--accent-emerald);
       background: rgba(52, 211, 153, 0.08);
       border: 1px solid rgba(52, 211, 153, 0.25);
-      padding: 0.3rem 0.75rem;
+      padding: 0.35rem 0.75rem;
       border-radius: 6px;
     }
 
@@ -355,6 +365,11 @@
       background: #04070e;
       height: 560px;
       width: 100%;
+      cursor: grab;
+      user-select: none;
+    }
+    .canvas-wrapper:active {
+      cursor: grabbing;
     }
     .sim-canvas {
       width: 100%;
@@ -730,7 +745,7 @@
       <div class="header-status">
         <div class="status-badge green">
           <span style="display:inline-block; width:6px; height:6px; background:var(--accent-emerald); border-radius:50%;"></span>
-          M1 Verification Gate (< 10⁻¹⁰)
+          M1 Verification Gate (&lt; 10⁻¹⁰)
         </div>
         <div class="status-badge blue">
           <span style="display:inline-block; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%;"></span>
@@ -753,44 +768,46 @@
     <!-- ===================================================================== -->
     <section id="tab-simulation" class="tab-content active">
       <div class="sim-layout">
-        <!-- Top Global Controls -->
+        <!-- Top Global Controls with direct Number Inputs -->
         <div class="control-panel">
           <div class="btn-group">
             <button class="btn-ctl active" id="btn-play" onclick="toggleSim()">⏸ Pause</button>
             <button class="btn-ctl" onclick="resetBothSims()">↺ Reset Orbits</button>
-            <button class="btn-ctl" onclick="centerBothViews()">✛ Recenter</button>
+            <button class="btn-ctl" onclick="resetCamera()">✛ Recenter View</button>
           </div>
 
           <div class="ctl-item">
             <label>Physical Scenario:</label>
             <select id="scenario-select" class="ctl-select" onchange="changeScenario(this.value)">
-              <option value="choreography">Figure-8 Three-Body Choreography (Stable Verlet vs Chaos)</option>
-              <option value="solar">Solar System Baseline (Sun + 8 Planets + Moon)</option>
-              <option value="mercury_rel">Mercury 1PN General Relativity Precession</option>
+              <option value="figure8" selected>Figure-8 Three-Body Choreography (Stable Verlet vs Chaos)</option>
+              <option value="precession">Mercury 1PN Relativistic Precession Rosette</option>
+              <option value="inner">Inner Terrestrial Solar System (Sun + 4 Planets)</option>
+              <option value="full">Full Solar System (Sun through Neptune)</option>
+              <option value="asteroids">Synthetic Asteroid Belt (300 Bodies + Jupiter Perturbation)</option>
             </select>
           </div>
 
           <div class="ctl-item">
-            <label>Playback Speed:</label>
+            <label>Speed:</label>
             <div class="ctl-slider-box">
-              <input type="range" id="global-speed" min="0.1" max="10.0" step="0.1" value="1.0" oninput="updateGlobalSpeed(this.value)">
-              <span class="ctl-slider-val" id="val-speed">1.0×</span>
+              <input type="range" id="global-speed" min="0.05" max="50.0" step="0.05" value="1.0" oninput="syncSpeed(this.value, 'range')">
+              <input type="number" id="num-speed" class="ctl-num-input" min="0.05" max="50.0" step="0.1" value="1.0" onchange="syncSpeed(this.value, 'num')">
             </div>
           </div>
 
           <div class="ctl-item">
-            <label>Trail Length:</label>
+            <label>Trail:</label>
             <div class="ctl-slider-box">
-              <input type="range" id="global-trail" min="20" max="500" step="10" value="200" oninput="updateGlobalTrail(this.value)">
-              <span class="ctl-slider-val" id="val-trail">200</span>
+              <input type="range" id="global-trail" min="10" max="1000" step="10" value="200" oninput="syncTrail(this.value, 'range')">
+              <input type="number" id="num-trail" class="ctl-num-input" min="10" max="1000" step="10" value="200" onchange="syncTrail(this.value, 'num')">
             </div>
           </div>
 
           <div class="ctl-item">
             <label>Smooth (W):</label>
             <div class="ctl-slider-box">
-              <input type="range" id="global-smooth" min="1" max="50" step="1" value="15" oninput="updateSmooth(this.value)">
-              <span class="ctl-slider-val" id="val-smooth">15</span>
+              <input type="range" id="global-smooth" min="1" max="100" step="1" value="15" oninput="syncSmooth(this.value, 'range')">
+              <input type="number" id="num-smooth" class="ctl-num-input" min="1" max="100" step="1" value="15" onchange="syncSmooth(this.value, 'num')">
             </div>
           </div>
 
@@ -799,7 +816,7 @@
           </div>
         </div>
 
-        <!-- Dual Simulation Panes -->
+        <!-- Dual Simulation Panes (560px Height, Synchronized Camera) -->
         <div class="dual-pane-grid">
           <!-- Pane A -->
           <div class="pane-card pane-a">
@@ -816,10 +833,10 @@
                   <option value="leapfrog">Symplectic Leapfrog</option>
                   <option value="gr_verlet">Verlet + 1PN Relativistic GR</option>
                 </select>
-                <div class="ctl-slider-box" title="Numerical integration step size">
+                <div class="ctl-slider-box" title="Numerical integration step size dt">
                   <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">dt:</span>
-                  <input type="range" id="dt-a" min="0.005" max="0.2" step="0.005" value="0.05" oninput="paneA.setDt(this.value)">
-                  <span class="ctl-slider-val" id="val-dt-a">0.05</span>
+                  <input type="range" id="dt-a" min="0.001" max="0.5" step="0.001" value="0.05" oninput="syncDtA(this.value, 'range')">
+                  <input type="number" id="num-dt-a" class="ctl-num-input" min="0.001" max="0.5" step="0.005" value="0.050" onchange="syncDtA(this.value, 'num')">
                 </div>
               </div>
             </div>
@@ -849,10 +866,10 @@
                   <option value="rk4">Runge-Kutta 4 (4th-Order Classical)</option>
                   <option value="euler">Forward Euler (1st-Order Non-Symplectic)</option>
                 </select>
-                <div class="ctl-slider-box" title="Numerical integration step size">
+                <div class="ctl-slider-box" title="Numerical integration step size dt">
                   <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">dt:</span>
-                  <input type="range" id="dt-b" min="0.005" max="0.2" step="0.005" value="0.05" oninput="paneB.setDt(this.value)">
-                  <span class="ctl-slider-val" id="val-dt-b">0.05</span>
+                  <input type="range" id="dt-b" min="0.001" max="0.5" step="0.001" value="0.05" oninput="syncDtB(this.value, 'range')">
+                  <input type="number" id="num-dt-b" class="ctl-num-input" min="0.001" max="0.5" step="0.005" value="0.050" onchange="syncDtB(this.value, 'num')">
                 </div>
               </div>
             </div>
@@ -928,7 +945,7 @@
               <div class="bento-card">
                 <div class="bento-title amber">🪐 Gaussian Astronomical Units</div>
                 <ul class="bento-bullets">
-                  <li><strong>Length ($r$)</strong>: Astronomical Units ($\text{AU}$).</li>
+                  <li><strong>Length ($r$)</strong>: Astronomical Units (AU).</li>
                   <li><strong>Mass ($m$)</strong>: Solar Masses ($M_\odot$).</li>
                   <li><strong>Time ($t$)</strong>: Days; Gaussian constant $G \approx 2.959122 \times 10^{-4}\text{ AU}^3 M_\odot^{-1}\text{ day}^{-2}$.</li>
                   <li><strong>Numerical Benefit</strong>: Eliminates catastrophic roundoff cancellation inherent to SI units ($10^{-11}$).</li>
@@ -1108,9 +1125,9 @@
                 </tr>
                 <tr>
                   <td><strong style="color:var(--accent-amber);">Fahad</strong></td>
-                  <td>Consolidation &amp; Data Analysis</td>
+                  <td>Consolidation &amp; Visualization</td>
                   <td>AMD Ryzen 5 5600G (6C/12T)</td>
-                  <td>Cross-platform branch consolidation under Contract v1, MS-MPI setup, master benchmark compilation &amp; data analysis, and oral defense platform.</td>
+                  <td>Branch &amp; benchmark consolidation, data visualization, presentation making.</td>
                 </tr>
               </tbody>
             </table>
@@ -1324,8 +1341,8 @@
         renderMathInElement(document.body, {
           delimiters: [
             {left: '$$', right: '$$', display: true},
-            {left: '\\\\[', right: '\\\\]', display: true},
-            {left: '\\\\(', right: '\\\\)', display: false},
+            {left: '\\[', right: '\\]', display: true},
+            {left: '\\(', right: '\\)', display: false},
             {left: '$', right: '$', display: false}
           ],
           throwOnError: false
@@ -1417,17 +1434,25 @@
     }
 
     // =========================================================================
-    // 4. DECOUPLED RING-BUFFER SIMULATION ENGINE
+    // 4. SYNCHRONIZED CAMERA & 5 PHYSICAL SCENARIOS
     // =========================================================================
     const G_GAUSS = 2.9591220828559e-4; // AU^3 / (M_sun * day^2)
-    const C_LIGHT = 173.1446; // AU / day
+    const SQRT_G = Math.sqrt(G_GAUSS);  // ~0.01720210
+    const C_LIGHT = 173.1446;           // AU / day
 
     let globalSpeed = 1.0;
     let globalTrailLength = 200;
     let globalSmoothWindow = 15;
-    let currentScenario = 'choreography';
+    let currentScenario = 'figure8';
     let simRunning = false;
-    let animFrameId = null;
+
+    // SYNCHRONIZED UNIFIED CAMERA ACROSS BOTH PANES
+    let camX = 0;
+    let camY = 0;
+    let camZoom = 1.0;
+    let isDragging = false;
+    let dragStartX = 0;
+    let dragStartY = 0;
 
     let globalPhysicalTime = 0.0;
     let paneA, paneB;
@@ -1443,22 +1468,13 @@
         this.energy0 = 0.0;
         this.currentEnergy = 0.0;
         this.drift = 0.0;
-        this.energyHistory = []; // stores { raw, log }
+        this.energyHistory = [];
         this.localSimTime = 0.0;
-        this.maxTrailBuffer = 600;
+        this.maxTrailBuffer = 1200;
 
-        // View controls
-        this.scale = 1.0;
-        this.panX = 0;
-        this.panY = 0;
-        this.isDragging = false;
-        this.lastMouse = { x: 0, y: 0 };
-
-        this.mercuryRosette = [];
-        this.prevR = 0;
-        this.prevDr = 0;
-
-        this.initEvents();
+        this.perihelionRays = [];
+        this.lastDist = null;
+        this.distDecreasing = false;
       }
 
       setIntegrator(val) {
@@ -1470,78 +1486,83 @@
       }
 
       setDt(val) {
-        this.dt = parseFloat(val);
-        const tag = document.getElementById(this.isPaneB ? 'val-dt-b' : 'val-dt-a');
-        if (tag) tag.innerText = parseFloat(val).toFixed(3);
-      }
-
-      initEvents() {
-        this.canvas.addEventListener('mousedown', e => {
-          this.isDragging = true;
-          this.lastMouse = { x: e.clientX, y: e.clientY };
-        });
-        window.addEventListener('mouseup', () => { this.isDragging = false; });
-        this.canvas.addEventListener('mousemove', e => {
-          if (!this.isDragging) return;
-          this.panX += (e.clientX - this.lastMouse.x);
-          this.panY += (e.clientY - this.lastMouse.y);
-          this.lastMouse = { x: e.clientX, y: e.clientY };
-          if (!simRunning) this.draw();
-        });
-        this.canvas.addEventListener('wheel', e => {
-          e.preventDefault();
-          const zoom = e.deltaY < 0 ? 1.15 : 0.85;
-          this.scale *= zoom;
-          if (!simRunning) this.draw();
-        }, { passive: false });
+        this.dt = Math.max(0.001, parseFloat(val) || 0.05);
       }
 
       initBodies(scenario) {
         this.bodies = [];
-        this.mercuryRosette = [];
-        this.prevR = 0;
-        this.prevDr = 0;
+        this.perihelionRays = [];
+        this.lastDist = null;
+        this.distDecreasing = false;
         this.localSimTime = 0.0;
         this.energyHistory = [];
 
-        if (scenario === 'choreography') {
-          const v_scale = Math.sqrt(G_GAUSS);
-          const p1 = { x: 0.97000436, y: -0.24308753 };
-          const p2 = { x: -0.97000436, y: 0.24308753 };
-          const p3 = { x: 0.0, y: 0.0 };
-          const v3 = { vx: -2 * -0.93240737 * v_scale, vy: -2 * -0.86473146 * v_scale };
-          const v1 = { vx: -0.5 * v3.vx, vy: -0.5 * v3.vy };
-          const v2 = { vx: -0.5 * v3.vx, vy: -0.5 * v3.vy };
+        if (scenario === 'figure8') {
+          // Chenciner & Montgomery / Moore (1993) Scaled by exact sqrt(G)
+          const vx3 = 0.93240737 * SQRT_G;
+          const vy3 = 0.86473146 * SQRT_G;
+          const vx1 = -0.5 * vx3;
+          const vy1 = -0.5 * vy3;
 
           this.bodies = [
-            this.createBody("Body 1", 1.0, p1.x, p1.y, v1.vx, v1.vy, "#38bdf8", 6),
-            this.createBody("Body 2", 1.0, p2.x, p2.y, v2.vx, v2.vy, "#fb7185", 6),
-            this.createBody("Body 3", 1.0, p3.x, p3.y, v3.vx, v3.vy, "#34d399", 6)
+            this.createBody("Body 1", 1.0, -0.97000436, 0.24308753, vx1, vy1, "#38bdf8", 6),
+            this.createBody("Body 2", 1.0, 0.97000436, -0.24308753, vx1, vy1, "#fb7185", 6),
+            this.createBody("Body 3", 1.0, 0.0, 0.0, vx3, vy3, "#34d399", 6)
           ];
         }
-        else if (scenario === 'solar') {
-          this.bodies = [
-            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#fbbf24", 9),
-            this.createBody("Mercury", 1.66e-7, 0.387, 0, 0, 0.0276, "#94a3b8", 3.5),
-            this.createBody("Venus", 2.45e-6, 0.723, 0, 0, 0.0202, "#fcd34d", 4.2),
-            this.createBody("Earth", 3.00e-6, 1.000, 0, 0, 0.0172, "#38bdf8", 4.5),
-            this.createBody("Moon", 3.69e-8, 1.00257, 0, 0, 0.0172 + 0.00058, "#e2e8f0", 2.0),
-            this.createBody("Mars", 3.23e-7, 1.524, 0, 0, 0.0139, "#f87171", 3.8),
-            this.createBody("Jupiter", 9.54e-4, 5.204, 0, 0, 0.0075, "#fdba74", 6.8),
-            this.createBody("Saturn", 2.86e-4, 9.582, 0, 0, 0.0055, "#fef08a", 6.0),
-            this.createBody("Uranus", 4.37e-5, 19.20, 0, 0, 0.0039, "#67e8f9", 5.2),
-            this.createBody("Neptune", 5.15e-5, 30.05, 0, 0, 0.0031, "#818cf8", 5.0)
-          ];
-        }
-        else if (scenario === 'mercury_rel') {
+        else if (scenario === 'precession') {
+          // Relativistic 1PN Precession Rosette
           const e = 0.2056;
           const a = 0.3871;
           const r_p = a * (1 - e);
           const v_p = Math.sqrt(G_GAUSS * (1 + e) / (a * (1 - e)));
+
           this.bodies = [
             this.createBody("Sun", 1.0, 0, 0, 0, 0, "#fbbf24", 9),
-            this.createBody("Mercury", 1.66e-7, r_p, 0, 0, v_p, "#38bdf8", 4.5)
+            this.createBody("Mercury", 1.66e-7, r_p, 0, 0, v_p, "#38bdf8", 4.5, true)
           ];
+        }
+        else if (scenario === 'inner') {
+          // Inner Solar System
+          this.bodies = [
+            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#fbbf24", 9),
+            this.createBody("Mercury", 1.66e-7, 0.387, 0, 0, 0.0276, "#94a3b8", 3.2),
+            this.createBody("Venus", 2.45e-6, 0.723, 0, 0, 0.0202, "#fde047", 4.0),
+            this.createBody("Earth", 3.00e-6, 1.000, 0, 0, 0.0172, "#38bdf8", 4.2),
+            this.createBody("Mars", 3.23e-7, 1.524, 0, 0, 0.0140, "#f87171", 3.6)
+          ];
+        }
+        else if (scenario === 'full') {
+          // Full Solar System (Sun through Neptune)
+          this.bodies = [
+            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#fbbf24", 9),
+            this.createBody("Mercury", 1.66e-7, 0.387, 0, 0, 0.0276, "#94a3b8", 2.5),
+            this.createBody("Venus", 2.45e-6, 0.723, 0, 0, 0.0202, "#fde047", 3.0),
+            this.createBody("Earth", 3.00e-6, 1.000, 0, 0, 0.0172, "#38bdf8", 3.2),
+            this.createBody("Mars", 3.23e-7, 1.524, 0, 0, 0.0140, "#f87171", 2.8),
+            this.createBody("Jupiter", 9.55e-4, 5.204, 0, 0, 0.0075, "#fb923c", 6.0),
+            this.createBody("Saturn", 2.86e-4, 9.582, 0, 0, 0.0055, "#facc15", 5.2),
+            this.createBody("Uranus", 4.37e-5, 19.20, 0, 0, 0.0039, "#818cf8", 4.2),
+            this.createBody("Neptune", 5.15e-5, 30.05, 0, 0, 0.0031, "#60a5fa", 4.0)
+          ];
+        }
+        else if (scenario === 'asteroids') {
+          // 300 Synthetic Asteroid Belt Particles + Jupiter Perturbation
+          this.bodies = [
+            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#fbbf24", 9),
+            this.createBody("Jupiter", 9.55e-4, 5.204, 0, 0, 0.0075, "#fb923c", 6.0)
+          ];
+          for (let i = 0; i < 300; i++) {
+            const a = 2.1 + Math.random() * 1.2;
+            const theta = Math.random() * Math.PI * 2;
+            const v = Math.sqrt(G_GAUSS / a);
+            this.bodies.push(this.createBody(
+              `Ast-${i}`, 1e-12,
+              a * Math.cos(theta), a * Math.sin(theta),
+              -v * Math.sin(theta), v * Math.cos(theta),
+              "rgba(147, 197, 253, 0.55)", 1.2
+            ));
+          }
         }
 
         this.computeAccelerations();
@@ -1549,16 +1570,15 @@
         this.currentEnergy = this.energy0;
         this.drift = 0.0;
         
-        // Initial record of positions into trail ring buffer
         this.recordTrail();
       }
 
-      createBody(name, m, x, y, vx, vy, color, radius) {
+      createBody(name, m, x, y, vx, vy, color, radius, isGR = false) {
         return {
           name, m, x, y, vx, vy,
           ax: 0, ay: 0, prev_ax: 0, prev_ay: 0,
-          color, radius,
-          // Fixed circular ring buffer (Float32Array) for zero-allocation trails
+          color, radius, isGR,
+          // Fast circular ring buffer (Float32Array)
           trailX: new Float32Array(this.maxTrailBuffer),
           trailY: new Float32Array(this.maxTrailBuffer),
           trailHead: 0,
@@ -1577,10 +1597,8 @@
             const b2 = this.bodies[j];
             const dx = b2.x - b1.x;
             const dy = b2.y - b1.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist > 1e-12) {
-              V -= (G_GAUSS * b1.m * b2.m) / dist;
-            }
+            const dist = Math.hypot(dx, dy) + 1e-12;
+            V -= (G_GAUSS * b1.m * b2.m) / dist;
           }
         }
         return T + V;
@@ -1599,39 +1617,33 @@
             const b2 = this.bodies[j];
             const dx = b2.x - b1.x;
             const dy = b2.y - b1.y;
-            const r2 = dx * dx + dy * dy;
-            const dist = Math.sqrt(r2);
-            if (dist < 1e-12) continue;
+            const distSq = dx * dx + dy * dy + 1e-12;
+            const dist3 = Math.pow(distSq, 1.5);
 
-            const f_base = G_GAUSS / (r2 * dist);
-            const fx = f_base * dx;
-            const fy = f_base * dy;
+            const fx = (G_GAUSS * dx) / dist3;
+            const fy = (G_GAUSS * dy) / dist3;
 
             b1.ax += fx * b2.m;
             b1.ay += fy * b2.m;
             b2.ax -= fx * b1.m;
             b2.ay -= fy * b1.m;
           }
-        }
 
-        // Relativistic 1PN Correction
-        if (this.integrator === 'gr_verlet' && this.bodies.length >= 2) {
-          const sun = this.bodies[0];
-          const merc = this.bodies[1];
-          const dx = merc.x - sun.x;
-          const dy = merc.y - sun.y;
-          const r = Math.sqrt(dx * dx + dy * dy);
-          const v2 = (merc.vx - sun.vx)**2 + (merc.vy - sun.vy)**2;
-          const r_dot_v = dx * (merc.vx - sun.vx) + dy * (merc.vy - sun.vy);
-          const c2 = C_LIGHT * C_LIGHT;
-          const pre = (G_GAUSS * sun.m) / (c2 * (r**3));
-          const gr_scale = 1000.0; // amplify for real-time visualization
+          // 1PN Relativistic Precession Correction
+          if (b1.isGR && this.integrator === 'gr_verlet') {
+            const rSq = b1.x * b1.x + b1.y * b1.y + 1e-12;
+            const r = Math.sqrt(rSq);
+            const vSq = b1.vx * b1.vx + b1.vy * b1.vy;
+            const rDotV = b1.x * b1.vx + b1.y * b1.vy;
+            const cSq = C_LIGHT * C_LIGHT;
+            const alphaGR = 450.0; // Amplified for immediate visual presentation
 
-          const f_gr_x = pre * (((4.0 * G_GAUSS * sun.m) / r - v2) * dx + 4.0 * r_dot_v * (merc.vx - sun.vx)) * gr_scale;
-          const f_gr_y = pre * (((4.0 * G_GAUSS * sun.m) / r - v2) * dy + 4.0 * r_dot_v * (merc.vy - sun.vy)) * gr_scale;
+            const factor = (alphaGR * G_GAUSS * 1.0) / (cSq * r * rSq);
+            const grTerm1 = ((4.0 * G_GAUSS * 1.0) / r - vSq);
 
-          merc.ax += f_gr_x;
-          merc.ay += f_gr_y;
+            b1.ax += factor * (grTerm1 * b1.x + 4.0 * rDotV * b1.vx);
+            b1.ay += factor * (grTerm1 * b1.y + 4.0 * rDotV * b1.vy);
+          }
         }
       }
 
@@ -1649,7 +1661,6 @@
           this.computeAccelerations();
         }
         else if (this.integrator === 'rk4') {
-          // Standard classical 4th order update
           for (let i = 0; i < n; i++) {
             const b = this.bodies[i];
             b.x += b.vx * dt + 0.5 * b.ax * dt * dt;
@@ -1676,23 +1687,24 @@
           }
         }
 
-        // Mercury Perihelion Rosette detection
-        if (currentScenario === 'mercury_rel' && this.bodies.length >= 2) {
+        // Mercury Perihelion Rosette tracking
+        if (currentScenario === 'precession' && this.bodies.length > 1) {
           const m = this.bodies[1];
-          const r = Math.sqrt(m.x * m.x + m.y * m.y);
-          const dr = r - this.prevR;
-          if (this.prevDr < 0 && dr >= 0 && this.prevR > 0) {
-            this.mercuryRosette.push({ x: m.x, y: m.y });
-            if (this.mercuryRosette.length > 36) this.mercuryRosette.shift();
+          const dist = Math.hypot(m.x, m.y);
+          if (this.lastDist !== null) {
+            if (dist > this.lastDist && this.distDecreasing) {
+              const angle = (Math.atan2(m.y, m.x) * 180 / Math.PI).toFixed(1);
+              this.perihelionRays.push({ x: m.x, y: m.y, angle });
+              if (this.perihelionRays.length > 24) this.perihelionRays.shift();
+            }
+            this.distDecreasing = (dist < this.lastDist);
           }
-          this.prevDr = dr;
-          this.prevR = r;
+          this.lastDist = dist;
         }
 
         this.localSimTime += dt;
       }
 
-      // Record trail point ONCE per render frame into pre-allocated circular ring buffer
       recordTrail() {
         for (let i = 0; i < this.bodies.length; i++) {
           const b = this.bodies[i];
@@ -1709,12 +1721,10 @@
         const h = this.canvas.height;
         ctx.clearRect(0, 0, w, h);
 
-        const centerX = (w / 2) + this.panX;
-        const centerY = (h / 2) + this.panY;
-
-        let baseScale = 160 * this.scale;
-        if (currentScenario === 'solar') baseScale = 14 * this.scale;
-        else if (currentScenario === 'mercury_rel') baseScale = 420 * this.scale;
+        // SYNCHRONIZED CAMERA COORDINATES
+        const centerX = (w / 2) + camX;
+        const centerY = (h / 2) + camY;
+        const baseScale = (h / 2.8) * camZoom;
 
         // Faint Coordinate Grid
         ctx.strokeStyle = '#162238';
@@ -1725,11 +1735,11 @@
         ctx.stroke();
 
         // Mercury Rosette Rays
-        if (currentScenario === 'mercury_rel' && this.mercuryRosette.length > 0) {
+        if (currentScenario === 'precession' && this.perihelionRays.length > 0) {
           ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
           ctx.lineWidth = 1.2;
           ctx.setLineDash([3, 4]);
-          for (const ray of this.mercuryRosette) {
+          for (const ray of this.perihelionRays) {
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
             ctx.lineTo(centerX + ray.x * baseScale * 1.8, centerY + ray.y * baseScale * 1.8);
@@ -1738,12 +1748,12 @@
           ctx.setLineDash([]);
         }
 
-        // Fast Segment-Batched Trail Drawing (Zero Stalls)
+        // Fast Segment-Batched Trail Drawing
         for (const b of this.bodies) {
+          if (b.m < 1e-10) continue; // skip 300 asteroid trails to maintain 60 FPS
           const count = Math.min(b.trailCount, globalTrailLength);
           if (count < 2) continue;
 
-          // Render in 4 multi-stop alpha segments instead of 500 individual strokes!
           const segments = 4;
           const step = Math.max(1, Math.floor(count / segments));
 
@@ -1789,9 +1799,11 @@
           ctx.arc(sx, sy, b.radius, 0, Math.PI * 2);
           ctx.fill();
 
-          ctx.fillStyle = '#f8fafc';
-          ctx.font = '11px JetBrains Mono';
-          ctx.fillText(b.name, sx + b.radius + 5, sy + 3);
+          if (b.m > 1e-10) {
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = '11px JetBrains Mono';
+            ctx.fillText(b.name, sx + b.radius + 5, sy + 3);
+          }
         }
 
         // Telemetry Update
@@ -1826,13 +1838,40 @@
     }
 
     // =========================================================================
-    // 5. SYNCHRONIZED ANIMATION LOOP & DRIFT COMPARATOR
+    // 5. SYNCHRONIZED CAMERA EVENT LISTENERS & LOOP
     // =========================================================================
     function initSimEngines() {
       paneA = new SimulationPane('canvas-a', false);
       paneB = new SimulationPane('canvas-b', true);
       resizeBothCanvases();
-      changeScenario('choreography');
+
+      // Shared Pan & Zoom Event Listeners on BOTH canvases
+      [paneA.canvas, paneB.canvas].forEach(c => {
+        c.addEventListener('mousedown', (e) => {
+          isDragging = true;
+          dragStartX = e.clientX - camX;
+          dragStartY = e.clientY - camY;
+        });
+        c.addEventListener('wheel', (e) => {
+          e.preventDefault();
+          const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
+          camZoom = Math.min(Math.max(camZoom * zoomFactor, 0.05), 30.0);
+          if (!simRunning) drawBothSims();
+        }, { passive: false });
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        camX = e.clientX - dragStartX;
+        camY = e.clientY - dragStartY;
+        if (!simRunning) drawBothSims();
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
+      changeScenario('figure8');
     }
 
     function resizeBothCanvases() {
@@ -1856,26 +1895,27 @@
 
     window.addEventListener('resize', () => {
       resizeBothCanvases();
-      if (!simRunning) {
-        if (paneA) paneA.draw();
-        if (paneB) paneB.draw();
-        drawUnifiedDrift();
-      }
+      if (!simRunning) drawBothSims();
     });
+
+    function resetCamera() {
+      camX = 0;
+      camY = 0;
+      if (currentScenario === 'figure8') camZoom = 0.95;
+      else if (currentScenario === 'precession') camZoom = 1.6;
+      else if (currentScenario === 'inner') camZoom = 1.1;
+      else if (currentScenario === 'full') camZoom = 0.18;
+      else if (currentScenario === 'asteroids') camZoom = 0.35;
+      else camZoom = 1.0;
+      drawBothSims();
+    }
 
     function changeScenario(val) {
       currentScenario = val;
       globalPhysicalTime = 0.0;
       if (paneA) paneA.initBodies(val);
       if (paneB) paneB.initBodies(val);
-      centerBothViews();
-      drawBothSims();
-    }
-
-    function centerBothViews() {
-      if (paneA) { paneA.panX = 0; paneA.panY = 0; paneA.scale = 1.0; }
-      if (paneB) { paneB.panX = 0; paneB.panY = 0; paneB.scale = 1.0; }
-      drawBothSims();
+      resetCamera();
     }
 
     function resetBothSims() {
@@ -1895,26 +1935,45 @@
       }
     }
 
-    function updateGlobalSpeed(val) {
-      globalSpeed = parseFloat(val);
-      const tag = document.getElementById('val-speed');
-      if (tag) tag.innerText = parseFloat(val).toFixed(1) + "×";
+    // Two-Way Synced Sliders + Number Inputs
+    function syncSpeed(val, source) {
+      const num = Math.min(50.0, Math.max(0.05, parseFloat(val) || 1.0));
+      globalSpeed = num;
+      if (source === 'range') document.getElementById('num-speed').value = num.toFixed(1);
+      else document.getElementById('global-speed').value = num;
+
       const days = (globalSpeed * 2.5).toFixed(1);
       const yrs = (globalSpeed * 2.5 / 365.25).toFixed(3);
       const rtTag = document.getElementById('tag-realtime');
       if (rtTag) rtTag.innerText = `1.0s real-time = ${days} orbital days (${yrs} Earth Years)`;
     }
 
-    function updateGlobalTrail(val) {
-      globalTrailLength = parseInt(val, 10);
-      const tag = document.getElementById('val-trail');
-      if (tag) tag.innerText = val;
+    function syncTrail(val, source) {
+      const num = Math.min(1000, Math.max(10, parseInt(val, 10) || 200));
+      globalTrailLength = num;
+      if (source === 'range') document.getElementById('num-trail').value = num;
+      else document.getElementById('global-trail').value = num;
     }
 
-    function updateSmooth(val) {
-      globalSmoothWindow = parseInt(val, 10);
-      const tag = document.getElementById('val-smooth');
-      if (tag) tag.innerText = val;
+    function syncSmooth(val, source) {
+      const num = Math.min(100, Math.max(1, parseInt(val, 10) || 15));
+      globalSmoothWindow = num;
+      if (source === 'range') document.getElementById('num-smooth').value = num;
+      else document.getElementById('global-smooth').value = num;
+    }
+
+    function syncDtA(val, source) {
+      const num = Math.min(0.5, Math.max(0.001, parseFloat(val) || 0.05));
+      paneA.setDt(num);
+      if (source === 'range') document.getElementById('num-dt-a').value = num.toFixed(3);
+      else document.getElementById('dt-a').value = num;
+    }
+
+    function syncDtB(val, source) {
+      const num = Math.min(0.5, Math.max(0.001, parseFloat(val) || 0.05));
+      paneB.setDt(num);
+      if (source === 'range') document.getElementById('num-dt-b').value = num.toFixed(3);
+      else document.getElementById('dt-b').value = num;
     }
 
     let lastTimestamp = performance.now();
@@ -1925,34 +1984,27 @@
       const elapsedMs = Math.min(timestamp - lastTimestamp, 80);
       lastTimestamp = timestamp;
 
-      // Lock-step physical orbital time advancement per animation frame
       const targetDeltaT = (elapsedMs / 1000.0) * (globalSpeed * 2.5);
       globalPhysicalTime += targetDeltaT;
 
-      // Advance Pane A via numerical sub-steps until caught up
       while (paneA.localSimTime < globalPhysicalTime) {
         const step = Math.min(paneA.dt, globalPhysicalTime - paneA.localSimTime);
         paneA.stepNumerical(step);
       }
 
-      // Advance Pane B via numerical sub-steps until caught up
       while (paneB.localSimTime < globalPhysicalTime) {
         const step = Math.min(paneB.dt, globalPhysicalTime - paneB.localSimTime);
         paneB.stepNumerical(step);
       }
 
-      // Record decoupled trail positions ONCE per animation frame
       paneA.recordTrail();
       paneB.recordTrail();
 
-      // Render both views
       paneA.draw();
       paneB.draw();
 
-      // Update Drift Graph
       drawUnifiedDrift();
 
-      // Update physical clock
       const clk = document.getElementById('sync-clock');
       if (clk) clk.innerText = `${globalPhysicalTime.toFixed(1)} d (${(globalPhysicalTime / 365.25).toFixed(3)} yr)`;
 
@@ -1981,7 +2033,6 @@
       const graphW = w - padL - padR;
       const graphH = h - padT - padB;
 
-      // Background grid: log scale -12 to 0
       ctx.strokeStyle = '#1e293b';
       ctx.lineWidth = 1;
       ctx.font = '10px JetBrains Mono';
@@ -1997,7 +2048,6 @@
         ctx.fillText(`10^${lvl}`, 6, y + 3);
       }
 
-      // Symplectic Bounded Zone Guide (-7 to -10)
       const yTop = padT + (-7 / -12.0) * graphH;
       const yBot = padT + (-10 / -12.0) * graphH;
       ctx.fillStyle = 'rgba(52, 211, 153, 0.04)';
@@ -2005,7 +2055,6 @@
       ctx.fillStyle = '#34d399';
       ctx.fillText("Symplectic Invariant Band (10⁻⁷ - 10⁻¹⁰)", padL + 8, yTop + 14);
 
-      // Plot Pane A (Amber) & Pane B (Cyan)
       plotDriftLine(ctx, paneA.energyHistory, '#fbbf24', padL, padT, graphW, graphH);
       plotDriftLine(ctx, paneB.energyHistory, '#38bdf8', padL, padT, graphW, graphH);
     }
