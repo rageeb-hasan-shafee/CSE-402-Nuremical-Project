@@ -42,6 +42,10 @@ _Avoid_: Collision damping, smoothing radius
 A conserved vector pointing toward the perihelion of an orbit used to monitor perihelion precession.
 _Avoid_: Periapsis vector, eccentricity vector
 
+**Decoupled Trail Ring-Buffer**:
+A fixed-capacity circular Float32Array coordinate buffer that samples celestial positions strictly at the display refresh rate (60 Hz), completely decoupled from numerical integration sub-stepping to eliminate memory reallocation and garbage collection stalls.
+_Avoid_: Point list, array shift trail, frame history
+
 ## Architecture & Parallelization Domain
 
 **Structure-of-Arrays (SoA)**:
