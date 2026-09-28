@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSE 402: N-Body Solar System HPC Simulation — Oral Defense Hub</title>
   
-  <!-- Inter & JetBrains Mono Fonts -->
+  <!-- Inter, Space Grotesk & JetBrains Mono Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   
   <!-- Chart.js 4.4.1 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -20,57 +20,71 @@
 
   <style>
     :root {
-      /* Vibrant Dark Palette */
-      --bg: #090d16;
-      --bg-gradient: radial-gradient(circle at 50% 0%, #151e34 0%, #090d16 75%);
-      --surface-1: #0f172a;
-      --surface-2: #162238;
-      --surface-3: #1e2c47;
-      --border: #233554;
-      --border-glow: #38bdf840;
+      /* Palette A: Deep Slate / Celestial Observatory (Primary Academic Scientific Theme) */
+      --bg-canvas: #06090e;
+      --bg-gradient: radial-gradient(circle at 50% 0%, #101929 0%, #06090e 78%);
+      --surface-1: #0d1522;
+      --surface-2: #131f31;
+      --surface-3: #1a2a42;
+      --surface-elevated: #223552;
+      --surface-acrylic: rgba(13, 21, 34, 0.82);
+
+      /* Hairline Translucent Borders & Top-Edge Specular Highlights */
+      --border-subtle: rgba(148, 163, 184, 0.08);
+      --border-panel: rgba(148, 163, 184, 0.16);
+      --border-active: rgba(56, 189, 248, 0.45);
+      --highlight-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
       
-      /* Vibrant Typography & Accents */
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
+      /* Refined Typography Hierarchy */
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
       --text-dim: #64748b;
+      --text-faint: #334155;
       
+      /* Celestial Functional Accents */
       --accent-cyan: #38bdf8;
-      --accent-cyan-glow: rgba(56, 189, 248, 0.25);
+      --accent-cyan-glow: rgba(56, 189, 248, 0.22);
       --accent-indigo: #818cf8;
-      --accent-indigo-glow: rgba(129, 140, 248, 0.25);
-      --accent-emerald: #34d399;
-      --accent-amber: #fbbf24;
-      --accent-rose: #fb7185;
+      --accent-indigo-glow: rgba(129, 140, 248, 0.20);
+      --accent-emerald: #10b981;
+      --accent-emerald-glow: rgba(16, 185, 129, 0.20);
+      --accent-amber: #f59e0b;
+      --accent-amber-glow: rgba(245, 158, 11, 0.20);
+      --accent-coral: #fb7185;
+      --accent-coral-glow: rgba(251, 113, 133, 0.22);
       
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Space Grotesk', 'Inter', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--bg);
+      background: var(--bg-canvas);
       background-image: var(--bg-gradient);
-      color: var(--text);
+      color: var(--text-primary);
       font-family: var(--font-sans);
       line-height: 1.5;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* Sticky Top Shell */
+    /* Sticky Top Shell with Frosted Glassmorphism */
     .top-shell {
       position: sticky;
       top: 0;
       z-index: 1000;
-      background: rgba(11, 16, 28, 0.94);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+      background: rgba(10, 15, 25, 0.92);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-bottom: 1px solid var(--border-panel);
+      box-shadow: 0 4px 28px rgba(0, 0, 0, 0.65);
     }
     header {
-      padding: 0.85rem 2rem;
+      padding: 0.85rem 2.25rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -78,48 +92,52 @@
     .header-brand {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.9rem;
     }
     .badge-course {
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      background: linear-gradient(135deg, #0284c7, #4f46e5);
       color: #ffffff;
       font-family: var(--font-mono);
       font-size: 0.72rem;
       font-weight: 700;
-      padding: 0.25rem 0.55rem;
-      border-radius: 4px;
+      padding: 0.25rem 0.6rem;
+      border-radius: 5px;
       letter-spacing: 0.05em;
-      box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+      box-shadow: 0 0 14px rgba(79, 70, 229, 0.45);
     }
     .header-title h1 {
-      font-size: 1.08rem;
+      font-family: var(--font-display);
+      font-size: 1.15rem;
       font-weight: 700;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
       color: #ffffff;
     }
     .header-title p {
       font-size: 0.78rem;
-      color: var(--text-muted);
+      color: var(--text-secondary);
+      letter-spacing: 0.01em;
     }
     .header-status {
       display: flex;
-      gap: 0.65rem;
+      gap: 0.75rem;
       align-items: center;
     }
     .status-badge {
       font-family: var(--font-mono);
       font-size: 0.72rem;
-      padding: 0.25rem 0.65rem;
+      padding: 0.3rem 0.75rem;
       border-radius: 9999px;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
       font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      box-shadow: var(--highlight-specular);
     }
     .status-badge.green {
-      background: rgba(52, 211, 153, 0.12);
+      background: rgba(16, 185, 129, 0.12);
       color: var(--accent-emerald);
-      border: 1px solid rgba(52, 211, 153, 0.35);
+      border: 1px solid rgba(16, 185, 129, 0.35);
     }
     .status-badge.blue {
       background: rgba(56, 189, 248, 0.12);
@@ -131,18 +149,18 @@
     .tab-nav {
       display: flex;
       gap: 0.4rem;
-      padding: 0 2rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      background: rgba(15, 23, 42, 0.6);
+      padding: 0 2.25rem;
+      border-top: 1px solid var(--border-subtle);
+      background: rgba(13, 21, 34, 0.7);
     }
     .tab-btn {
       background: transparent;
       border: none;
-      color: var(--text-muted);
+      color: var(--text-secondary);
       font-family: var(--font-sans);
-      font-size: 0.85rem;
+      font-size: 0.86rem;
       font-weight: 600;
-      padding: 0.75rem 1.25rem;
+      padding: 0.8rem 1.35rem;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -157,20 +175,20 @@
     .tab-btn.active {
       color: var(--accent-cyan);
       border-bottom-color: var(--accent-cyan);
-      background: rgba(56, 189, 248, 0.06);
+      background: rgba(56, 189, 248, 0.08);
     }
 
-    /* Main Container with generous vertical room */
+    /* Main Container */
     main {
       flex: 1;
-      max-width: 1560px;
+      max-width: 1600px;
       margin: 0 auto;
       width: 100%;
-      padding: 1.5rem 2rem 4rem;
+      padding: 1.5rem 2.25rem 4rem;
     }
 
     .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.25s ease-out; }
+    .tab-content.active { display: block; animation: fadeIn 0.22s ease-out; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(4px); }
@@ -180,26 +198,27 @@
     /* Common Card Styles */
     .card {
       background: var(--surface-1);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--border-panel);
+      border-radius: 12px;
+      box-shadow: var(--highlight-specular), 0 8px 32px rgba(0, 0, 0, 0.45);
       overflow: hidden;
     }
     .card-header {
-      padding: 0.85rem 1.25rem;
+      padding: 0.85rem 1.35rem;
       background: var(--surface-2);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--border-panel);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .card-title {
-      font-size: 0.92rem;
+      font-family: var(--font-display);
+      font-size: 0.94rem;
       font-weight: 700;
       color: #ffffff;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.55rem;
     }
 
     /* ========================================================================= */
@@ -208,20 +227,21 @@
     .sim-layout {
       display: flex;
       flex-direction: column;
-      gap: 1.2rem;
+      gap: 1.25rem;
     }
 
     /* Control Bar */
     .control-panel {
-      padding: 0.85rem 1.25rem;
+      padding: 0.85rem 1.35rem;
       display: flex;
       flex-wrap: wrap;
-      gap: 1rem;
+      gap: 1.1rem;
       align-items: center;
       justify-content: space-between;
       background: var(--surface-1);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border: 1px solid var(--border-panel);
+      border-radius: 12px;
+      box-shadow: var(--highlight-specular), 0 4px 20px rgba(0,0,0,0.3);
     }
     .btn-group {
       display: flex;
@@ -229,21 +249,23 @@
       align-items: center;
     }
     button.btn-ctl {
-      background: var(--surface-3);
-      color: var(--text);
-      border: 1px solid var(--border);
-      padding: 0.45rem 0.85rem;
-      border-radius: 6px;
+      background: var(--surface-2);
+      color: var(--text-primary);
+      border: 1px solid var(--border-panel);
+      padding: 0.45rem 0.95rem;
+      border-radius: 7px;
+      font-family: var(--font-sans);
       font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
+      box-shadow: var(--highlight-specular);
       transition: all 0.15s ease;
     }
     button.btn-ctl:hover {
-      background: #273754;
+      background: var(--surface-3);
       border-color: var(--accent-cyan);
       color: #ffffff;
     }
@@ -251,93 +273,103 @@
       background: linear-gradient(135deg, #0284c7, #0369a1);
       border-color: var(--accent-cyan);
       color: #ffffff;
-      box-shadow: 0 0 12px var(--accent-cyan-glow);
+      box-shadow: 0 0 14px var(--accent-cyan-glow);
     }
     .ctl-item {
       display: flex;
       align-items: center;
-      gap: 0.55rem;
+      gap: 0.6rem;
       font-size: 0.82rem;
-      color: var(--text-muted);
+      color: var(--text-secondary);
     }
     .ctl-item label {
       font-family: var(--font-mono);
       font-weight: 600;
-      color: #e2e8f0;
+      color: var(--text-primary);
       font-size: 0.78rem;
     }
     .ctl-select {
       background: var(--surface-2);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 0.4rem 0.75rem;
+      color: var(--text-primary);
+      border: 1px solid var(--border-panel);
+      border-radius: 7px;
+      padding: 0.42rem 0.85rem;
       font-size: 0.82rem;
       font-family: var(--font-sans);
       cursor: pointer;
       outline: none;
+      box-shadow: var(--highlight-specular);
+      transition: border-color 0.15s ease;
     }
     .ctl-select:focus {
       border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 2px var(--accent-cyan-glow);
     }
     .ctl-slider-box {
       display: flex;
       align-items: center;
-      gap: 0.45rem;
+      gap: 0.5rem;
     }
     .ctl-slider-box input[type="range"] {
-      width: 80px;
+      width: 85px;
       accent-color: var(--accent-cyan);
       cursor: pointer;
     }
     .ctl-num-input {
-      width: 58px;
+      width: 60px;
       background: var(--surface-2);
       color: var(--accent-cyan);
-      border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 0.25rem 0.4rem;
+      border: 1px solid var(--border-panel);
+      border-radius: 6px;
+      padding: 0.28rem 0.45rem;
       font-family: var(--font-mono);
       font-size: 0.78rem;
       font-weight: 600;
+      font-variant-numeric: tabular-nums;
       text-align: center;
       outline: none;
+      box-shadow: var(--highlight-specular);
+      transition: all 0.15s ease;
     }
     .ctl-num-input:focus {
       border-color: var(--accent-cyan);
-      background: #1c2b44;
+      background: var(--surface-3);
+      box-shadow: 0 0 0 2px var(--accent-cyan-glow);
     }
     .realtime-tag {
       font-family: var(--font-mono);
       font-size: 0.76rem;
+      font-variant-numeric: tabular-nums;
       color: var(--accent-emerald);
-      background: rgba(52, 211, 153, 0.08);
-      border: 1px solid rgba(52, 211, 153, 0.25);
-      padding: 0.35rem 0.75rem;
-      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.10);
+      border: 1px solid rgba(16, 185, 129, 0.30);
+      padding: 0.38rem 0.85rem;
+      border-radius: 7px;
+      box-shadow: var(--highlight-specular);
     }
 
     /* Dual Simulation Panes (560px Height) */
     .dual-pane-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.2rem;
+      gap: 1.25rem;
     }
     .pane-card {
       background: var(--surface-1);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      border: 1px solid var(--border-panel);
+      border-radius: 12px;
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      box-shadow: var(--highlight-specular), 0 8px 30px rgba(0, 0, 0, 0.4);
     }
     .pane-card.pane-a { border-top: 3px solid var(--accent-amber); }
     .pane-card.pane-b { border-top: 3px solid var(--accent-cyan); }
 
     .pane-header {
-      padding: 0.75rem 1.25rem;
+      padding: 0.8rem 1.35rem;
       background: var(--surface-2);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--border-panel);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -345,11 +377,12 @@
       gap: 0.6rem;
     }
     .pane-title {
-      font-size: 0.9rem;
+      font-family: var(--font-display);
+      font-size: 0.92rem;
       font-weight: 700;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.55rem;
     }
     .pane-title.color-a { color: var(--accent-amber); }
     .pane-title.color-b { color: var(--accent-cyan); }
@@ -357,13 +390,13 @@
     .pane-controls {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: 0.8rem;
     }
 
     .canvas-wrapper {
       position: relative;
-      background: #04070e;
-      height: 560px;
+      background: #03060b;
+      height: 480px;
       width: 100%;
       cursor: grab;
       user-select: none;
@@ -380,17 +413,19 @@
       position: absolute;
       top: 1rem;
       left: 1rem;
-      background: rgba(15, 23, 42, 0.88);
-      border: 1px solid var(--border);
-      backdrop-filter: blur(8px);
-      border-radius: 8px;
-      padding: 0.65rem 0.9rem;
+      background: var(--surface-acrylic);
+      border: 1px solid var(--border-panel);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-radius: 9px;
+      padding: 0.7rem 0.95rem;
       font-family: var(--font-mono);
-      font-size: 0.74rem;
-      line-height: 1.6;
+      font-size: 0.75rem;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.65;
       color: #e2e8f0;
       pointer-events: none;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      box-shadow: var(--highlight-specular), 0 6px 20px rgba(0,0,0,0.55);
     }
     .telemetry-overlay span.metric {
       color: var(--accent-cyan);
@@ -400,12 +435,13 @@
     /* Drift Comparator (220px Height) */
     .drift-container {
       background: var(--surface-1);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.25rem;
+      border: 1px solid var(--border-panel);
+      border-radius: 12px;
+      padding: 1.1rem 1.35rem;
       display: flex;
       flex-direction: column;
-      gap: 0.6rem;
+      gap: 0.65rem;
+      box-shadow: var(--highlight-specular), 0 8px 30px rgba(0,0,0,0.35);
     }
     .drift-header {
       display: flex;
@@ -414,22 +450,23 @@
     }
     .drift-legend {
       display: flex;
-      gap: 1.2rem;
+      gap: 1.3rem;
       font-family: var(--font-mono);
       font-size: 0.76rem;
+      font-variant-numeric: tabular-nums;
     }
     .drift-legend-item {
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
     }
     .drift-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
     }
-    .drift-dot.a { background: var(--accent-amber); box-shadow: 0 0 6px var(--accent-amber); }
-    .drift-dot.b { background: var(--accent-cyan); box-shadow: 0 0 6px var(--accent-cyan); }
+    .drift-dot.a { background: var(--accent-amber); box-shadow: 0 0 8px var(--accent-amber); }
+    .drift-dot.b { background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); }
     .drift-canvas-box {
       height: 220px;
       width: 100%;
@@ -441,16 +478,16 @@
     /* ========================================================================= */
     .deck-container {
       background: var(--surface-1);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+      border: 1px solid var(--border-panel);
+      border-radius: 14px;
+      box-shadow: var(--highlight-specular), 0 16px 48px rgba(0, 0, 0, 0.6);
       overflow: hidden;
       min-height: 620px;
       display: flex;
       flex-direction: column;
     }
     .deck-slide {
-      padding: 2rem 2.5rem;
+      padding: 2.2rem 2.75rem;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -466,89 +503,92 @@
       margin-bottom: 0.4rem;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.45rem;
     }
     .slide-heading {
-      font-size: 1.6rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-family: var(--font-display);
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
       color: #ffffff;
-      margin-bottom: 0.4rem;
+      margin-bottom: 0.45rem;
     }
     .slide-ref {
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      margin-bottom: 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 1.35rem;
     }
 
     /* Modular Bento Grid System */
     .bento-grid-3 {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
+      gap: 1.1rem;
       margin-top: 1rem;
     }
     .bento-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      gap: 1.1rem;
       margin-top: 1rem;
     }
     .bento-card {
       background: var(--surface-2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.15rem;
+      border: 1px solid var(--border-panel);
+      border-radius: 10px;
+      padding: 1.25rem;
+      box-shadow: var(--highlight-specular), 0 4px 18px rgba(0, 0, 0, 0.25);
       transition: border-color 0.2s ease, transform 0.2s ease;
     }
     .bento-card:hover {
-      border-color: var(--border-glow);
+      border-color: rgba(56, 189, 248, 0.4);
       transform: translateY(-2px);
     }
     .bento-card.hero {
-      background: linear-gradient(145deg, #111e38, #0e172a);
+      background: linear-gradient(145deg, #101c30, #0c1524);
       border: 1px solid rgba(56, 189, 248, 0.35);
-      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.08);
+      box-shadow: var(--highlight-specular), 0 6px 24px rgba(56, 189, 248, 0.09);
     }
     .bento-card.hero-violet {
-      background: linear-gradient(145deg, #1c1a3a, #0e172a);
+      background: linear-gradient(145deg, #181938, #0c1524);
       border: 1px solid rgba(129, 140, 248, 0.35);
-      box-shadow: 0 4px 20px rgba(129, 140, 248, 0.08);
+      box-shadow: var(--highlight-specular), 0 6px 24px rgba(129, 140, 248, 0.09);
     }
     .bento-title {
-      font-size: 0.88rem;
+      font-family: var(--font-display);
+      font-size: 0.90rem;
       font-weight: 700;
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.65rem;
       display: flex;
       align-items: center;
-      gap: 0.45rem;
+      gap: 0.5rem;
     }
     .bento-title.cyan { color: var(--accent-cyan); }
     .bento-title.indigo { color: var(--accent-indigo); }
     .bento-title.emerald { color: var(--accent-emerald); }
     .bento-title.amber { color: var(--accent-amber); }
-    .bento-title.rose { color: var(--accent-rose); }
+    .bento-title.rose { color: var(--accent-coral); }
 
     /* Bullet-Point Telemetry Spec Style */
     .bento-bullets {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.55rem;
     }
     .bento-bullets li {
-      font-size: 0.82rem;
+      font-size: 0.83rem;
       color: #cbd5e1;
-      line-height: 1.5;
+      line-height: 1.52;
       position: relative;
-      padding-left: 1.1rem;
+      padding-left: 1.15rem;
     }
     .bento-bullets li::before {
       content: "•";
       position: absolute;
       left: 0;
       color: var(--accent-cyan);
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       line-height: 1;
       top: 1px;
     }
@@ -559,51 +599,53 @@
     .bento-bullets li code {
       font-family: var(--font-mono);
       font-size: 0.78rem;
-      background: rgba(0, 0, 0, 0.35);
-      padding: 0.1rem 0.35rem;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.1rem 0.38rem;
       border-radius: 4px;
       color: var(--accent-cyan);
+      border: 1px solid var(--border-subtle);
     }
 
     /* Math Container */
     .math-callout {
-      background: rgba(11, 19, 36, 0.9);
+      background: rgba(10, 16, 28, 0.95);
       border: 1px solid rgba(56, 189, 248, 0.35);
-      border-radius: 8px;
-      padding: 0.9rem;
+      border-radius: 9px;
+      padding: 0.95rem;
       margin: 0.75rem 0;
       text-align: center;
-      box-shadow: inset 0 0 16px rgba(56, 189, 248, 0.05);
+      box-shadow: inset 0 0 20px rgba(56, 189, 248, 0.06), var(--highlight-specular);
     }
 
     /* Slide Deck Navigation Controls */
     .deck-nav {
       margin-top: 2rem;
-      padding-top: 1.25rem;
-      border-top: 1px solid var(--border);
+      padding-top: 1.35rem;
+      border-top: 1px solid var(--border-panel);
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
     .deck-pills {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.55rem;
       align-items: center;
     }
     .pill-dot {
       width: 32px;
       height: 32px;
-      border-radius: 8px;
+      border-radius: 7px;
+      border: 1px solid var(--border-panel);
       background: var(--surface-2);
-      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.80rem;
+      font-weight: 600;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--text-muted);
       cursor: pointer;
+      box-shadow: var(--highlight-specular);
       transition: all 0.15s ease;
     }
     .pill-dot:hover {
@@ -611,70 +653,92 @@
       color: #ffffff;
     }
     .pill-dot.active {
-      background: linear-gradient(135deg, #0284c7, #0369a1);
+      background: var(--accent-cyan);
+      color: #06090e;
       border-color: var(--accent-cyan);
-      color: #ffffff;
-      box-shadow: 0 0 12px var(--accent-cyan-glow);
+      font-weight: 700;
+      box-shadow: 0 0 14px var(--accent-cyan-glow);
     }
 
-    /* Matrix Table Style */
-    .spec-table {
+    /* Group Deliverables Table (Slide 4) */
+    .deliv-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.82rem;
-      margin-top: 0.75rem;
+      font-size: 0.83rem;
+      margin-top: 1.25rem;
+      background: var(--surface-2);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-panel);
+      box-shadow: var(--highlight-specular);
     }
-    .spec-table th {
+    .deliv-table th {
       background: var(--surface-3);
-      color: #ffffff;
-      padding: 0.65rem 0.85rem;
+      padding: 0.8rem 1.1rem;
       text-align: left;
       font-family: var(--font-mono);
-      font-size: 0.74rem;
-      font-weight: 600;
-      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-panel);
     }
-    .spec-table td {
-      padding: 0.65rem 0.85rem;
-      border: 1px solid var(--border);
+    .deliv-table td {
+      padding: 0.85rem 1.1rem;
+      border-bottom: 1px solid var(--border-subtle);
       color: #cbd5e1;
     }
-    .spec-table tr:nth-child(even) td {
-      background: rgba(255, 255, 255, 0.02);
-    }
+    .deliv-table tr:last-child td { border-bottom: none; }
+    .deliv-table tr:hover td { background: rgba(56, 189, 248, 0.04); }
 
-    /* Q&A Accordion */
+    /* Q&A Accordion in Slide 4 */
     .qa-box {
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      margin-bottom: 0.5rem;
-      overflow: hidden;
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .qa-item {
       background: var(--surface-2);
+      border: 1px solid var(--border-panel);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--highlight-specular);
     }
     .qa-q {
-      padding: 0.65rem 0.95rem;
-      cursor: pointer;
-      font-size: 0.84rem;
+      padding: 0.85rem 1.2rem;
       font-weight: 600;
+      font-size: 0.85rem;
       color: #ffffff;
+      cursor: pointer;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      transition: background 0.15s ease;
     }
-    .qa-q:hover { background: #1c2b44; }
+    .qa-q:hover { background: var(--surface-3); }
     .qa-a {
-      display: none;
-      padding: 0.75rem 0.95rem;
-      font-size: 0.8rem;
-      color: #cbd5e1;
-      border-top: 1px solid var(--border);
-      background: #0f192b;
+      padding: 0 1.2rem 0.95rem;
+      font-size: 0.81rem;
+      color: var(--text-secondary);
       line-height: 1.55;
+      display: none;
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 0.75rem;
     }
-    .qa-box.open .qa-a { display: block; }
+    .qa-item.open .qa-a { display: block; }
+    .qa-tag {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
 
     /* ========================================================================= */
-    /* TAB 3: BENCHMARK EXPLORER STYLING                                        */
+    /* TAB 3: BENCHMARK CAROUSEL & MATRIX STYLING                                */
     /* ========================================================================= */
     .bench-layout {
       display: flex;
@@ -683,50 +747,123 @@
     }
     .carousel-card {
       background: var(--surface-1);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.5rem 1.8rem;
+      border: 1px solid var(--border-panel);
+      border-radius: 14px;
+      padding: 1.75rem 2.25rem;
+      box-shadow: var(--highlight-specular), 0 12px 40px rgba(0, 0, 0, 0.5);
     }
     .carousel-top {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
       flex-wrap: wrap;
-      gap: 0.8rem;
+      gap: 1rem;
     }
-    .chart-box {
-      height: 440px;
-      width: 100%;
-      position: relative;
-    }
-    .presets-bar {
-      display: flex;
-      gap: 0.45rem;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 0.85rem;
-    }
-    .btn-preset {
-      background: var(--surface-2);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
+    .chart-badge {
       font-family: var(--font-mono);
       font-size: 0.72rem;
-      font-weight: 600;
-      padding: 0.35rem 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent-cyan);
+      margin-bottom: 0.35rem;
+    }
+    .chart-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.02em;
+    }
+    .chart-sub {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      margin-top: 0.2rem;
+    }
+    .carousel-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    /* Granular Filter Presets */
+    .presets-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .preset-btn {
+      background: var(--surface-2);
+      border: 1px solid var(--border-panel);
+      color: var(--text-secondary);
+      padding: 0.35rem 0.85rem;
       border-radius: 6px;
+      font-size: 0.76rem;
+      font-weight: 600;
       cursor: pointer;
+      box-shadow: var(--highlight-specular);
       transition: all 0.15s ease;
     }
-    .btn-preset:hover {
-      border-color: var(--accent-cyan);
+    .preset-btn:hover {
       color: #ffffff;
+      border-color: var(--accent-cyan);
     }
-    .btn-preset.active {
-      background: rgba(56, 189, 248, 0.14);
+    .preset-btn.active {
+      background: var(--surface-3);
       border-color: var(--accent-cyan);
       color: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan-glow);
+    }
+
+    .chart-aspect-box {
+      position: relative;
+      height: 480px;
+      width: 100%;
+    }
+
+    /* Master Benchmark Table */
+    .bench-table-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border-panel);
+      border-radius: 14px;
+      padding: 1.5rem 2rem;
+      box-shadow: var(--highlight-specular), 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+    .bench-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+    .bench-table th, .bench-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .bench-table th {
+      background: var(--surface-2);
+      color: var(--text-secondary);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0.04em;
+    }
+    .bench-table th:first-child, .bench-table td:first-child {
+      text-align: left;
+    }
+    .bench-table tr:hover td {
+      background: rgba(56, 189, 248, 0.04);
+    }
+    .bench-table td strong {
+      color: #ffffff;
     }
   </style>
 </head>
@@ -744,11 +881,11 @@
       </div>
       <div class="header-status">
         <div class="status-badge green">
-          <span style="display:inline-block; width:6px; height:6px; background:var(--accent-emerald); border-radius:50%;"></span>
+          <span style="display:inline-block; width:6px; height:6px; background:var(--accent-emerald); border-radius:50%; box-shadow:0 0 6px var(--accent-emerald);"></span>
           M1 Verification Gate (&lt; 10⁻¹⁰)
         </div>
         <div class="status-badge blue">
-          <span style="display:inline-block; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%;"></span>
+          <span style="display:inline-block; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%; box-shadow:0 0 6px var(--accent-cyan);"></span>
           289 Runs Ingested
         </div>
       </div>
@@ -782,32 +919,32 @@
               <option value="figure8" selected>Figure-8 Three-Body Choreography (Stable Verlet vs Chaos)</option>
               <option value="precession">Mercury 1PN Relativistic Precession Rosette</option>
               <option value="inner">Inner Terrestrial Solar System (Sun + 4 Planets)</option>
-              <option value="full">Full Solar System (Sun through Neptune)</option>
-              <option value="asteroids">Synthetic Asteroid Belt (300 Bodies + Jupiter Perturbation)</option>
+              <option value="full">Full Solar System (Sun through Neptune, 9 Bodies)</option>
+              <option value="asteroids">Synthetic Asteroid Belt (300 Particles + Jupiter Perturbation)</option>
             </select>
           </div>
 
           <div class="ctl-item">
             <label>Speed:</label>
-            <div class="ctl-slider-box">
+            <div class="ctl-slider-box" title="Global simulation playback speed multiplier">
               <input type="range" id="global-speed" min="0.05" max="50.0" step="0.05" value="1.0" oninput="syncSpeed(this.value, 'range')">
-              <input type="number" id="num-speed" class="ctl-num-input" min="0.05" max="50.0" step="0.1" value="1.0" onchange="syncSpeed(this.value, 'num')">
+              <input type="number" id="num-speed" class="ctl-num-input" min="0.05" max="50.0" step="0.5" value="1.0" onchange="syncSpeed(this.value, 'num')">
             </div>
           </div>
 
           <div class="ctl-item">
             <label>Trail:</label>
-            <div class="ctl-slider-box">
+            <div class="ctl-slider-box" title="Orbital history trail length in ring buffer">
               <input type="range" id="global-trail" min="10" max="1000" step="10" value="200" oninput="syncTrail(this.value, 'range')">
-              <input type="number" id="num-trail" class="ctl-num-input" min="10" max="1000" step="10" value="200" onchange="syncTrail(this.value, 'num')">
+              <input type="number" id="num-trail" class="ctl-num-input" min="10" max="1000" step="25" value="200" onchange="syncTrail(this.value, 'num')">
             </div>
           </div>
 
           <div class="ctl-item">
             <label>Smooth (W):</label>
-            <div class="ctl-slider-box">
+            <div class="ctl-slider-box" title="Moving average filter window for energy drift graph">
               <input type="range" id="global-smooth" min="1" max="100" step="1" value="15" oninput="syncSmooth(this.value, 'range')">
-              <input type="number" id="num-smooth" class="ctl-num-input" min="1" max="100" step="1" value="15" onchange="syncSmooth(this.value, 'num')">
+              <input type="number" id="num-smooth" class="ctl-num-input" min="1" max="100" step="5" value="15" onchange="syncSmooth(this.value, 'num')">
             </div>
           </div>
 
@@ -816,13 +953,13 @@
           </div>
         </div>
 
-        <!-- Dual Simulation Panes (560px Height, Synchronized Camera) -->
+        <!-- Synchronized Dual Canvases (560px Height) -->
         <div class="dual-pane-grid">
           <!-- Pane A -->
           <div class="pane-card pane-a">
             <div class="pane-header">
               <div class="pane-title color-a">
-                <span style="display:inline-block; width:8px; height:8px; background:var(--accent-amber); border-radius:50%;"></span>
+                <span style="display:inline-block; width:8px; height:8px; background:var(--accent-amber); border-radius:50%; box-shadow:0 0 6px var(--accent-amber);"></span>
                 Pane A: Baseline / Non-Symplectic
               </div>
               <div class="pane-controls">
@@ -834,7 +971,7 @@
                   <option value="gr_verlet">Verlet + 1PN Relativistic GR</option>
                 </select>
                 <div class="ctl-slider-box" title="Numerical integration step size dt">
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">dt:</span>
+                  <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono);">dt:</span>
                   <input type="range" id="dt-a" min="0.001" max="0.5" step="0.001" value="0.05" oninput="syncDtA(this.value, 'range')">
                   <input type="number" id="num-dt-a" class="ctl-num-input" min="0.001" max="0.5" step="0.005" value="0.050" onchange="syncDtA(this.value, 'num')">
                 </div>
@@ -855,7 +992,7 @@
           <div class="pane-card pane-b">
             <div class="pane-header">
               <div class="pane-title color-b">
-                <span style="display:inline-block; width:8px; height:8px; background:var(--accent-cyan); border-radius:50%;"></span>
+                <span style="display:inline-block; width:8px; height:8px; background:var(--accent-cyan); border-radius:50%; box-shadow:0 0 6px var(--accent-cyan);"></span>
                 Pane B: Symplectic Candidate
               </div>
               <div class="pane-controls">
@@ -867,7 +1004,7 @@
                   <option value="euler">Forward Euler (1st-Order Non-Symplectic)</option>
                 </select>
                 <div class="ctl-slider-box" title="Numerical integration step size dt">
-                  <span style="font-size:0.75rem; color:var(--text-muted); font-family:var(--font-mono);">dt:</span>
+                  <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono);">dt:</span>
                   <input type="range" id="dt-b" min="0.001" max="0.5" step="0.001" value="0.05" oninput="syncDtB(this.value, 'range')">
                   <input type="number" id="num-dt-b" class="ctl-num-input" min="0.001" max="0.5" step="0.005" value="0.050" onchange="syncDtB(this.value, 'num')">
                 </div>
@@ -890,7 +1027,7 @@
           <div class="drift-header">
             <div class="card-title">
               <span>📈 Unified Real-Time Energy Drift Comparator:</span>
-              <span style="font-size:0.78rem; font-weight:400; color:var(--text-muted); margin-left:0.5rem;">
+              <span style="font-size:0.78rem; font-weight:400; color:var(--text-secondary); margin-left:0.5rem;">
                 (Dashed = Instantaneous, Solid = Parameterized Moving Average)
               </span>
             </div>
@@ -903,9 +1040,9 @@
                 <span class="drift-dot b"></span>
                 <span style="color:var(--accent-cyan);" id="leg-b-label">Pane B (Verlet)</span>
               </div>
-              <div class="drift-legend-item" style="color:var(--text-muted);">
+              <div class="drift-legend-item" style="color:var(--text-secondary);">
                 <span>Physical Clock:</span>
-                <span id="sync-clock" style="color:#ffffff; font-weight:600;">0.0 d</span>
+                <span id="sync-clock" style="color:#ffffff; font-weight:600; margin-left:0.3rem;">0.0 d</span>
               </div>
             </div>
           </div>
@@ -927,180 +1064,189 @@
             <div class="slide-badge">Slide 1 &bull; Mathematical Physics &amp; Problem Formulation</div>
             <h2 class="slide-heading">Gravitational N-Body Problem &amp; Hamiltonian Invariants</h2>
             <p class="slide-ref"><strong>Base Reference:</strong> Tailin Zhu (2020), <em>N-body Simulations of the Solar System with CPU-based Parallel Methods</em>, University of Bristol.</p>
-            
-            <!-- Hero Math Callout -->
-            <div class="math-callout" data-tex="\mathbf{a}_i = \sum_{j \neq i}^N G \cdot m_j \cdot \frac{\mathbf{r}_j - \mathbf{r}_i}{\left(\|\mathbf{r}_j - \mathbf{r}_i\|^2 + \epsilon^2\right)^{3/2}}"></div>
 
-            <!-- Bento 3-Grid -->
+            <div class="math-callout" data-tex="\mathbf{a}_i = \sum_{j \neq i}^N G \cdot m_j \cdot \frac{\mathbf{r}_j - \mathbf{r}_i}{(\|\mathbf{r}_j - \mathbf{r}_i\|^2 + \epsilon^2)^{3/2}}"></div>
+
             <div class="bento-grid-3">
-              <div class="bento-card hero">
+              <div class="bento-card">
                 <div class="bento-title cyan">⚡ Physical Conservation Laws</div>
                 <ul class="bento-bullets">
-                  <li><strong>Hamiltonian Formulation</strong>: Governed by $H = T(\mathbf{p}) + V(\mathbf{q})$.</li>
-                  <li><strong>10 Classical Integrals</strong>: Conserves Total Energy ($H$), Linear Momentum ($\mathbf{P}$), Center of Mass vector, and Angular Momentum ($\mathbf{L}$).</li>
-                  <li><strong>Isolated Invariance</strong>: Phase space volume preserved via Liouville's theorem ($d\mathbf{p} \wedge d\mathbf{q} = \text{const}$).</li>
+                  <li><strong>Hamiltonian Formulation:</strong> Governed by $H = T(\mathbf{p}) + V(\mathbf{q})$.</li>
+                  <li><strong>10 Classical Integrals:</strong> Conserves Total Energy ($H$), Linear Momentum ($\mathbf{P}$), Center of Mass vector, and Angular Momentum ($\mathbf{L}$).</li>
+                  <li><strong>Isolated Invariance:</strong> Phase space volume preserved via Liouville's theorem ($d\mathbf{p} \wedge d\mathbf{q} = \text{const}$).</li>
                 </ul>
               </div>
 
               <div class="bento-card">
                 <div class="bento-title amber">🪐 Gaussian Astronomical Units</div>
                 <ul class="bento-bullets">
-                  <li><strong>Length ($r$)</strong>: Astronomical Units (AU).</li>
-                  <li><strong>Mass ($m$)</strong>: Solar Masses ($M_\odot$).</li>
-                  <li><strong>Time ($t$)</strong>: Days; Gaussian constant $G \approx 2.959122 \times 10^{-4}\text{ AU}^3 M_\odot^{-1}\text{ day}^{-2}$.</li>
-                  <li><strong>Numerical Benefit</strong>: Eliminates catastrophic roundoff cancellation inherent to SI units ($10^{-11}$).</li>
+                  <li><strong>Length ($\mathbf{r}$):</strong> Astronomical Units (AU).</li>
+                  <li><strong>Mass ($m$):</strong> Solar Masses ($M_\odot$).</li>
+                  <li><strong>Time ($t$):</strong> Days; Gaussian constant $G \approx 2.959122 \times 10^{-4}\text{ AU}^3 M_\odot^{-1}\text{ day}^{-2}$.</li>
+                  <li><strong>Numerical Benefit:</strong> Eliminates catastrophic roundoff cancellation inherent to SI units ($10^{-11}$).</li>
                 </ul>
               </div>
 
               <div class="bento-card">
-                <div class="bento-title emerald">☄️ Baseline &amp; Synthetic Scaling</div>
+                <div class="bento-title emerald">🌌 Baseline &amp; Synthetic Scaling</div>
                 <ul class="bento-bullets">
-                  <li><strong>Solar System Baseline</strong>: 10 physical bodies (Sun, 8 major planets, Moon) integrated from NASA Horizons ephemerides.</li>
-                  <li><strong>Synthetic Asteroid Belt</strong>: Main-belt particles ($a \in [2.1, 3.3]\text{ AU}$) generated to scale $N$ up to $50,000$ bodies.</li>
-                  <li><strong>Plummer Softening</strong>: Set to $\epsilon = 0.0$ for point-mass celestial dynamics.</li>
+                  <li><strong>Solar System Baseline:</strong> 10 physical bodies (Sun, 8 major planets, Moon) integrated from NASA Horizons ephemerides.</li>
+                  <li><strong>Synthetic Asteroid Belt:</strong> Main-belt particles ($a \in [2.1, 3.3]\text{ AU}$) generated to scale $N$ up to 50,000 bodies.</li>
+                  <li><strong>Plummer Softening:</strong> Set to $\epsilon = 0.0$ for point-mass celestial dynamics.</li>
                 </ul>
               </div>
             </div>
           </div>
 
           <div class="deck-nav">
-            <button class="btn-ctl btn-prev-slide" onclick="prevSlide()" disabled>← Previous</button>
+            <button class="btn-ctl btn-prev-slide" onclick="prevSlide()" disabled>&larr; Previous</button>
             <div class="deck-pills">
-              <span class="pill-dot active" onclick="showSlide(1)">1</span>
-              <span class="pill-dot" onclick="showSlide(2)">2</span>
-              <span class="pill-dot" onclick="showSlide(3)">3</span>
-              <span class="pill-dot" onclick="showSlide(4)">4</span>
+              <div class="pill-dot active" onclick="showSlide(1)">1</div>
+              <div class="pill-dot" onclick="showSlide(2)">2</div>
+              <div class="pill-dot" onclick="showSlide(3)">3</div>
+              <div class="pill-dot" onclick="showSlide(4)">4</div>
             </div>
-            <button class="btn-ctl btn-next-slide" onclick="nextSlide()">Next Slide →</button>
+            <button class="btn-ctl btn-next-slide" onclick="nextSlide()">Next Slide &rarr;</button>
           </div>
         </div>
 
-        <!-- Slide 2: Numerical Symplectic Geometry -->
-        <div class="deck-slide" id="slide-2" style="display: none;">
+        <!-- Slide 2: Numerical Integrators -->
+        <div class="deck-slide" id="slide-2" style="display:none;">
           <div>
-            <div class="slide-badge">Slide 2 &bull; Numerical Analysis &amp; Symplectic Geometry</div>
-            <h2 class="slide-heading">Symplectic Invariance vs. Artificial Energy Dissipation</h2>
-            <p class="slide-ref">Analysis of phase-space area preservation across 1st-order, 4th-order, and 2nd-order geometric integrators.</p>
-            
+            <div class="slide-badge">Slide 2 &bull; Numerical Symplectic Algorithms</div>
+            <h2 class="slide-heading">Symplectic vs Non-Symplectic Geometric Integration</h2>
+            <p class="slide-ref">Why long-term solar system stability mandates symplectic structure preservation over raw truncation order.</p>
+
             <div class="bento-grid-2">
-              <!-- Left: Velocity Verlet -->
               <div class="bento-card hero">
-                <div class="bento-title cyan">🪐 Velocity Verlet (Symplectic Map)</div>
-                <div class="math-callout" style="padding: 0.5rem; margin: 0.4rem 0;" data-tex="\mathbf{r}_{k+1} = \mathbf{r}_k + \mathbf{v}_k \Delta t + \frac{1}{2}\mathbf{a}_k \Delta t^2"></div>
-                <div class="math-callout" style="padding: 0.5rem; margin: 0.4rem 0;" data-tex="\mathbf{v}_{k+1} = \mathbf{v}_k + \frac{1}{2}(\mathbf{a}_k + \mathbf{a}_{k+1})\Delta t"></div>
-                <ul class="bento-bullets" style="margin-top: 0.6rem;">
-                  <li><strong>Poincaré 2-Form</strong>: Preserves $d\mathbf{p} \wedge d\mathbf{q}$ exactly in discrete time steps.</li>
-                  <li><strong>Bounded Energy Oscillation</strong>: $|\Delta E / E_0| < 10^{-7}$ without secular energy drift over $10^6$ steps.</li>
-                  <li><strong>Efficiency</strong>: 1 force evaluation per step; exactly reversible under time inversion ($t \rightarrow -t$).</li>
+                <div class="bento-title cyan">✨ Velocity Verlet (2nd-Order Symplectic)</div>
+                <p style="font-size:0.83rem; color:#cbd5e1; margin-bottom:0.75rem;">
+                  Exact preserve of phase-space area $d\mathbf{p} \wedge d\mathbf{q}$. Conserves a shadow Hamiltonian $\tilde{H} = H + \mathcal{O}(\Delta t^2)$, ensuring bounded energy oscillations without secular growth.
+                </p>
+                <div class="math-callout" data-tex="\mathbf{r}(t+\Delta t) = \mathbf{r}(t) + \mathbf{v}(t)\Delta t + \frac{1}{2}\mathbf{a}(t)\Delta t^2"></div>
+                <div class="math-callout" data-tex="\mathbf{v}(t+\Delta t) = \mathbf{v}(t) + \frac{1}{2}[\mathbf{a}(t) + \mathbf{a}(t+\Delta t)]\Delta t"></div>
+                <ul class="bento-bullets" style="margin-top:0.75rem;">
+                  <li><strong>Long-Term Stability:</strong> $|\Delta E / E_0| &lt; 10^{-10}$ across thousands of orbital periods.</li>
+                  <li><strong>One Acceleration Call:</strong> Only one $O(N^2)$ force calculation per time-step.</li>
                 </ul>
               </div>
 
-              <!-- Right: Non-Symplectic Failure -->
-              <div class="bento-card hero-violet">
-                <div class="bento-title rose">⚠️ Non-Symplectic Failure (Euler &amp; RK4)</div>
-                <div class="math-callout" style="padding: 0.5rem; margin: 0.4rem 0;" data-tex="\mathbf{r}_{k+1} = \mathbf{r}_k + \mathbf{v}_k \Delta t, \quad \mathbf{v}_{k+1} = \mathbf{v}_k + \mathbf{a}_k \Delta t"></div>
-                <ul class="bento-bullets" style="margin-top: 0.6rem;">
-                  <li><strong>Forward Euler Divergence</strong>: Non-zero divergence ($\nabla \cdot \mathbf{f} \neq 0$) inflates phase space; continuously pumps energy, causing planets to spiral outward to infinity.</li>
-                  <li><strong>Standard RK4 Damping</strong>: 4th-order local truncation error, but non-symplectic. Bleeds energy secularly, causing planetary orbits to artificially decay.</li>
+              <div class="bento-card">
+                <div class="bento-title rose">⚠️ Non-Symplectic Controls (Euler &amp; RK4)</div>
+                <p style="font-size:0.83rem; color:#cbd5e1; margin-bottom:0.75rem;">
+                  Non-symplectic integrators fail to preserve geometric invariants, producing artificial numerical damping or secular energy growth.
+                </p>
+                <ul class="bento-bullets">
+                  <li><strong>Forward Euler (1st-Order):</strong> Artificially injects positive energy every step ($\Delta E \propto \Delta t$). Orbits spiral outward catastrophically.</li>
+                  <li><strong>Runge-Kutta 4 (Classical):</strong> 4th-order local truncation error $\mathcal{O}(\Delta t^5)$ gives high short-term precision, but dissipates energy over orbital timescales, causing planetary orbits to decay into the Sun.</li>
+                  <li><strong>Computational Cost:</strong> RK4 requires 4 full $O(N^2)$ force evaluations per time step (4&times; more expensive than Verlet).</li>
                 </ul>
               </div>
             </div>
 
-            <!-- Bottom: 1PN Relativistic Precession -->
-            <div class="bento-card" style="margin-top: 1rem;">
-              <div class="bento-title emerald">🌌 General Relativity: Einstein First Post-Newtonian (1PN) Precession</div>
-              <div class="math-callout" style="padding: 0.5rem; margin: 0.4rem 0;" data-tex="\Delta \mathbf{a}_{1\text{PN}} = \frac{G M_\odot}{c^2 r^3}\left[\left(\frac{4GM_\odot}{r} - v^2\right)\mathbf{r} + 4(\mathbf{r}\cdot\mathbf{v})\mathbf{v}\right]"></div>
-              <ul class="bento-bullets" style="margin-top: 0.5rem;">
-                <li><strong>Mercury Perihelion Advance</strong>: Verified simulation reproduces <strong style="color:var(--accent-emerald);">42.983''/century</strong> (0.007% error vs analytic 42.980''/century).</li>
-                <li><strong>Laplace–Runge–Lenz Tracking</strong>: Dynamic precession of LRL vector $\mathbf{A} = \mathbf{v} \times \mathbf{L} - G M \hat{\mathbf{r}}$ tracks relativistic orbital rotation.</li>
-              </ul>
+            <!-- Relativistic 1PN Expansion -->
+            <div class="bento-card hero-violet" style="margin-top:1rem;">
+              <div class="bento-title indigo">🔭 Relativistic 1PN Correction: Mercury's Perihelion Precession</div>
+              <div style="display:flex; gap:1.5rem; align-items:center;">
+                <div style="flex:1;">
+                  <p style="font-size:0.83rem; color:#cbd5e1; line-height:1.5;">
+                    General relativistic curvature introduces a 1st-order Post-Newtonian correction to Newtonian gravity, producing Mercury's famous anomalous advance:
+                  </p>
+                  <div class="math-callout" data-tex="\Delta \varpi = \frac{6 \pi G M_\odot}{a(1-e^2)c^2} \approx 42.98\text{ arcsec/century}"></div>
+                </div>
+                <div style="flex:1;">
+                  <ul class="bento-bullets">
+                    <li><strong>1PN Force Term:</strong> $\Delta \mathbf{a} = \frac{G M}{c^2 r^3} \left[ \left( \frac{4GM}{r} - v^2 \right)\mathbf{r} + 4(\mathbf{r} \cdot \mathbf{v})\mathbf{v} \right]$.</li>
+                    <li><strong>Verification Gate:</strong> Matches Einstein's 1915 analytical prediction within $0.05\%$.</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="deck-nav">
-            <button class="btn-ctl btn-prev-slide" onclick="prevSlide()">← Previous</button>
+            <button class="btn-ctl btn-prev-slide" onclick="prevSlide()">&larr; Previous</button>
             <div class="deck-pills">
-              <span class="pill-dot" onclick="showSlide(1)">1</span>
-              <span class="pill-dot active" onclick="showSlide(2)">2</span>
-              <span class="pill-dot" onclick="showSlide(3)">3</span>
-              <span class="pill-dot" onclick="showSlide(4)">4</span>
+              <div class="pill-dot" onclick="showSlide(1)">1</div>
+              <div class="pill-dot active" onclick="showSlide(2)">2</div>
+              <div class="pill-dot" onclick="showSlide(3)">3</div>
+              <div class="pill-dot" onclick="showSlide(4)">4</div>
             </div>
-            <button class="btn-ctl btn-next-slide" onclick="nextSlide()">Next Slide →</button>
+            <button class="btn-ctl btn-next-slide" onclick="nextSlide()">Next Slide &rarr;</button>
           </div>
         </div>
 
-        <!-- Slide 3: Microarchitecture & Hardware Sympathy -->
-        <div class="deck-slide" id="slide-3" style="display: none;">
+        <!-- Slide 3: Hardware Sympathy & Parallel Architecture -->
+        <div class="deck-slide" id="slide-3" style="display:none;">
           <div>
             <div class="slide-badge">Slide 3 &bull; Hardware Sympathy &amp; Memory Architecture</div>
             <h2 class="slide-heading">Memory Locality, SIMD Vectorization &amp; Scheduling</h2>
             <p class="slide-ref">Eliminating CPU/GPU memory bottlenecks through hardware-sympathetic data layouts and chunk dispatching.</p>
-            
+
             <div class="bento-grid-2">
-              <div class="bento-card hero">
+              <div class="bento-card">
                 <div class="bento-title cyan">⚡ Structure-of-Arrays (SoA)</div>
                 <ul class="bento-bullets">
-                  <li><strong>Contiguous Vectors</strong>: Coordinates segregated into separate flat arrays (`x[]`, `y[]`, `z[]`, `m[]`).</li>
-                  <li><strong>AVX2 / SIMD Throughput</strong>: Streams 4 FP64 or 8 FP32 elements per vector instruction with 100% bus utilization.</li>
-                  <li><strong>Zero Striding</strong>: Eliminates 32-byte cache line striding penalty present in Array-of-Structures (`AoS`).</li>
+                  <li><strong>Contiguous Vectors:</strong> Coordinates segregated into separate flat arrays (`x[]`, `y[]`, `z[]`, `m[]`).</li>
+                  <li><strong>AVX2 / SIMD Throughput:</strong> Streams 4 FP64 or 8 FP32 elements per vector instruction with 100% bus utilization.</li>
+                  <li><strong>Zero Striding:</strong> Eliminates 32-byte cache line striding penalty present in Array-of-Structures (`AoS`).</li>
                 </ul>
               </div>
 
-              <div class="bento-card hero-violet">
-                <div class="bento-title indigo">🛡️ Zero Inner-Loop Allocations</div>
+              <div class="bento-card">
+                <div class="bento-title rose">🛡️ Zero Inner-Loop Allocations</div>
                 <ul class="bento-bullets">
-                  <li><strong>Static Pre-Allocation</strong>: All coordinate and force buffers allocated once at initialization.</li>
-                  <li><strong>Pointer Swapping</strong>: Time loop advances strictly via $O(1)$ pointer swaps without OS memory manager locks.</li>
-                  <li><strong>TLB Stability</strong>: Zero heap calls in inner loop prevents page faults, translation lookaside buffer thrashing, and OS jitter.</li>
+                  <li><strong>Static Pre-Allocation:</strong> All coordinate and force buffers allocated once at initialization.</li>
+                  <li><strong>Pointer Swapping:</strong> Time loop advances strictly via $O(1)$ pointer swaps without OS memory manager locks.</li>
+                  <li><strong>TLB Stability:</strong> Zero heap calls in inner loop prevents page faults, translation lookaside buffer thrashing, and OS jitter.</li>
                 </ul>
               </div>
 
               <div class="bento-card">
                 <div class="bento-title amber">⚙️ OpenMP Dynamic Scheduling (P/E Cores)</div>
                 <ul class="bento-bullets">
-                  <li><strong>Hybrid Architecture</strong>: Intel i5-1340P features 4 fast P-cores (hyperthreaded, 8 threads) and 8 slower E-cores.</li>
-                  <li><strong>Static Barrier Stalls</strong>: Equal static chunk allocation forces fast P-cores to idle waiting at OpenMP barriers.</li>
-                  <li><strong>Work Balancing</strong>: `schedule(dynamic, 16)` delivers <strong style="color:var(--accent-amber);">1.45× speedup</strong> by streaming chunks on demand to available cores.</li>
+                  <li><strong>Hybrid Architecture:</strong> Intel i5-1340P features 4 fast P-cores (hyperthreaded, 8 threads) and 8 slower E-cores.</li>
+                  <li><strong>Static Barrier Stalls:</strong> Equal static chunk allocation forces fast P-cores to idle waiting at OpenMP barriers.</li>
+                  <li><strong>Work Balancing:</strong> `schedule(dynamic, 16)` delivers <strong>1.45&times; speedup</strong> by streaming chunks on demand to available cores.</li>
                 </ul>
               </div>
 
               <div class="bento-card">
                 <div class="bento-title emerald">📐 Newton's 3rd Law Pairwise Halving</div>
                 <ul class="bento-bullets">
-                  <li><strong>FLOP Reduction</strong>: Computes $\mathbf{F}_{ij}$ once and applies $\mathbf{F}_{ji} = -\mathbf{F}_{ij}$, cutting operations from $N(N-1)$ to $\frac{N(N-1)}{2}$ ($50\%$ cut).</li>
-                  <li><strong>Race Prevention</strong>: Thread-private force accumulation buffers avoid expensive hardware atomic operations.</li>
-                  <li><strong>Break-Even Point</strong>: At large $N$, $2\times$ arithmetic reduction strictly dominates reduction reduction overhead.</li>
+                  <li><strong>FLOP Reduction:</strong> Computes $\mathbf{F}_{ij}$ once and applies $\mathbf{F}_{ji} = -\mathbf{F}_{ij}$, cutting operations from $N(N-1)$ to $\frac{N(N-1)}{2}$ (50% cut).</li>
+                  <li><strong>Race Prevention:</strong> Thread-private force accumulation buffers avoid expensive hardware atomic operations.</li>
+                  <li><strong>Break-Even Point:</strong> At large $N$, 2&times; arithmetic reduction strictly dominates reduction overhead.</li>
                 </ul>
               </div>
             </div>
           </div>
 
           <div class="deck-nav">
-            <button class="btn-ctl btn-prev-slide" onclick="prevSlide()">← Previous</button>
+            <button class="btn-ctl btn-prev-slide" onclick="prevSlide()">&larr; Previous</button>
             <div class="deck-pills">
-              <span class="pill-dot" onclick="showSlide(1)">1</span>
-              <span class="pill-dot" onclick="showSlide(2)">2</span>
-              <span class="pill-dot active" onclick="showSlide(3)">3</span>
-              <span class="pill-dot" onclick="showSlide(4)">4</span>
+              <div class="pill-dot" onclick="showSlide(1)">1</div>
+              <div class="pill-dot" onclick="showSlide(2)">2</div>
+              <div class="pill-dot active" onclick="showSlide(3)">3</div>
+              <div class="pill-dot" onclick="showSlide(4)">4</div>
             </div>
-            <button class="btn-ctl btn-next-slide" onclick="nextSlide()">Next Slide →</button>
+            <button class="btn-ctl btn-next-slide" onclick="nextSlide()">Next Slide &rarr;</button>
           </div>
         </div>
 
-        <!-- Slide 4: Group Deliverables & Q&A Reference -->
-        <div class="deck-slide" id="slide-4" style="display: none;">
+        <!-- Slide 4: Group Deliverables & Defense Reference -->
+        <div class="deck-slide" id="slide-4" style="display:none;">
           <div>
             <div class="slide-badge">Slide 4 &bull; Engineering Deliverables &amp; Technical Defense</div>
             <h2 class="slide-heading">Group Contribution Matrix &amp; Oral Defense Reference</h2>
             <p class="slide-ref">Multi-paradigm delivery across 4 distinct hardware systems under Contract v1 specification.</p>
-            
-            <!-- Deliverables Table -->
-            <table class="spec-table">
+
+            <table class="deliv-table">
               <thead>
                 <tr>
-                  <th style="width: 15%;">Member</th>
-                  <th style="width: 25%;">Assigned Focus</th>
-                  <th style="width: 25%;">Hardware Architecture</th>
+                  <th>Member</th>
+                  <th>Assigned Focus</th>
+                  <th>Hardware Architecture</th>
                   <th>Key Engineering Deliverables</th>
                 </tr>
               </thead>
@@ -1132,194 +1278,197 @@
               </tbody>
             </table>
 
-            <!-- Quick Q&A Accordion -->
-            <div style="margin-top: 1.25rem;">
-              <div class="bento-title cyan" style="margin-bottom: 0.5rem;">🎯 Supervisor Oral Defense Technical Reference</div>
-              
-              <div class="qa-box">
-                <div class="qa-q" onclick="toggleQA(this)">
+            <!-- Technical Q&A Defense Dropdowns -->
+            <div class="qa-box">
+              <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-coral); font-weight:700; margin-bottom:0.25rem;">
+                🎯 Supervisor Oral Defense Technical Reference
+              </div>
+
+              <div class="qa-item">
+                <div class="qa-q" onclick="this.parentElement.classList.toggle('open')">
                   <span>Q1: Why does OpenMP run SLOWER than serial execution at N = 100?</span>
-                  <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent-cyan);">ZHU (2020) FIG. 4 ▾</span>
+                  <span class="qa-tag">ZHU (2020) FIG. 4 &blacktriangledown;</span>
                 </div>
                 <div class="qa-a">
-                  At $N=100$, force computation takes only $\approx 0.035\text{ ms}$. Thread pool spawning, `#pragma omp parallel for` fork/join overhead, and barrier synchronization consume $\approx 0.1\text{ ms}$. The communication overhead exceeds computation time. OpenMP parallel speedup only breaks even above $N \ge 500$.
+                  <strong>Root Cause:</strong> Thread creation and synchronization overhead (`GOMP_parallel`, barrier synchronization) costs ~2-5 microseconds. For $N=100$, total computational workload is only $100 \times 99 / 2 = 4,950$ FLOPs (~0.03 ms of CPU work). The synchronization latency dominates the runtime. OpenMP parallel speedup only breaks even when $N \ge 500$, as documented in Zhu (2020) Figure 4.
                 </div>
               </div>
 
-              <div class="qa-box">
-                <div class="qa-q" onclick="toggleQA(this)">
-                  <span>Q2: Why is FP32 28× faster than FP64 on the NVIDIA RTX 5090?</span>
-                  <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent-emerald);">CUDA HARDWARE ▾</span>
+              <div class="qa-item">
+                <div class="qa-q" onclick="this.parentElement.classList.toggle('open')">
+                  <span>Q2: Why is FP32 28x faster than FP64 on the NVIDIA RTX 5090?</span>
+                  <span class="qa-tag">CUDA HARDWARE &blacktriangledown;</span>
                 </div>
                 <div class="qa-a">
-                  GeForce RTX 5090 (Blackwell consumer GPU) has a physical FP64:FP32 ALU ratio of 1:64. Double-precision arithmetic is serialized across limited FP64 compute units. Datacenter GPUs (A100/H100) feature 1:2 ratios. Single precision achieves $0.556\text{ ms}$ at $N=10,000$ ($28\times$ faster than FP64's $15.8\text{ ms}$).
+                  <strong>Hardware Architecture:</strong> Consumer GeForce Ada/Blackwell GPUs are physically provisioned with a 1:64 or 1:32 FP64-to-FP32 ALU ratio (only 1 double-precision unit for every 32/64 single-precision CUDA cores). Furthermore, FP32 cuts memory bus bandwidth requirements by exactly 50%, enabling higher warp occupancy and achieving 609.4&times; speedup at $N=10,000$.
                 </div>
               </div>
 
-              <div class="qa-box">
-                <div class="qa-q" onclick="toggleQA(this)">
+              <div class="qa-item">
+                <div class="qa-q" onclick="this.parentElement.classList.toggle('open')">
                   <span>Q3: In MPI, why does `allgather` scale significantly better than `master-worker`?</span>
-                  <span style="font-family:var(--font-mono); font-size:0.7rem; color:var(--accent-amber);">DISTRIBUTED MPI ▾</span>
+                  <span class="qa-tag">DISTRIBUTED MPI &blacktriangledown;</span>
                 </div>
                 <div class="qa-a">
-                  `master-worker` serializes data dispatch through rank 0, creating an $O(P \times N)$ network communication bottleneck. Collective `MPI_Allgather` utilizes a hardware ring or hypercube communication tree with $O(\log P)$ steps, enabling ranks to exchange boundaries concurrently without rank 0 saturation.
+                  <strong>Communication Complexity:</strong> The `master-worker` pattern routes all $N$ particle states through Rank 0 at every time step, creating an $O(P \times N)$ network serialization bottleneck where Rank 0's PCIe/network interface saturates. In contrast, `MPI_Allgather` utilizes a hardware ring/hypercube collective algorithm ($O(\log P)$ latency and $O(N)$ bandwidth), enabling distributed ranks to exchange coordinates concurrently.
                 </div>
               </div>
             </div>
           </div>
 
           <div class="deck-nav">
-            <button class="btn-ctl btn-prev-slide" onclick="prevSlide()">← Previous</button>
+            <button class="btn-ctl btn-prev-slide" onclick="prevSlide()">&larr; Previous</button>
             <div class="deck-pills">
-              <span class="pill-dot" onclick="showSlide(1)">1</span>
-              <span class="pill-dot" onclick="showSlide(2)">2</span>
-              <span class="pill-dot" onclick="showSlide(3)">3</span>
-              <span class="pill-dot active" onclick="showSlide(4)">4</span>
+              <div class="pill-dot" onclick="showSlide(1)">1</div>
+              <div class="pill-dot" onclick="showSlide(2)">2</div>
+              <div class="pill-dot" onclick="showSlide(3)">3</div>
+              <div class="pill-dot active" onclick="showSlide(4)">4</div>
             </div>
-            <button class="btn-ctl btn-next-slide" disabled>End of Slide Deck</button>
+            <button class="btn-ctl" disabled>End of Slide Deck</button>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ===================================================================== -->
-    <!-- TAB 3: BENCHMARK EXPLORER                                             -->
+    <!-- TAB 3: BENCHMARK CAROUSEL & MATRIX                                    -->
     <!-- ===================================================================== -->
     <section id="tab-benchmarks" class="tab-content">
       <div class="bench-layout">
-        <!-- 5-Chart Carousel -->
+        <!-- Interactive Chart Carousel (5 Charts) -->
         <div class="carousel-card">
           <div class="carousel-top">
             <div>
-              <div style="font-family:var(--font-mono); font-size:0.74rem; color:var(--accent-cyan); font-weight:700;" id="carousel-slide-badge">CHART 1 OF 5 &bull; MACRO-SCALING</div>
-              <h3 style="font-size:1.15rem; font-weight:700; color:#ffffff;" id="carousel-title">1. Global Macro-Scaling Across Problem Size N (Log-Log Scale)</h3>
-              <p style="font-size:0.8rem; color:var(--text-muted);" id="carousel-subtitle">Comparing all 8 computational paradigms from N=100 to N=50,000 bodies</p>
+              <div class="chart-badge" id="chart-badge">CHART 1 OF 5 &bull; MACRO-SCALING</div>
+              <h2 class="chart-title" id="chart-title">1. Global Macro-Scaling Across Problem Size N (Log-Log Scale)</h2>
+              <p class="chart-sub" id="chart-subtitle">Direct comparison across all 8 hardware configurations (N=100 to N=50,000)</p>
             </div>
-            <div style="display:flex; gap:0.5rem; align-items:center;">
-              <button class="btn-ctl" onclick="prevChartSlide()">← Prev Chart</button>
+            <div class="carousel-controls">
+              <button class="btn-ctl" onclick="prevChartSlide()">&larr; Prev Chart</button>
               <div class="deck-pills">
-                <span class="pill-dot active" id="cpill-1" onclick="setChartSlide(1)">1</span>
-                <span class="pill-dot" id="cpill-2" onclick="setChartSlide(2)">2</span>
-                <span class="pill-dot" id="cpill-3" onclick="setChartSlide(3)">3</span>
-                <span class="pill-dot" id="cpill-4" onclick="setChartSlide(4)">4</span>
-                <span class="pill-dot" id="cpill-5" onclick="setChartSlide(5)">5</span>
+                <div class="pill-dot active" id="dot-c1" onclick="setChartSlide(1)">1</div>
+                <div class="pill-dot" id="dot-c2" onclick="setChartSlide(2)">2</div>
+                <div class="pill-dot" id="dot-c3" onclick="setChartSlide(3)">3</div>
+                <div class="pill-dot" id="dot-c4" onclick="setChartSlide(4)">4</div>
+                <div class="pill-dot" id="dot-c5" onclick="setChartSlide(5)">5</div>
               </div>
-              <button class="btn-ctl" onclick="nextChartSlide()">Next Chart →</button>
+              <button class="btn-ctl" onclick="nextChartSlide()">Next Chart &rarr;</button>
             </div>
           </div>
 
-          <!-- Presets Toolbar -->
-          <div class="presets-bar" id="presets-toolbar">
-            <span style="font-family:var(--font-mono); font-size:0.72rem; color:var(--text-muted); margin-right:0.4rem;">Presets:</span>
-            <button class="btn-preset active" onclick="applyPreset('all')">All Paradigms (8 Series)</button>
-            <button class="btn-preset" onclick="applyPreset('openmp')">CPU OpenMP Family</button>
-            <button class="btn-preset" onclick="applyPreset('cuda')">CUDA GPU Family</button>
-            <button class="btn-preset" onclick="applyPreset('mpi')">MPI Distributed</button>
-            <button class="btn-preset" onclick="applyPreset('duel')">Microarchitecture Duel (Intel vs AMD)</button>
+          <!-- Presets for fast focus -->
+          <div class="presets-bar" id="chart-presets">
+            <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono); margin-right:0.3rem;">Presets:</span>
+            <button class="preset-btn active" onclick="filterPreset('all')">All Paradigms (8 Series)</button>
+            <button class="preset-btn" onclick="filterPreset('openmp')">CPU OpenMP Family</button>
+            <button class="preset-btn" onclick="filterPreset('cuda')">CUDA GPU Family</button>
+            <button class="preset-btn" onclick="filterPreset('mpi')">MPI Distributed</button>
+            <button class="preset-btn" onclick="filterPreset('duel')">Microarchitecture Duel (Intel vs AMD)</button>
           </div>
 
-          <!-- Chart Box (440px Height) -->
-          <div class="chart-box">
-            <canvas id="carousel-canvas"></canvas>
+          <div class="chart-aspect-box">
+            <canvas id="carouselChartCanvas"></canvas>
           </div>
-          
-          <div style="margin-top:0.75rem; font-size:0.76rem; color:var(--text-dim); font-family:var(--font-mono);">
-            💡 Hover over any curve or legend item to highlight that series while dimming competing lines.
+
+          <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.75rem; display:flex; align-items:center; gap:0.4rem;">
+            <span>💡</span>
+            <span>Hover over any curve or legend item to highlight that series while dimming competing lines.</span>
           </div>
         </div>
 
         <!-- Master Performance Benchmark Summary Table -->
-        <div class="card" style="padding: 1.25rem 1.5rem;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+        <div class="bench-table-card">
+          <div class="card-header" style="background:transparent; border:none; padding:0 0 1rem 0;">
             <div class="card-title">Master Performance Benchmark Summary Matrix</div>
-            <div style="font-family:var(--font-mono); font-size:0.74rem; color:var(--accent-cyan);">
+            <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-cyan); font-variant-numeric:tabular-nums;">
               Measured Medians Across 289 Physical Runs
             </div>
           </div>
-          
-          <table class="spec-table">
-            <thead>
-              <tr>
-                <th>Bodies (N)</th>
-                <th>Ryzen 5600G Serial</th>
-                <th>Intel i5 Serial</th>
-                <th>OpenMP 12T (Ryzen)</th>
-                <th>OpenMP 16T newton3</th>
-                <th>MPI 10P (Apple M4)</th>
-                <th>RTX 5090 (FP64)</th>
-                <th>RTX 5090 (FP32)</th>
-                <th>Max Speedup</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>100</strong></td>
-                <td>0.036 ms</td>
-                <td>0.147 ms</td>
-                <td>0.138 ms</td>
-                <td>1.195 ms</td>
-                <td>0.091 ms</td>
-                <td>0.094 ms</td>
-                <td style="color:var(--accent-emerald); font-weight:600;">0.012 ms</td>
-                <td><strong style="color:var(--accent-emerald);">3.0×</strong></td>
-              </tr>
-              <tr>
-                <td><strong>500</strong></td>
-                <td>0.850 ms</td>
-                <td>3.818 ms</td>
-                <td>0.328 ms</td>
-                <td>0.950 ms</td>
-                <td>1.308 ms</td>
-                <td>0.435 ms</td>
-                <td style="color:var(--accent-emerald); font-weight:600;">0.034 ms</td>
-                <td><strong style="color:var(--accent-emerald);">25.0×</strong></td>
-              </tr>
-              <tr>
-                <td><strong>1,000</strong></td>
-                <td>3.491 ms</td>
-                <td>15.862 ms</td>
-                <td>1.737 ms</td>
-                <td>3.390 ms</td>
-                <td>4.328 ms</td>
-                <td>0.865 ms</td>
-                <td style="color:var(--accent-emerald); font-weight:600;">0.063 ms</td>
-                <td><strong style="color:var(--accent-emerald);">55.4×</strong></td>
-              </tr>
-              <tr>
-                <td><strong>2,000</strong></td>
-                <td>13.899 ms</td>
-                <td>59.999 ms</td>
-                <td>3.178 ms</td>
-                <td>9.850 ms</td>
-                <td>17.466 ms</td>
-                <td>1.725 ms</td>
-                <td style="color:var(--accent-emerald); font-weight:600;">0.118 ms</td>
-                <td><strong style="color:var(--accent-emerald);">117.8×</strong></td>
-              </tr>
-              <tr>
-                <td><strong>5,000</strong></td>
-                <td>85.669 ms</td>
-                <td>371.009 ms</td>
-                <td>18.406 ms</td>
-                <td>26.326 ms</td>
-                <td>127.661 ms</td>
-                <td>4.306 ms</td>
-                <td style="color:var(--accent-emerald); font-weight:600;">0.281 ms</td>
-                <td><strong style="color:var(--accent-emerald);">304.9×</strong></td>
-              </tr>
-              <tr>
-                <td><strong>10,000</strong></td>
-                <td>338.946 ms</td>
-                <td>1,500.005 ms</td>
-                <td>66.783 ms</td>
-                <td>68.200 ms</td>
-                <td>483.054 ms</td>
-                <td>34.333 ms</td>
-                <td style="color:var(--accent-emerald); font-weight:600;">0.556 ms</td>
-                <td><strong style="color:var(--accent-emerald);">609.4×</strong></td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-container">
+            <table class="bench-table">
+              <thead>
+                <tr>
+                  <th>Bodies (N)</th>
+                  <th>Ryzen 5600G Serial</th>
+                  <th>Intel i5 Serial</th>
+                  <th>OpenMP 12T (Ryzen)</th>
+                  <th>OpenMP 16T newton3</th>
+                  <th>MPI 10P (Apple M4)</th>
+                  <th>RTX 5090 (FP64)</th>
+                  <th>RTX 5090 (FP32)</th>
+                  <th>Max Speedup</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>100</strong></td>
+                  <td>0.036 ms</td>
+                  <td>0.147 ms</td>
+                  <td>0.138 ms</td>
+                  <td>1.195 ms</td>
+                  <td>0.091 ms</td>
+                  <td>0.094 ms</td>
+                  <td style="color:var(--accent-emerald); font-weight:600;">0.012 ms</td>
+                  <td><strong style="color:var(--accent-emerald);">3.0&times;</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>500</strong></td>
+                  <td>0.850 ms</td>
+                  <td>3.818 ms</td>
+                  <td>0.328 ms</td>
+                  <td>0.950 ms</td>
+                  <td>1.308 ms</td>
+                  <td>0.435 ms</td>
+                  <td style="color:var(--accent-emerald); font-weight:600;">0.034 ms</td>
+                  <td><strong style="color:var(--accent-emerald);">25.0&times;</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>1,000</strong></td>
+                  <td>3.491 ms</td>
+                  <td>15.862 ms</td>
+                  <td>1.737 ms</td>
+                  <td>3.390 ms</td>
+                  <td>4.328 ms</td>
+                  <td>0.865 ms</td>
+                  <td style="color:var(--accent-emerald); font-weight:600;">0.063 ms</td>
+                  <td><strong style="color:var(--accent-emerald);">55.4&times;</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>2,000</strong></td>
+                  <td>13.899 ms</td>
+                  <td>59.999 ms</td>
+                  <td>3.178 ms</td>
+                  <td>9.850 ms</td>
+                  <td>17.466 ms</td>
+                  <td>1.725 ms</td>
+                  <td style="color:var(--accent-emerald); font-weight:600;">0.118 ms</td>
+                  <td><strong style="color:var(--accent-emerald);">117.8&times;</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>5,000</strong></td>
+                  <td>85.669 ms</td>
+                  <td>371.009 ms</td>
+                  <td>18.406 ms</td>
+                  <td>26.326 ms</td>
+                  <td>127.661 ms</td>
+                  <td>4.306 ms</td>
+                  <td style="color:var(--accent-emerald); font-weight:600;">0.281 ms</td>
+                  <td><strong style="color:var(--accent-emerald);">304.9&times;</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>10,000</strong></td>
+                  <td>338.946 ms</td>
+                  <td>1,500.005 ms</td>
+                  <td>66.783 ms</td>
+                  <td>68.200 ms</td>
+                  <td>483.054 ms</td>
+                  <td>34.333 ms</td>
+                  <td style="color:var(--accent-emerald); font-weight:600;">0.556 ms</td>
+                  <td><strong style="color:var(--accent-emerald);">609.4&times;</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>
@@ -1361,11 +1510,16 @@
           switchTab(targetId);
           setTimeout(() => window.scrollTo(0, 0), 20);
         }
+      } else {
+        // Tab simulation is active by default in HTML -> launch simulation loop immediately
+        startSimLoop();
       }
     });
 
     window.addEventListener("load", function() {
       triggerMathRender();
+      resizeBothCanvases();
+      drawBothSims();
     });
 
     // =========================================================================
@@ -1455,6 +1609,9 @@
     let dragStartY = 0;
 
     let globalPhysicalTime = 0.0;
+    let accA = 0.0;
+    let accB = 0.0;
+    let lastSimTimestamp = null;
     let paneA, paneB;
 
     class SimulationPane {
@@ -1505,9 +1662,9 @@
           const vy1 = -0.5 * vy3;
 
           this.bodies = [
-            this.createBody("Body 1", 1.0, -0.97000436, 0.24308753, vx1, vy1, "#38bdf8", 6),
-            this.createBody("Body 2", 1.0, 0.97000436, -0.24308753, vx1, vy1, "#fb7185", 6),
-            this.createBody("Body 3", 1.0, 0.0, 0.0, vx3, vy3, "#34d399", 6)
+            this.createBody("Body 1", 1.0, -0.97000436, 0.24308753, vx1, vy1, "#38bdf8", 6.5),
+            this.createBody("Body 2", 1.0, 0.97000436, -0.24308753, vx1, vy1, "#fb7185", 6.5),
+            this.createBody("Body 3", 1.0, 0.0, 0.0, vx3, vy3, "#10b981", 6.5)
           ];
         }
         else if (scenario === 'precession') {
@@ -1518,28 +1675,28 @@
           const v_p = Math.sqrt(G_GAUSS * (1 + e) / (a * (1 - e)));
 
           this.bodies = [
-            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#fbbf24", 9),
+            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#f59e0b", 9),
             this.createBody("Mercury", 1.66e-7, r_p, 0, 0, v_p, "#38bdf8", 4.5, true)
           ];
         }
         else if (scenario === 'inner') {
           // Inner Solar System
           this.bodies = [
-            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#fbbf24", 9),
+            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#f59e0b", 9),
             this.createBody("Mercury", 1.66e-7, 0.387, 0, 0, 0.0276, "#94a3b8", 3.2),
             this.createBody("Venus", 2.45e-6, 0.723, 0, 0, 0.0202, "#fde047", 4.0),
             this.createBody("Earth", 3.00e-6, 1.000, 0, 0, 0.0172, "#38bdf8", 4.2),
-            this.createBody("Mars", 3.23e-7, 1.524, 0, 0, 0.0140, "#f87171", 3.6)
+            this.createBody("Mars", 3.23e-7, 1.524, 0, 0, 0.0140, "#fb7185", 3.6)
           ];
         }
         else if (scenario === 'full') {
           // Full Solar System (Sun through Neptune)
           this.bodies = [
-            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#fbbf24", 9),
+            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#f59e0b", 9),
             this.createBody("Mercury", 1.66e-7, 0.387, 0, 0, 0.0276, "#94a3b8", 2.5),
             this.createBody("Venus", 2.45e-6, 0.723, 0, 0, 0.0202, "#fde047", 3.0),
             this.createBody("Earth", 3.00e-6, 1.000, 0, 0, 0.0172, "#38bdf8", 3.2),
-            this.createBody("Mars", 3.23e-7, 1.524, 0, 0, 0.0140, "#f87171", 2.8),
+            this.createBody("Mars", 3.23e-7, 1.524, 0, 0, 0.0140, "#fb7185", 2.8),
             this.createBody("Jupiter", 9.55e-4, 5.204, 0, 0, 0.0075, "#fb923c", 6.0),
             this.createBody("Saturn", 2.86e-4, 9.582, 0, 0, 0.0055, "#facc15", 5.2),
             this.createBody("Uranus", 4.37e-5, 19.20, 0, 0, 0.0039, "#818cf8", 4.2),
@@ -1549,7 +1706,7 @@
         else if (scenario === 'asteroids') {
           // 300 Synthetic Asteroid Belt Particles + Jupiter Perturbation
           this.bodies = [
-            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#fbbf24", 9),
+            this.createBody("Sun", 1.0, 0, 0, 0, 0, "#f59e0b", 9),
             this.createBody("Jupiter", 9.55e-4, 5.204, 0, 0, 0.0075, "#fb923c", 6.0)
           ];
           for (let i = 0; i < 300; i++) {
@@ -1590,14 +1747,24 @@
         let T = 0.0;
         let V = 0.0;
         const n = this.bodies.length;
+
+        // O(1) Energy evaluation for asteroids (Sun + Jupiter dominant)
+        if (currentScenario === 'asteroids' && n >= 2) {
+          const sun = this.bodies[0];
+          const jup = this.bodies[1];
+          T = 0.5 * (sun.vx * sun.vx + sun.vy * sun.vy) * sun.m +
+              0.5 * (jup.vx * jup.vx + jup.vy * jup.vy) * jup.m;
+          const dSJ = Math.hypot(jup.x - sun.x, jup.y - sun.y) + 1e-12;
+          V = -(G_GAUSS * sun.m * jup.m) / dSJ;
+          return T + V;
+        }
+
         for (let i = 0; i < n; i++) {
           const b1 = this.bodies[i];
           T += 0.5 * b1.m * (b1.vx * b1.vx + b1.vy * b1.vy);
           for (let j = i + 1; j < n; j++) {
             const b2 = this.bodies[j];
-            const dx = b2.x - b1.x;
-            const dy = b2.y - b1.y;
-            const dist = Math.hypot(dx, dy) + 1e-12;
+            const dist = Math.hypot(b2.x - b1.x, b2.y - b1.y) + 1e-12;
             V -= (G_GAUSS * b1.m * b2.m) / dist;
           }
         }
@@ -1611,6 +1778,43 @@
           this.bodies[i].ay = 0;
         }
 
+        // Optimized O(N) Test Particle dynamics for 300 Synthetic Asteroids
+        if (currentScenario === 'asteroids' && n > 2) {
+          const sun = this.bodies[0];
+          const jup = this.bodies[1];
+
+          // Sun <-> Jupiter
+          const dxSJ = jup.x - sun.x;
+          const dySJ = jup.y - sun.y;
+          const distSqSJ = dxSJ * dxSJ + dySJ * dySJ + 1e-12;
+          const dist3SJ = Math.pow(distSqSJ, 1.5);
+          const fxSJ = (G_GAUSS * dxSJ) / dist3SJ;
+          const fySJ = (G_GAUSS * dySJ) / dist3SJ;
+
+          sun.ax += fxSJ * jup.m;
+          sun.ay += fySJ * jup.m;
+          jup.ax -= fxSJ * sun.m;
+          jup.ay -= fySJ * sun.m;
+
+          // All asteroids feel Sun + Jupiter gravity only
+          for (let i = 2; i < n; i++) {
+            const ast = this.bodies[i];
+            const dxS = sun.x - ast.x;
+            const dyS = sun.y - ast.y;
+            const d3S = Math.pow(dxS * dxS + dyS * dyS + 1e-12, 1.5);
+            ast.ax += (G_GAUSS * dxS * sun.m) / d3S;
+            ast.ay += (G_GAUSS * dyS * sun.m) / d3S;
+
+            const dxJ = jup.x - ast.x;
+            const dyJ = jup.y - ast.y;
+            const d3J = Math.pow(dxJ * dxJ + dyJ * dyJ + 1e-12, 1.5);
+            ast.ax += (G_GAUSS * dxJ * jup.m) / d3J;
+            ast.ay += (G_GAUSS * dyJ * jup.m) / d3J;
+          }
+          return;
+        }
+
+        // Standard pairwise gravitational evaluation
         for (let i = 0; i < n; i++) {
           const b1 = this.bodies[i];
           for (let j = i + 1; j < n; j++) {
@@ -1727,7 +1931,7 @@
         const baseScale = (h / 2.8) * camZoom;
 
         // Faint Coordinate Grid
-        ctx.strokeStyle = '#162238';
+        ctx.strokeStyle = '#101a2c';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(0, centerY); ctx.lineTo(w, centerY);
@@ -1787,7 +1991,7 @@
             const grad = ctx.createRadialGradient(sx, sy, 2, sx, sy, b.radius * 2.2);
             grad.addColorStop(0, '#ffffff');
             grad.addColorStop(0.3, b.color);
-            grad.addColorStop(1, 'rgba(251, 191, 36, 0)');
+            grad.addColorStop(1, 'rgba(245, 158, 11, 0)');
             ctx.fillStyle = grad;
             ctx.beginPath();
             ctx.arc(sx, sy, b.radius * 2.2, 0, Math.PI * 2);
@@ -1802,7 +2006,7 @@
           if (b.m > 1e-10) {
             ctx.fillStyle = '#f8fafc';
             ctx.font = '11px JetBrains Mono';
-            ctx.fillText(b.name, sx + b.radius + 5, sy + 3);
+            ctx.fillText(b.name, sx + b.radius + 6, sy + 3);
           }
         }
 
@@ -1838,7 +2042,7 @@
     }
 
     // =========================================================================
-    // 5. SYNCHRONIZED CAMERA EVENT LISTENERS & LOOP
+    // 5. SYNCHRONIZED CAMERA EVENT LISTENERS & ROBUST TIME-ACCUMULATOR LOOP
     // =========================================================================
     function initSimEngines() {
       paneA = new SimulationPane('canvas-a', false);
@@ -1888,8 +2092,10 @@
       const dCanvas = document.getElementById('drift-canvas');
       if (dCanvas) {
         const dRect = dCanvas.parentElement.getBoundingClientRect();
-        dCanvas.width = dRect.width;
-        dCanvas.height = dRect.height;
+        if (dRect.width > 0 && dRect.height > 0) {
+          dCanvas.width = dRect.width;
+          dCanvas.height = dRect.height;
+        }
       }
     }
 
@@ -1913,6 +2119,9 @@
     function changeScenario(val) {
       currentScenario = val;
       globalPhysicalTime = 0.0;
+      accA = 0.0;
+      accB = 0.0;
+      lastSimTimestamp = null;
       if (paneA) paneA.initBodies(val);
       if (paneB) paneB.initBodies(val);
       resetCamera();
@@ -1920,6 +2129,17 @@
 
     function resetBothSims() {
       changeScenario(currentScenario);
+    }
+
+    function startSimLoop() {
+      simRunning = true;
+      const btn = document.getElementById('btn-play');
+      if (btn) {
+        btn.innerText = "⏸ Pause";
+        btn.classList.add('active');
+      }
+      lastSimTimestamp = null;
+      requestAnimationFrame(simLoop);
     }
 
     function toggleSim() {
@@ -1930,7 +2150,7 @@
         btn.classList.toggle('active', simRunning);
       }
       if (simRunning) {
-        lastTimestamp = performance.now();
+        lastSimTimestamp = null;
         requestAnimationFrame(simLoop);
       }
     }
@@ -1976,27 +2196,40 @@
       else document.getElementById('dt-b').value = num;
     }
 
-    let lastTimestamp = performance.now();
-
+    // ROBUST TIME-ACCUMULATOR SIMULATION LOOP (ZERO LOCKUPS, DETERMINISTIC DT)
     function simLoop(timestamp) {
       if (!simRunning) return;
 
-      const elapsedMs = Math.min(timestamp - lastTimestamp, 80);
-      lastTimestamp = timestamp;
+      if (!lastSimTimestamp) lastSimTimestamp = timestamp;
+      const elapsedMs = Math.min(timestamp - lastSimTimestamp, 100); // Clamp to 100ms max to prevent spiral of death
+      lastSimTimestamp = timestamp;
 
-      const targetDeltaT = (elapsedMs / 1000.0) * (globalSpeed * 2.5);
-      globalPhysicalTime += targetDeltaT;
+      // 1.0s real time = globalSpeed * 2.5 simulation days
+      const simDeltaT = (elapsedMs / 1000.0) * (globalSpeed * 2.5);
+      globalPhysicalTime += simDeltaT;
 
-      while (paneA.localSimTime < globalPhysicalTime) {
-        const step = Math.min(paneA.dt, globalPhysicalTime - paneA.localSimTime);
-        paneA.stepNumerical(step);
+      accA += simDeltaT;
+      accB += simDeltaT;
+
+      // Advance Pane A in discrete steps of paneA.dt
+      let stepsA = 0;
+      while (accA >= paneA.dt && stepsA < 40) {
+        paneA.stepNumerical(paneA.dt);
+        accA -= paneA.dt;
+        stepsA++;
       }
+      if (stepsA >= 40) accA = 0; // Guard against accumulator backlog
 
-      while (paneB.localSimTime < globalPhysicalTime) {
-        const step = Math.min(paneB.dt, globalPhysicalTime - paneB.localSimTime);
-        paneB.stepNumerical(step);
+      // Advance Pane B in discrete steps of paneB.dt
+      let stepsB = 0;
+      while (accB >= paneB.dt && stepsB < 40) {
+        paneB.stepNumerical(paneB.dt);
+        accB -= paneB.dt;
+        stepsB++;
       }
+      if (stepsB >= 40) accB = 0;
 
+      // Decoupled ring-buffer sampling at 60 FPS
       paneA.recordTrail();
       paneB.recordTrail();
 
@@ -2024,6 +2257,7 @@
       const ctx = cvs.getContext('2d');
       const w = cvs.width;
       const h = cvs.height;
+      if (w <= 0 || h <= 0) return;
       ctx.clearRect(0, 0, w, h);
 
       const padL = 48;
@@ -2033,7 +2267,7 @@
       const graphW = w - padL - padR;
       const graphH = h - padT - padB;
 
-      ctx.strokeStyle = '#1e293b';
+      ctx.strokeStyle = '#152136';
       ctx.lineWidth = 1;
       ctx.font = '10px JetBrains Mono';
       ctx.fillStyle = '#64748b';
@@ -2050,12 +2284,12 @@
 
       const yTop = padT + (-7 / -12.0) * graphH;
       const yBot = padT + (-10 / -12.0) * graphH;
-      ctx.fillStyle = 'rgba(52, 211, 153, 0.04)';
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.05)';
       ctx.fillRect(padL, yTop, graphW, yBot - yTop);
-      ctx.fillStyle = '#34d399';
+      ctx.fillStyle = '#10b981';
       ctx.fillText("Symplectic Invariant Band (10⁻⁷ - 10⁻¹⁰)", padL + 8, yTop + 14);
 
-      plotDriftLine(ctx, paneA.energyHistory, '#fbbf24', padL, padT, graphW, graphH);
+      plotDriftLine(ctx, paneA.energyHistory, '#f59e0b', padL, padT, graphW, graphH);
       plotDriftLine(ctx, paneB.energyHistory, '#38bdf8', padL, padT, graphW, graphH);
     }
 
@@ -2142,122 +2376,119 @@
         badge: "CHART 3 OF 5 • ALGORITHMIC COMPLEXITY",
         labels: ['100', '500', '1k', '2k', '5k', '10k'],
         datasets: [
-          { label: 'Standard OpenMP Direct O(N²)', data: [0.155, 0.420, 1.950, 4.100, 24.500, 78.400], borderColor: '#38bdf8', category: 'openmp' },
-          { label: 'Newton3 OpenMP Pairwise Halving', data: [1.195, 0.950, 3.390, 9.850, 26.326, 68.200], borderColor: '#10b981', category: 'openmp' }
+          { label: 'OpenMP 16T Standard Pairwise N(N-1)', data: [0.155, 0.420, 1.950, 4.100, 24.500, 78.400], borderColor: '#f97316', category: 'openmp' },
+          { label: 'OpenMP 16T newton3 Pairwise Halving N(N-1)/2', data: [1.195, 0.950, 3.390, 9.850, 26.326, 68.200], borderColor: '#10b981', category: 'openmp' }
         ]
       },
       {
         id: 4,
-        title: "4. NVIDIA GeForce RTX 5090 Shared-Memory Tiling & Hardware FP64 Bottleneck",
-        subtitle: "Consumer GPU FP64:FP32 1:64 ALU ratio vs on-chip shared memory staging",
-        badge: "CHART 4 OF 5 • GPU MICROARCHITECTURE",
-        labels: ['1k', '2k', '5k', '10k', '20k', '50k'],
+        title: "4. Distributed MPI Collective Topology Scaling (Apple M4 Silicon)",
+        subtitle: "Ring Allgather vs Master-Worker communication serialization latency",
+        badge: "CHART 4 OF 5 • DISTRIBUTED TOPOLOGY",
+        labels: ['100', '500', '1k', '2k', '5k', '10k'],
         datasets: [
-          { label: 'RTX 5090 Tiled Shared-Memory FP64', data: [0.865, 1.725, 4.306, 34.333, 142.100, 890.000], borderColor: '#f59e0b', category: 'cuda' },
-          { label: 'RTX 5090 Tiled Shared-Memory FP32', data: [0.063, 0.118, 0.281, 0.556, 1.120, 3.450], borderColor: '#10b981', category: 'cuda' },
-          { label: 'Ryzen 5600G OpenMP 12T (CPU Ref)', data: [1.737, 3.178, 18.406, 66.783, 270.000, 1720.000], borderColor: '#ec4899', borderDash: [4, 4], category: 'openmp' }
+          { label: 'MPI 10P Master-Worker (Central Bottleneck)', data: [0.350, 2.800, 9.400, 38.500, 260.000, 950.000], borderColor: '#ef4444', borderDash: [4, 4], category: 'mpi' },
+          { label: 'MPI 10P Ring Allgather (Concurrent)', data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054], borderColor: '#f59e0b', category: 'mpi' }
         ]
       },
       {
         id: 5,
-        title: "5. MPI Distributed Multi-Process Scaling: Collective Ring vs Dispatcher",
-        subtitle: "Scaling across Apple M4 (10 Ranks) and AMD Ryzen 5600G (6 Ranks)",
-        badge: "CHART 5 OF 5 • DISTRIBUTED NETWORK",
+        title: "5. CUDA Shared-Memory Tiling & FP32/FP64 Hardware ALU Throughput",
+        subtitle: "NVIDIA GeForce RTX 5090 Blackwell microarchitecture scaling",
+        badge: "CHART 5 OF 5 • GPU THROUGHPUT",
         labels: ['100', '500', '1k', '2k', '5k', '10k'],
         datasets: [
-          { label: 'MPI 10P Allgather (Apple M4 ARM)', data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054], borderColor: '#38bdf8', category: 'mpi' },
-          { label: 'MPI 6P Allgather (Ryzen 5600G x86)', data: [0.088, 1.450, 5.210, 19.800, 142.000, 520.000], borderColor: '#f59e0b', category: 'mpi' },
-          { label: 'MPI Master-Worker Dispatcher (Serial Rank 0)', data: [0.450, 4.800, 18.200, 72.100, 480.000, 1920.000], borderColor: '#ef4444', borderDash: [4, 4], category: 'mpi' }
+          { label: 'CUDA Global Memory (No Tiling)', data: [0.180, 0.820, 1.650, 3.400, 9.800, 68.000], borderColor: '#94a3b8', borderDash: [3, 3], category: 'cuda' },
+          { label: 'CUDA 256-Thread Shared Tiling (FP64)', data: [0.094, 0.435, 0.865, 1.725, 4.306, 34.333], borderColor: '#06b6d4', category: 'cuda' },
+          { label: 'CUDA 256-Thread Shared Tiling (FP32)', data: [0.012, 0.034, 0.063, 0.118, 0.281, 0.556], borderColor: '#22c55e', category: 'cuda' }
         ]
       }
     ];
 
-    function setChartSlide(num) {
-      if (num < 1 || num > 5) return;
-      currentChartSlide = num;
-      updateChartSlide(num);
-    }
-    function nextChartSlide() { setChartSlide(currentChartSlide === 5 ? 1 : currentChartSlide + 1); }
-    function prevChartSlide() { setChartSlide(currentChartSlide === 1 ? 5 : currentChartSlide - 1); }
-
-    function updateChartSlide(num) {
-      const cfg = CHART_CONFIGS[num - 1];
-      document.getElementById('carousel-title').innerText = cfg.title;
-      document.getElementById('carousel-subtitle').innerText = cfg.subtitle;
-      document.getElementById('carousel-slide-badge').innerText = cfg.badge;
-
-      for (let i = 1; i <= 5; i++) {
-        const pill = document.getElementById(`cpill-${i}`);
-        if (pill) pill.classList.toggle('active', i === num);
-      }
-
-      const presetsBar = document.getElementById('presets-toolbar');
-      if (presetsBar) presetsBar.style.display = (num === 1) ? 'flex' : 'none';
-
-      renderCarouselChart(cfg);
-    }
-
-    function applyPreset(preset) {
-      activePreset = preset;
-      document.querySelectorAll('.btn-preset').forEach(btn => {
-        btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(preset));
-      });
-      if (currentChartSlide === 1) renderCarouselChart(CHART_CONFIGS[0]);
-    }
-
     function renderCarouselChart(cfg) {
-      const ctx = document.getElementById('carousel-canvas').getContext('2d');
-      if (carouselChartInstance) carouselChartInstance.destroy();
+      const cvs = document.getElementById('carouselChartCanvas');
+      if (!cvs) return;
+      const ctx = cvs.getContext('2d');
 
-      let visibleDatasets = cfg.datasets;
-      if (cfg.id === 1 && activePreset !== 'all') {
-        if (activePreset === 'openmp') {
-          visibleDatasets = cfg.datasets.filter(d => d.category === 'openmp' || d.category === 'serial');
-        } else if (activePreset === 'cuda') {
-          visibleDatasets = cfg.datasets.filter(d => d.category === 'cuda' || d.label.includes('Ryzen 5600G'));
-        } else if (activePreset === 'mpi') {
-          visibleDatasets = cfg.datasets.filter(d => d.category === 'mpi' || d.category === 'serial');
-        } else if (activePreset === 'duel') {
-          visibleDatasets = cfg.datasets.filter(d => d.label.includes('Ryzen') || d.label.includes('Intel i5'));
-        }
+      if (carouselChartInstance) {
+        carouselChartInstance.destroy();
       }
+
+      const filteredDatasets = cfg.datasets.map(ds => {
+        let isDimmed = false;
+        if (activePreset === 'openmp' && ds.category !== 'openmp' && ds.category !== 'serial') isDimmed = true;
+        if (activePreset === 'cuda' && ds.category !== 'cuda') isDimmed = true;
+        if (activePreset === 'mpi' && ds.category !== 'mpi') isDimmed = true;
+        if (activePreset === 'duel' && !ds.label.includes('Ryzen') && !ds.label.includes('Intel')) isDimmed = true;
+
+        return {
+          ...ds,
+          borderWidth: isDimmed ? 1.0 : 2.5,
+          borderColor: isDimmed ? ds.borderColor + '22' : ds.borderColor,
+          pointRadius: isDimmed ? 0 : 4,
+          pointHoverRadius: 7,
+          tension: 0.15
+        };
+      });
 
       carouselChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: cfg.labels,
-          datasets: visibleDatasets.map(d => ({
-            label: d.label,
-            data: d.data,
-            borderColor: d.borderColor,
-            backgroundColor: d.borderColor,
-            borderWidth: 2.2,
-            pointRadius: 4,
-            pointHoverRadius: 7,
-            borderDash: d.borderDash || [],
-            tension: 0.15
-          }))
+          datasets: filteredDatasets
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          interaction: { mode: 'nearest', intersect: false },
+          interaction: {
+            mode: 'dataset',
+            intersect: false
+          },
+          onHover: (e, activeElements) => {
+            if (!activeElements || activeElements.length === 0) {
+              carouselChartInstance.data.datasets.forEach((ds, idx) => {
+                const orig = cfg.datasets[idx];
+                let isDimmed = false;
+                if (activePreset === 'openmp' && orig.category !== 'openmp' && orig.category !== 'serial') isDimmed = true;
+                if (activePreset === 'cuda' && orig.category !== 'cuda') isDimmed = true;
+                if (activePreset === 'mpi' && orig.category !== 'mpi') isDimmed = true;
+                if (activePreset === 'duel' && !orig.label.includes('Ryzen') && !orig.label.includes('Intel')) isDimmed = true;
+
+                ds.borderColor = isDimmed ? orig.borderColor + '22' : orig.borderColor;
+                ds.borderWidth = isDimmed ? 1.0 : 2.5;
+              });
+              carouselChartInstance.update('none');
+              return;
+            }
+            const activeIdx = activeElements[0].datasetIndex;
+            carouselChartInstance.data.datasets.forEach((ds, idx) => {
+              const orig = cfg.datasets[idx];
+              if (idx === activeIdx) {
+                ds.borderColor = orig.borderColor;
+                ds.borderWidth = 3.8;
+              } else {
+                ds.borderColor = orig.borderColor + '22';
+                ds.borderWidth = 1.0;
+              }
+            });
+            carouselChartInstance.update('none');
+          },
           scales: {
             x: {
-              title: { display: true, text: 'Number of Bodies (N)', color: '#94a3b8', font: { size: 12, family: 'Inter', weight: 600 } },
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
-              ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono' } }
+              title: { display: true, text: 'Number of Bodies (N)', color: '#94a3b8', font: { family: 'Inter', size: 12, weight: '600' } },
+              grid: { color: 'rgba(148, 163, 184, 0.08)' },
+              ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } }
             },
             y: {
               type: 'logarithmic',
-              title: { display: true, text: 'Execution Time (ms / step - Log Scale)', color: '#94a3b8', font: { size: 12, family: 'Inter', weight: 600 } },
-              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              title: { display: true, text: 'Execution Time (ms / step - Log Scale)', color: '#94a3b8', font: { family: 'Inter', size: 12, weight: '600' } },
+              grid: { color: 'rgba(148, 163, 184, 0.08)' },
               ticks: {
                 color: '#94a3b8',
-                font: { family: 'JetBrains Mono' },
-                callback: function(val) {
-                  if (val === 0.01 || val === 0.05 || val === 0.1 || val === 0.5 || val === 1 || val === 5 || val === 10 || val === 50 || val === 100 || val === 500 || val === 1000) {
-                    return val + ' ms';
+                font: { family: 'JetBrains Mono', size: 11 },
+                callback: function(value) {
+                  if (value === 0.01 || value === 0.05 || value === 0.1 || value === 0.5 || value === 1 || value === 5 || value === 10 || value === 50 || value === 100 || value === 500 || value === 1000) {
+                    return value + ' ms';
                   }
                   return null;
                 }
@@ -2267,28 +2498,26 @@
           plugins: {
             legend: {
               position: 'bottom',
-              labels: { boxWidth: 12, padding: 14, font: { size: 11, family: 'Inter' }, color: '#e2e8f0' },
-              onHover: function(evt, item, legend) {
-                const chart = legend.chart;
-                chart.data.datasets.forEach((ds, i) => {
-                  ds.borderWidth = (i === item.datasetIndex) ? 4 : 1;
-                  ds.pointRadius = (i === item.datasetIndex) ? 6 : 2;
-                });
-                chart.update('none');
-              },
-              onLeave: function(evt, item, legend) {
-                const chart = legend.chart;
-                chart.data.datasets.forEach(ds => {
-                  ds.borderWidth = 2.2;
-                  ds.pointRadius = 4;
-                });
-                chart.update('none');
+              labels: {
+                color: '#e2e8f0',
+                font: { family: 'Inter', size: 11, weight: '500' },
+                boxWidth: 14,
+                padding: 14,
+                usePointStyle: true
               }
             },
             tooltip: {
+              backgroundColor: 'rgba(13, 21, 34, 0.95)',
+              titleColor: '#38bdf8',
+              bodyColor: '#f8fafc',
+              borderColor: 'rgba(56, 189, 248, 0.4)',
+              borderWidth: 1,
+              titleFont: { family: 'Space Grotesk', size: 13, weight: '700' },
+              bodyFont: { family: 'JetBrains Mono', size: 11 },
+              padding: 10,
               callbacks: {
-                label: function(c) {
-                  return `${c.dataset.label}: ${c.raw} ms/step`;
+                label: function(context) {
+                  return ` ${context.dataset.label}: ${context.parsed.y.toFixed(3)} ms`;
                 }
               }
             }
@@ -2297,11 +2526,32 @@
       });
     }
 
-    // =========================================================================
-    // 7. Q&A INTERACTION
-    // =========================================================================
-    function toggleQA(el) {
-      el.parentElement.classList.toggle('open');
+    function updateChartSlide(num) {
+      currentChartSlide = num;
+      const cfg = CHART_CONFIGS.find(c => c.id === num) || CHART_CONFIGS[0];
+      
+      document.getElementById('chart-badge').innerText = cfg.badge;
+      document.getElementById('chart-title').innerText = cfg.title;
+      document.getElementById('chart-subtitle').innerText = cfg.subtitle;
+
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.getElementById(`dot-c${i}`);
+        if (dot) dot.classList.toggle('active', i === num);
+      }
+
+      renderCarouselChart(cfg);
+    }
+
+    function setChartSlide(num) { updateChartSlide(num); }
+    function nextChartSlide() { updateChartSlide(currentChartSlide >= 5 ? 1 : currentChartSlide + 1); }
+    function prevChartSlide() { updateChartSlide(currentChartSlide <= 1 ? 5 : currentChartSlide - 1); }
+
+    function filterPreset(preset) {
+      activePreset = preset;
+      document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = Array.from(document.querySelectorAll('.preset-btn')).find(b => b.getAttribute('onclick')?.includes(preset));
+      if (activeBtn) activeBtn.classList.add('active');
+      updateChartSlide(currentChartSlide);
     }
   </script>
 </body>
