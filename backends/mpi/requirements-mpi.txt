@@ -1,0 +1,4 @@
+# MPI backend (py-mpi). Install a system MPI FIRST (see backends/mpi/README.md), then:
+#   python -m pip install -r backends/mpi/requirements-mpi.txt
+-r ../../nbody_sim/requirements.txt
+mpi4py>=4.0
