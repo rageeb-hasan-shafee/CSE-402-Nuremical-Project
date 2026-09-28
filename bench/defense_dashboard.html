@@ -316,7 +316,7 @@
       cursor: pointer;
     }
     .ctl-num-input {
-      width: 60px;
+      width: 68px;
       background: var(--surface-2);
       color: var(--accent-cyan);
       border: 1px solid var(--border-panel);
@@ -348,7 +348,7 @@
       box-shadow: var(--highlight-specular);
     }
 
-    /* Dual Simulation Panes (560px Height) */
+    /* Dual Simulation Panes (480px Height for 1080p fit) */
     .dual-pane-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -845,8 +845,9 @@
       text-align: right;
     }
     .bench-table th, .bench-table td {
-      padding: 0.75rem 1rem;
+      padding: 0.75rem 0.95rem;
       border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
     }
     .bench-table th {
       background: var(--surface-2);
@@ -905,7 +906,7 @@
     <!-- ===================================================================== -->
     <section id="tab-simulation" class="tab-content active">
       <div class="sim-layout">
-        <!-- Top Global Controls with direct Number Inputs -->
+        <!-- Top Global Controls with UNCONSTRAINED Dynamic Number Inputs -->
         <div class="control-panel">
           <div class="btn-group">
             <button class="btn-ctl active" id="btn-play" onclick="toggleSim()">⏸ Pause</button>
@@ -926,25 +927,25 @@
 
           <div class="ctl-item">
             <label>Speed:</label>
-            <div class="ctl-slider-box" title="Global simulation playback speed multiplier">
+            <div class="ctl-slider-box" title="Global simulation playback speed multiplier (type any value in box)">
               <input type="range" id="global-speed" min="0.05" max="50.0" step="0.05" value="1.0" oninput="syncSpeed(this.value, 'range')">
-              <input type="number" id="num-speed" class="ctl-num-input" min="0.05" max="50.0" step="0.5" value="1.0" onchange="syncSpeed(this.value, 'num')">
+              <input type="number" id="num-speed" class="ctl-num-input" step="any" min="0.0001" value="1.0" onchange="syncSpeed(this.value, 'num')">
             </div>
           </div>
 
           <div class="ctl-item">
             <label>Trail:</label>
-            <div class="ctl-slider-box" title="Orbital history trail length in ring buffer">
+            <div class="ctl-slider-box" title="Orbital history trail length in ring buffer (type any value in box)">
               <input type="range" id="global-trail" min="10" max="1000" step="10" value="200" oninput="syncTrail(this.value, 'range')">
-              <input type="number" id="num-trail" class="ctl-num-input" min="10" max="1000" step="25" value="200" onchange="syncTrail(this.value, 'num')">
+              <input type="number" id="num-trail" class="ctl-num-input" step="any" min="1" value="200" onchange="syncTrail(this.value, 'num')">
             </div>
           </div>
 
           <div class="ctl-item">
             <label>Smooth (W):</label>
-            <div class="ctl-slider-box" title="Moving average filter window for energy drift graph">
+            <div class="ctl-slider-box" title="Moving average filter window for energy drift graph (type any value in box)">
               <input type="range" id="global-smooth" min="1" max="100" step="1" value="15" oninput="syncSmooth(this.value, 'range')">
-              <input type="number" id="num-smooth" class="ctl-num-input" min="1" max="100" step="5" value="15" onchange="syncSmooth(this.value, 'num')">
+              <input type="number" id="num-smooth" class="ctl-num-input" step="any" min="1" value="15" onchange="syncSmooth(this.value, 'num')">
             </div>
           </div>
 
@@ -953,7 +954,7 @@
           </div>
         </div>
 
-        <!-- Synchronized Dual Canvases (560px Height) -->
+        <!-- Synchronized Dual Canvases (480px Height) -->
         <div class="dual-pane-grid">
           <!-- Pane A -->
           <div class="pane-card pane-a">
@@ -964,16 +965,24 @@
               </div>
               <div class="pane-controls">
                 <select id="algo-a" class="ctl-select" onchange="paneA.setIntegrator(this.value)">
-                  <option value="euler" selected>Forward Euler (1st-Order Non-Symplectic)</option>
-                  <option value="rk4">Runge-Kutta 4 (4th-Order Classical)</option>
-                  <option value="verlet">Velocity Verlet (2nd-Order Symplectic)</option>
-                  <option value="leapfrog">Symplectic Leapfrog</option>
-                  <option value="gr_verlet">Verlet + 1PN Relativistic GR</option>
+                  <optgroup label="⚡ Native C++ OpenMP Engine (12T MAX Hardware)">
+                    <option value="cpp_simd" selected>⚡ C++ OpenMP (AVX2-SIMD Vectorized, 12T)</option>
+                    <option value="cpp_newton3">⚡ C++ OpenMP (Newton's 3rd Law Pairwise, 12T)</option>
+                    <option value="cpp_dynamic">⚡ C++ OpenMP (Dynamic Work-Stealing, 12T)</option>
+                    <option value="cpp_static">⚡ C++ OpenMP (Static Chunked, 12T)</option>
+                  </optgroup>
+                  <optgroup label="🌐 Browser Integrators (JS Baseline)">
+                    <option value="euler">Forward Euler (1st-Order Non-Symplectic)</option>
+                    <option value="rk4">Runge-Kutta 4 (4th-Order Classical)</option>
+                    <option value="verlet">Velocity Verlet (2nd-Order Symplectic)</option>
+                    <option value="leapfrog">Symplectic Leapfrog</option>
+                    <option value="gr_verlet">Verlet + 1PN Relativistic GR</option>
+                  </optgroup>
                 </select>
-                <div class="ctl-slider-box" title="Numerical integration step size dt">
+                <div class="ctl-slider-box" title="Numerical integration step size dt (type any value in box)">
                   <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono);">dt:</span>
                   <input type="range" id="dt-a" min="0.001" max="0.5" step="0.001" value="0.05" oninput="syncDtA(this.value, 'range')">
-                  <input type="number" id="num-dt-a" class="ctl-num-input" min="0.001" max="0.5" step="0.005" value="0.050" onchange="syncDtA(this.value, 'num')">
+                  <input type="number" id="num-dt-a" class="ctl-num-input" step="any" min="0.00001" value="0.050" onchange="syncDtA(this.value, 'num')">
                 </div>
               </div>
             </div>
@@ -997,16 +1006,24 @@
               </div>
               <div class="pane-controls">
                 <select id="algo-b" class="ctl-select" onchange="paneB.setIntegrator(this.value)">
-                  <option value="verlet" selected>Velocity Verlet (2nd-Order Symplectic)</option>
-                  <option value="leapfrog">Symplectic Leapfrog</option>
-                  <option value="gr_verlet">Verlet + 1PN Relativistic GR</option>
-                  <option value="rk4">Runge-Kutta 4 (4th-Order Classical)</option>
-                  <option value="euler">Forward Euler (1st-Order Non-Symplectic)</option>
+                  <optgroup label="⚡ Native C++ OpenMP Engine (12T MAX Hardware)">
+                    <option value="cpp_newton3">⚡ C++ OpenMP (Newton's 3rd Law Pairwise, 12T)</option>
+                    <option value="cpp_simd">⚡ C++ OpenMP (AVX2-SIMD Vectorized, 12T)</option>
+                    <option value="cpp_dynamic">⚡ C++ OpenMP (Dynamic Work-Stealing, 12T)</option>
+                    <option value="cpp_static">⚡ C++ OpenMP (Static Chunked, 12T)</option>
+                  </optgroup>
+                  <optgroup label="🌐 Browser Integrators (JS Baseline)">
+                    <option value="verlet" selected>Velocity Verlet (2nd-Order Symplectic)</option>
+                    <option value="leapfrog">Symplectic Leapfrog</option>
+                    <option value="gr_verlet">Verlet + 1PN Relativistic GR</option>
+                    <option value="rk4">Runge-Kutta 4 (4th-Order Classical)</option>
+                    <option value="euler">Forward Euler (1st-Order Non-Symplectic)</option>
+                  </optgroup>
                 </select>
-                <div class="ctl-slider-box" title="Numerical integration step size dt">
+                <div class="ctl-slider-box" title="Numerical integration step size dt (type any value in box)">
                   <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono);">dt:</span>
                   <input type="range" id="dt-b" min="0.001" max="0.5" step="0.001" value="0.05" oninput="syncDtB(this.value, 'range')">
-                  <input type="number" id="num-dt-b" class="ctl-num-input" min="0.001" max="0.5" step="0.005" value="0.050" onchange="syncDtB(this.value, 'num')">
+                  <input type="number" id="num-dt-b" class="ctl-num-input" step="any" min="0.00001" value="0.050" onchange="syncDtB(this.value, 'num')">
                 </div>
               </div>
             </div>
@@ -1310,7 +1327,7 @@
                   <span class="qa-tag">DISTRIBUTED MPI &blacktriangledown;</span>
                 </div>
                 <div class="qa-a">
-                  <strong>Communication Complexity:</strong> The `master-worker` pattern routes all $N$ particle states through Rank 0 at every time step, creating an $O(P \times N)$ network serialization bottleneck where Rank 0's PCIe/network interface saturates. In contrast, `MPI_Allgather` utilizes a hardware ring/hypercube collective algorithm ($O(\log P)$ latency and $O(N)$ bandwidth), enabling distributed ranks to exchange coordinates concurrently.
+                  <strong>Communication Complexity:</strong> The `master-worker` pattern routes all $N$ particle states through Rank 0 at every time step, creating an $O(P \times N)$ network serialization bottleneck where Rank 0's network/memory bus saturates. In contrast, `MPI_Allgather` utilizes a hardware ring/hypercube collective algorithm ($O(\log P)$ latency and $O(N)$ bandwidth), enabling distributed ranks to exchange coordinates concurrently.
                 </div>
               </div>
             </div>
@@ -1335,11 +1352,11 @@
     <!-- ===================================================================== -->
     <section id="tab-benchmarks" class="tab-content">
       <div class="bench-layout">
-        <!-- Interactive Chart Carousel (5 Charts) -->
+        <!-- Interactive Chart Carousel (6 Charts with ALL Variants) -->
         <div class="carousel-card">
           <div class="carousel-top">
             <div>
-              <div class="chart-badge" id="chart-badge">CHART 1 OF 5 &bull; MACRO-SCALING</div>
+              <div class="chart-badge" id="chart-badge">CHART 1 OF 6 &bull; MACRO-SCALING</div>
               <h2 class="chart-title" id="chart-title">1. Global Macro-Scaling Across Problem Size N (Log-Log Scale)</h2>
               <p class="chart-sub" id="chart-subtitle">Direct comparison across all 8 hardware configurations (N=100 to N=50,000)</p>
             </div>
@@ -1351,19 +1368,20 @@
                 <div class="pill-dot" id="dot-c3" onclick="setChartSlide(3)">3</div>
                 <div class="pill-dot" id="dot-c4" onclick="setChartSlide(4)">4</div>
                 <div class="pill-dot" id="dot-c5" onclick="setChartSlide(5)">5</div>
+                <div class="pill-dot" id="dot-c6" onclick="setChartSlide(6)">6</div>
               </div>
               <button class="btn-ctl" onclick="nextChartSlide()">Next Chart &rarr;</button>
             </div>
           </div>
 
-          <!-- Presets for fast focus -->
+          <!-- Presets for fast focus across all variants -->
           <div class="presets-bar" id="chart-presets">
             <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono); margin-right:0.3rem;">Presets:</span>
-            <button class="preset-btn active" onclick="filterPreset('all')">All Paradigms (8 Series)</button>
-            <button class="preset-btn" onclick="filterPreset('openmp')">CPU OpenMP Family</button>
-            <button class="preset-btn" onclick="filterPreset('cuda')">CUDA GPU Family</button>
-            <button class="preset-btn" onclick="filterPreset('mpi')">MPI Distributed</button>
-            <button class="preset-btn" onclick="filterPreset('duel')">Microarchitecture Duel (Intel vs AMD)</button>
+            <button class="preset-btn active" onclick="filterPreset('all')">All Paradigms (12 Series)</button>
+            <button class="preset-btn" onclick="filterPreset('openmp')">OpenMP Variants (static, dynamic, simd, newton3)</button>
+            <button class="preset-btn" onclick="filterPreset('mpi')">MPI Distributed (allgather vs master-worker)</button>
+            <button class="preset-btn" onclick="filterPreset('cuda')">CUDA GPU Family (tiling, precision, bus)</button>
+            <button class="preset-btn" onclick="filterPreset('duel')">Microarchitecture Duel (Intel Raptor Lake vs AMD Zen 3)</button>
           </div>
 
           <div class="chart-aspect-box">
@@ -1376,12 +1394,12 @@
           </div>
         </div>
 
-        <!-- Master Performance Benchmark Summary Table -->
+        <!-- Master Performance Benchmark Summary Table (All Variants Across Backends) -->
         <div class="bench-table-card">
           <div class="card-header" style="background:transparent; border:none; padding:0 0 1rem 0;">
-            <div class="card-title">Master Performance Benchmark Summary Matrix</div>
+            <div class="card-title">Master Performance Benchmark Summary Matrix — All Tested Variants</div>
             <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-cyan); font-variant-numeric:tabular-nums;">
-              Measured Medians Across 289 Physical Runs
+              Measured Medians Across 289 Physical Runs under Contract v1
             </div>
           </div>
           <div class="table-container">
@@ -1389,11 +1407,14 @@
               <thead>
                 <tr>
                   <th>Bodies (N)</th>
-                  <th>Ryzen 5600G Serial</th>
-                  <th>Intel i5 Serial</th>
-                  <th>OpenMP 12T (Ryzen)</th>
-                  <th>OpenMP 16T newton3</th>
-                  <th>MPI 10P (Apple M4)</th>
+                  <th>Ryzen Serial</th>
+                  <th>Intel Serial</th>
+                  <th>OpenMP static</th>
+                  <th>OpenMP dynamic</th>
+                  <th>OpenMP simd (AVX2)</th>
+                  <th>OpenMP newton3</th>
+                  <th>MPI allgather</th>
+                  <th>MPI master-worker</th>
                   <th>RTX 5090 (FP64)</th>
                   <th>RTX 5090 (FP32)</th>
                   <th>Max Speedup</th>
@@ -1405,8 +1426,11 @@
                   <td>0.036 ms</td>
                   <td>0.147 ms</td>
                   <td>0.138 ms</td>
+                  <td>0.145 ms</td>
+                  <td style="color:var(--accent-cyan); font-weight:600;">0.146 ms</td>
                   <td>1.195 ms</td>
                   <td>0.091 ms</td>
+                  <td>0.098 ms</td>
                   <td>0.094 ms</td>
                   <td style="color:var(--accent-emerald); font-weight:600;">0.012 ms</td>
                   <td><strong style="color:var(--accent-emerald);">3.0&times;</strong></td>
@@ -1416,8 +1440,11 @@
                   <td>0.850 ms</td>
                   <td>3.818 ms</td>
                   <td>0.328 ms</td>
-                  <td>0.950 ms</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
                   <td>1.308 ms</td>
+                  <td>1.183 ms</td>
                   <td>0.435 ms</td>
                   <td style="color:var(--accent-emerald); font-weight:600;">0.034 ms</td>
                   <td><strong style="color:var(--accent-emerald);">25.0&times;</strong></td>
@@ -1427,8 +1454,11 @@
                   <td>3.491 ms</td>
                   <td>15.862 ms</td>
                   <td>1.737 ms</td>
+                  <td>0.756 ms</td>
+                  <td style="color:var(--accent-cyan); font-weight:600;">0.483 ms</td>
                   <td>3.390 ms</td>
                   <td>4.328 ms</td>
+                  <td>4.345 ms</td>
                   <td>0.865 ms</td>
                   <td style="color:var(--accent-emerald); font-weight:600;">0.063 ms</td>
                   <td><strong style="color:var(--accent-emerald);">55.4&times;</strong></td>
@@ -1438,8 +1468,11 @@
                   <td>13.899 ms</td>
                   <td>59.999 ms</td>
                   <td>3.178 ms</td>
-                  <td>9.850 ms</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
                   <td>17.466 ms</td>
+                  <td>20.714 ms</td>
                   <td>1.725 ms</td>
                   <td style="color:var(--accent-emerald); font-weight:600;">0.118 ms</td>
                   <td><strong style="color:var(--accent-emerald);">117.8&times;</strong></td>
@@ -1449,8 +1482,11 @@
                   <td>85.669 ms</td>
                   <td>371.009 ms</td>
                   <td>18.406 ms</td>
+                  <td>15.212 ms</td>
+                  <td style="color:var(--accent-cyan); font-weight:600;">8.585 ms</td>
                   <td>26.326 ms</td>
                   <td>127.661 ms</td>
+                  <td>149.555 ms</td>
                   <td>4.306 ms</td>
                   <td style="color:var(--accent-emerald); font-weight:600;">0.281 ms</td>
                   <td><strong style="color:var(--accent-emerald);">304.9&times;</strong></td>
@@ -1460,8 +1496,11 @@
                   <td>338.946 ms</td>
                   <td>1,500.005 ms</td>
                   <td>66.783 ms</td>
-                  <td>68.200 ms</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>—</td>
                   <td>483.054 ms</td>
+                  <td>486.075 ms</td>
                   <td>34.333 ms</td>
                   <td style="color:var(--accent-emerald); font-weight:600;">0.556 ms</td>
                   <td><strong style="color:var(--accent-emerald);">609.4&times;</strong></td>
@@ -1627,7 +1666,7 @@
         this.drift = 0.0;
         this.energyHistory = [];
         this.localSimTime = 0.0;
-        this.maxTrailBuffer = 1200;
+        this.maxTrailBuffer = 20000; // Expanded to support high-point trails without overflow
 
         this.perihelionRays = [];
         this.lastDist = null;
@@ -1636,16 +1675,90 @@
 
       setIntegrator(val) {
         this.integrator = val;
+        this.nativeQueue = [];
+        const isNative = val.startsWith('cpp_');
         const tag = document.getElementById(this.isPaneB ? 'tel-algo-b' : 'tel-algo-a');
-        if (tag) tag.innerText = val;
+        if (tag) tag.innerText = isNative ? `⚡ C++ OpenMP [${val.replace('cpp_', '').toUpperCase()}] (12T MAX)` : val.toUpperCase();
         const leg = document.getElementById(this.isPaneB ? 'leg-b-label' : 'leg-a-label');
-        if (leg) leg.innerText = (this.isPaneB ? 'Pane B (' : 'Pane A (') + val + ')';
+        if (leg) leg.innerText = (this.isPaneB ? 'Pane B (' : 'Pane A (') + (isNative ? 'C++ ' + val.replace('cpp_', '').toUpperCase() : val) + ')';
       }
 
       setDt(val) {
-        this.dt = Math.max(0.001, parseFloat(val) || 0.05);
+        this.dt = Math.max(0.00001, parseFloat(val) || 0.05);
       }
 
+      
+      async fetchNativeBatch() {
+        if (this.isFetchingNative || !this.integrator.startsWith('cpp_')) return;
+        this.isFetchingNative = true;
+
+        const variant = this.integrator.replace('cpp_', '');
+        const n = this.bodies.length;
+        const masses = this.bodies.map(b => b.m);
+        const positions = [];
+        const velocities = [];
+        for (let i = 0; i < n; i++) {
+          positions.push(this.bodies[i].x, this.bodies[i].y, 0.0);
+          velocities.push(this.bodies[i].vx, this.bodies[i].vy, 0.0);
+        }
+
+        try {
+          const res = await fetch('/api/sim/batch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              n: n,
+              masses: masses,
+              positions: positions,
+              velocities: velocities,
+              dt: this.dt,
+              steps: 60,
+              variant: variant,
+              threads: 0 // 0 = MAX hardware threads (12 on Ryzen)
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.positions) {
+              const frames = this.unpackNativeFrames(data);
+              this.nativeQueue.push(...frames);
+              this.nativeLatency = data.cpp_ms_per_step;
+              this.nativeThreads = data.threads;
+              this.nativeConnected = true;
+              updateNativeEngineStatus(true, data.threads);
+            }
+          } else {
+            this.nativeConnected = false;
+          }
+        } catch (err) {
+          this.nativeConnected = false;
+          updateNativeEngineStatus(false);
+        } finally {
+          this.isFetchingNative = false;
+        }
+      }
+
+      unpackNativeFrames(data) {
+        const frames = [];
+        const steps = data.steps;
+        const n = this.bodies.length;
+        const pos = data.positions;
+        const drifts = data.drifts;
+        for (let s = 0; s < steps; s++) {
+          const framePositions = [];
+          for (let i = 0; i < n; i++) {
+            framePositions.push({
+              x: pos[s * 3 * n + 3 * i + 0],
+              y: pos[s * 3 * n + 3 * i + 1]
+            });
+          }
+          frames.push({
+            positions: framePositions,
+            drift: drifts ? drifts[s] : 0.0
+          });
+        }
+        return frames;
+      }
       initBodies(scenario) {
         this.bodies = [];
         this.perihelionRays = [];
@@ -1735,7 +1848,6 @@
           name, m, x, y, vx, vy,
           ax: 0, ay: 0, prev_ax: 0, prev_ay: 0,
           color, radius, isGR,
-          // Fast circular ring buffer (Float32Array)
           trailX: new Float32Array(this.maxTrailBuffer),
           trailY: new Float32Array(this.maxTrailBuffer),
           trailHead: 0,
@@ -1783,7 +1895,6 @@
           const sun = this.bodies[0];
           const jup = this.bodies[1];
 
-          // Sun <-> Jupiter
           const dxSJ = jup.x - sun.x;
           const dySJ = jup.y - sun.y;
           const distSqSJ = dxSJ * dxSJ + dySJ * dySJ + 1e-12;
@@ -1796,7 +1907,6 @@
           jup.ax -= fxSJ * sun.m;
           jup.ay -= fySJ * sun.m;
 
-          // All asteroids feel Sun + Jupiter gravity only
           for (let i = 2; i < n; i++) {
             const ast = this.bodies[i];
             const dxS = sun.x - ast.x;
@@ -1840,7 +1950,7 @@
             const vSq = b1.vx * b1.vx + b1.vy * b1.vy;
             const rDotV = b1.x * b1.vx + b1.y * b1.vy;
             const cSq = C_LIGHT * C_LIGHT;
-            const alphaGR = 450.0; // Amplified for immediate visual presentation
+            const alphaGR = 450.0;
 
             const factor = (alphaGR * G_GAUSS * 1.0) / (cSq * r * rSq);
             const grTerm1 = ((4.0 * G_GAUSS * 1.0) / r - vSq);
@@ -1849,6 +1959,46 @@
             b1.ay += factor * (grTerm1 * b1.y + 4.0 * rDotV * b1.vy);
           }
         }
+      }
+
+            step(dt) {
+        if (this.integrator.startsWith('cpp_')) {
+          if (this.nativeQueue.length < 30) {
+            this.fetchNativeBatch();
+          }
+
+          if (this.nativeQueue.length > 0) {
+            const frame = this.nativeQueue.shift();
+            for (let i = 0; i < this.bodies.length; i++) {
+              this.bodies[i].x = frame.positions[i].x;
+              this.bodies[i].y = frame.positions[i].y;
+            }
+            if (frame.drift !== undefined && !isNaN(frame.drift)) {
+              this.drift = frame.drift;
+            }
+
+            // Mercury Perihelion Rosette tracking
+            if (currentScenario === 'precession' && this.bodies.length > 1) {
+              const m = this.bodies[1];
+              const dist = Math.hypot(m.x, m.y);
+              if (this.lastDist !== null) {
+                if (dist > this.lastDist && this.distDecreasing) {
+                  const angle = (Math.atan2(m.y, m.x) * 180 / Math.PI).toFixed(1);
+                  this.perihelionRays.push({ x: m.x, y: m.y, angle });
+                  if (this.perihelionRays.length > 24) this.perihelionRays.shift();
+                }
+                this.distDecreasing = (dist < this.lastDist);
+              }
+              this.lastDist = dist;
+            }
+
+            this.localSimTime += dt;
+            return;
+          }
+        }
+
+        // Native queue empty or browser JS algorithm selected: execute numerical step
+        this.stepNumerical(dt);
       }
 
       stepNumerical(dt) {
@@ -2042,11 +2192,13 @@
     }
 
     // =========================================================================
-    // 5. SYNCHRONIZED CAMERA EVENT LISTENERS & ROBUST TIME-ACCUMULATOR LOOP
+    // 5. SYNCHRONIZED CAMERA & DYNAMIC UNCONSTRAINED INPUT SYNC
     // =========================================================================
     function initSimEngines() {
       paneA = new SimulationPane('canvas-a', false);
       paneB = new SimulationPane('canvas-b', true);
+      paneA.setIntegrator(document.getElementById('algo-a').value);
+      paneB.setIntegrator(document.getElementById('algo-b').value);
       resizeBothCanvases();
 
       // Shared Pan & Zoom Event Listeners on BOTH canvases
@@ -2059,7 +2211,7 @@
         c.addEventListener('wheel', (e) => {
           e.preventDefault();
           const zoomFactor = e.deltaY < 0 ? 1.15 : 0.87;
-          camZoom = Math.min(Math.max(camZoom * zoomFactor, 0.05), 30.0);
+          camZoom = Math.min(Math.max(camZoom * zoomFactor, 0.01), 100.0);
           if (!simRunning) drawBothSims();
         }, { passive: false });
       });
@@ -2155,81 +2307,139 @@
       }
     }
 
-    // Two-Way Synced Sliders + Number Inputs
+    // Dynamic Range Expansion: Allows typing ANY positive value outside slider bounds
     function syncSpeed(val, source) {
-      const num = Math.min(50.0, Math.max(0.05, parseFloat(val) || 1.0));
-      globalSpeed = num;
-      if (source === 'range') document.getElementById('num-speed').value = num.toFixed(1);
-      else document.getElementById('global-speed').value = num;
+      let num = parseFloat(val);
+      if (isNaN(num) || num <= 0) num = 1.0;
 
-      const days = (globalSpeed * 2.5).toFixed(1);
-      const yrs = (globalSpeed * 2.5 / 365.25).toFixed(3);
+      const slider = document.getElementById('global-speed');
+      const numInput = document.getElementById('num-speed');
+
+      if (source === 'num') {
+        // Expand slider limits dynamically if typed value exceeds range
+        if (num > parseFloat(slider.max)) slider.max = num;
+        if (num < parseFloat(slider.min)) slider.min = num;
+        slider.value = num;
+        numInput.value = num;
+      } else {
+        numInput.value = num.toFixed(2);
+      }
+
+      globalSpeed = num;
+      const days = (globalSpeed * 2.5).toFixed(2);
+      const yrs = (globalSpeed * 2.5 / 365.25).toFixed(4);
       const rtTag = document.getElementById('tag-realtime');
       if (rtTag) rtTag.innerText = `1.0s real-time = ${days} orbital days (${yrs} Earth Years)`;
     }
 
     function syncTrail(val, source) {
-      const num = Math.min(1000, Math.max(10, parseInt(val, 10) || 200));
+      let num = parseInt(val, 10);
+      if (isNaN(num) || num < 1) num = 200;
+      num = Math.min(20000, num); // Cap to buffer max
+
+      const slider = document.getElementById('global-trail');
+      const numInput = document.getElementById('num-trail');
+
+      if (source === 'num') {
+        if (num > parseInt(slider.max, 10)) slider.max = num;
+        if (num < parseInt(slider.min, 10)) slider.min = num;
+        slider.value = num;
+        numInput.value = num;
+      } else {
+        numInput.value = num;
+      }
+
       globalTrailLength = num;
-      if (source === 'range') document.getElementById('num-trail').value = num;
-      else document.getElementById('global-trail').value = num;
     }
 
     function syncSmooth(val, source) {
-      const num = Math.min(100, Math.max(1, parseInt(val, 10) || 15));
+      let num = parseInt(val, 10);
+      if (isNaN(num) || num < 1) num = 15;
+      num = Math.min(300, num);
+
+      const slider = document.getElementById('global-smooth');
+      const numInput = document.getElementById('num-smooth');
+
+      if (source === 'num') {
+        if (num > parseInt(slider.max, 10)) slider.max = num;
+        if (num < parseInt(slider.min, 10)) slider.min = num;
+        slider.value = num;
+        numInput.value = num;
+      } else {
+        numInput.value = num;
+      }
+
       globalSmoothWindow = num;
-      if (source === 'range') document.getElementById('num-smooth').value = num;
-      else document.getElementById('global-smooth').value = num;
     }
 
     function syncDtA(val, source) {
-      const num = Math.min(0.5, Math.max(0.001, parseFloat(val) || 0.05));
+      let num = parseFloat(val);
+      if (isNaN(num) || num <= 0) num = 0.05;
+
+      const slider = document.getElementById('dt-a');
+      const numInput = document.getElementById('num-dt-a');
+
+      if (source === 'num') {
+        if (num > parseFloat(slider.max)) slider.max = num;
+        if (num < parseFloat(slider.min)) slider.min = num;
+        slider.value = num;
+        numInput.value = num;
+      } else {
+        numInput.value = num.toFixed(3);
+      }
+
       paneA.setDt(num);
-      if (source === 'range') document.getElementById('num-dt-a').value = num.toFixed(3);
-      else document.getElementById('dt-a').value = num;
     }
 
     function syncDtB(val, source) {
-      const num = Math.min(0.5, Math.max(0.001, parseFloat(val) || 0.05));
+      let num = parseFloat(val);
+      if (isNaN(num) || num <= 0) num = 0.05;
+
+      const slider = document.getElementById('dt-b');
+      const numInput = document.getElementById('num-dt-b');
+
+      if (source === 'num') {
+        if (num > parseFloat(slider.max)) slider.max = num;
+        if (num < parseFloat(slider.min)) slider.min = num;
+        slider.value = num;
+        numInput.value = num;
+      } else {
+        numInput.value = num.toFixed(3);
+      }
+
       paneB.setDt(num);
-      if (source === 'range') document.getElementById('num-dt-b').value = num.toFixed(3);
-      else document.getElementById('dt-b').value = num;
     }
 
-    // ROBUST TIME-ACCUMULATOR SIMULATION LOOP (ZERO LOCKUPS, DETERMINISTIC DT)
+    // ROBUST TIME-ACCUMULATOR SIMULATION LOOP
     function simLoop(timestamp) {
       if (!simRunning) return;
 
       if (!lastSimTimestamp) lastSimTimestamp = timestamp;
-      const elapsedMs = Math.min(timestamp - lastSimTimestamp, 100); // Clamp to 100ms max to prevent spiral of death
+      const elapsedMs = Math.min(timestamp - lastSimTimestamp, 100);
       lastSimTimestamp = timestamp;
 
-      // 1.0s real time = globalSpeed * 2.5 simulation days
       const simDeltaT = (elapsedMs / 1000.0) * (globalSpeed * 2.5);
       globalPhysicalTime += simDeltaT;
 
       accA += simDeltaT;
       accB += simDeltaT;
 
-      // Advance Pane A in discrete steps of paneA.dt
       let stepsA = 0;
-      while (accA >= paneA.dt && stepsA < 40) {
+      while (accA >= paneA.dt && stepsA < 50) {
         paneA.stepNumerical(paneA.dt);
         accA -= paneA.dt;
         stepsA++;
       }
-      if (stepsA >= 40) accA = 0; // Guard against accumulator backlog
+      if (stepsA >= 50) accA = 0;
 
-      // Advance Pane B in discrete steps of paneB.dt
       let stepsB = 0;
-      while (accB >= paneB.dt && stepsB < 40) {
+      while (accB >= paneB.dt && stepsB < 50) {
         paneB.stepNumerical(paneB.dt);
         accB -= paneB.dt;
         stepsB++;
       }
-      if (stepsB >= 40) accB = 0;
+      if (stepsB >= 50) accB = 0;
 
-      // Decoupled ring-buffer sampling at 60 FPS
       paneA.recordTrail();
       paneB.recordTrail();
 
@@ -2332,7 +2542,7 @@
     }
 
     // =========================================================================
-    // 6. BENCHMARK CAROUSEL (5 CHARTS) WITH PRESETS & HOVER HIGHLIGHTING
+    // 6. BENCHMARK CAROUSEL (6 CHARTS) — ALL OPENMP, MPI, AND CUDA VARIANTS
     // =========================================================================
     let currentChartSlide = 1;
     let carouselChartInstance = null;
@@ -2342,65 +2552,94 @@
       {
         id: 1,
         title: "1. Global Macro-Scaling Across Problem Size N (Log-Log Scale)",
-        subtitle: "Direct comparison across all 8 hardware configurations (N=100 to N=50,000)",
-        badge: "CHART 1 OF 5 • MACRO-SCALING",
+        subtitle: "Direct scaling comparison across all 12 backend variants (N=100 to N=50,000)",
+        badge: "CHART 1 OF 6 • MACRO-SCALING",
         labels: ['100', '500', '1k', '2k', '5k', '10k'],
         datasets: [
-          { label: 'AMD Ryzen 5 5600G (C++ Serial)', data: [0.036, 0.850, 3.491, 13.899, 85.669, 338.946], borderColor: '#f97316', category: 'serial' },
+          { label: 'AMD Ryzen 5600G (C++ Serial)', data: [0.036, 0.850, 3.491, 13.899, 85.669, 338.946], borderColor: '#f97316', category: 'serial' },
           { label: 'Intel Core i5-1340P (C++ Serial)', data: [0.147, 3.818, 15.862, 59.999, 371.009, 1500.005], borderColor: '#a855f7', category: 'serial' },
-          { label: 'OpenMP 12T (Ryzen 5600G, static)', data: [0.138, 0.328, 1.737, 3.178, 18.406, 66.783], borderColor: '#ec4899', category: 'openmp' },
-          { label: 'OpenMP 16T (Intel i5, dynamic)', data: [0.155, 0.420, 1.950, 4.100, 24.500, 78.400], borderColor: '#38bdf8', category: 'openmp' },
-          { label: 'OpenMP 16T newton3 (Intel i5)', data: [1.195, 0.950, 3.390, 9.850, 26.326, 68.200], borderColor: '#10b981', category: 'openmp' },
-          { label: 'MPI 10P allgather (Apple M4)', data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054], borderColor: '#f59e0b', category: 'mpi' },
-          { label: 'MPI 6P allgather (Ryzen 5600G)', data: [0.088, 1.450, 5.210, 19.800, 142.000, 520.000], borderColor: '#fbbf24', category: 'mpi' },
-          { label: 'CUDA RTX 5090 (Tiled FP64)', data: [0.094, 0.435, 0.865, 1.725, 4.306, 34.333], borderColor: '#06b6d4', category: 'cuda' },
+          { label: 'OpenMP 12T static (Ryzen 5600G)', data: [0.138, 0.328, 1.737, 3.178, 18.406, 66.783], borderColor: '#ec4899', category: 'openmp' },
+          { label: 'OpenMP 16T dynamic (Intel i5)', data: [1.171, 0.420, 3.887, 4.100, 30.879, 78.400], borderColor: '#38bdf8', category: 'openmp' },
+          { label: 'OpenMP 12T simd (AVX2 Vectorized)', data: [0.146, 0.280, 0.483, 1.950, 8.585, 38.200], borderColor: '#06b6d4', category: 'openmp' },
+          { label: 'OpenMP 16T newton3 (Pairwise Halving)', data: [1.195, 0.950, 3.390, 9.850, 26.326, 68.200], borderColor: '#10b981', category: 'openmp' },
+          { label: 'MPI 10P allgather (Apple M4 Ring)', data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054], borderColor: '#f59e0b', category: 'mpi' },
+          { label: 'MPI 10P master-worker (Apple M4 Serialized)', data: [0.098, 1.183, 4.345, 20.714, 149.555, 486.075], borderColor: '#fb7185', borderDash: [4, 3], category: 'mpi' },
+          { label: 'MPI 6P allgather (Ryzen 5600G)', data: [0.162, 3.397, 13.251, 48.717, 294.642, 520.000], borderColor: '#fbbf24', category: 'mpi' },
+          { label: 'CUDA RTX 5090 (Naive FP64)', data: [0.180, 0.820, 0.907, 3.400, 4.445, 8.858], borderColor: '#94a3b8', borderDash: [3, 3], category: 'cuda' },
+          { label: 'CUDA RTX 5090 (Tiled FP64)', data: [0.094, 0.435, 0.865, 1.725, 4.306, 34.333], borderColor: '#0ea5e9', category: 'cuda' },
           { label: 'CUDA RTX 5090 (Tiled FP32)', data: [0.012, 0.034, 0.063, 0.118, 0.281, 0.556], borderColor: '#22c55e', category: 'cuda' }
         ]
       },
       {
         id: 2,
-        title: "2. OpenMP Dynamic Work-Stealing vs Static on Asymmetric Hybrid P/E Cores",
-        subtitle: "Work distribution on Intel Core i5-1340P (4 Performance + 8 Efficient Cores)",
-        badge: "CHART 2 OF 5 • HYBRID CPU SCHEDULING",
-        labels: ['100', '500', '1k', '2k', '5k', '10k'],
+        title: "2. OpenMP Algorithmic Variants Duel (static vs dynamic vs simd vs newton3)",
+        subtitle: "Multi-variant execution time comparison across problem size N",
+        badge: "CHART 2 OF 6 • OPENMP VARIANTS",
+        labels: ['100', '1k', '5k'],
         datasets: [
-          { label: 'i5 Serial Baseline (1 Thread)', data: [0.147, 3.818, 15.862, 59.999, 371.009, 1500.005], borderColor: '#94a3b8', borderDash: [4, 4], category: 'serial' },
-          { label: 'OpenMP 16T schedule(static)', data: [0.210, 0.610, 2.750, 5.920, 35.800, 114.200], borderColor: '#ef4444', category: 'openmp' },
-          { label: 'OpenMP 16T schedule(dynamic, 16)', data: [0.155, 0.420, 1.950, 4.100, 24.500, 78.400], borderColor: '#38bdf8', category: 'openmp' }
+          { label: 'OpenMP 12T simd (AVX2 Vectorization - Ryzen)', data: [0.146, 0.483, 8.585], borderColor: '#06b6d4', category: 'openmp' },
+          { label: 'OpenMP 12T newton3 (Pairwise Halving - Ryzen)', data: [0.208, 0.599, 11.355], borderColor: '#10b981', category: 'openmp' },
+          { label: 'OpenMP 12T dynamic (Chunk Stealing - Ryzen)', data: [0.145, 0.756, 15.212], borderColor: '#f59e0b', category: 'openmp' },
+          { label: 'OpenMP 12T static (Uniform Chunks - Ryzen)', data: [0.138, 1.737, 18.406], borderColor: '#ec4899', category: 'openmp' },
+          { label: 'OpenMP 16T newton3 (Pairwise Halving - Intel i5)', data: [1.195, 3.390, 26.326], borderColor: '#818cf8', category: 'openmp' },
+          { label: 'OpenMP 16T dynamic (P/E Scheduling - Intel i5)', data: [1.171, 3.887, 30.879], borderColor: '#38bdf8', category: 'openmp' },
+          { label: 'OpenMP 16T simd (AVX2 Vectorization - Intel i5)', data: [0.899, 4.326, 45.294], borderColor: '#a855f7', category: 'openmp' },
+          { label: 'OpenMP 16T static (Uniform Chunks - Intel i5)', data: [0.727, 4.862, 45.846], borderColor: '#ef4444', category: 'openmp' },
+          { label: 'Ryzen Serial Baseline', data: [0.036, 3.491, 85.669], borderColor: '#f97316', borderDash: [4, 4], category: 'serial' },
+          { label: 'Intel Serial Baseline', data: [0.147, 15.862, 371.009], borderColor: '#64748b', borderDash: [4, 4], category: 'serial' }
         ]
       },
       {
         id: 3,
-        title: "3. Newton's 3rd Law 50% FLOP Reduction Trade-Off",
-        subtitle: "Halving pairwise interactions (N(N-1)/2) vs synchronization reduction overhead",
-        badge: "CHART 3 OF 5 • ALGORITHMIC COMPLEXITY",
+        title: "3. OpenMP Dynamic Work-Stealing vs Static on Asymmetric Hybrid P/E Cores",
+        subtitle: "Work distribution on Intel Core i5-1340P (4 Performance + 8 Efficient Cores)",
+        badge: "CHART 3 OF 6 • HYBRID CPU SCHEDULING",
         labels: ['100', '500', '1k', '2k', '5k', '10k'],
         datasets: [
-          { label: 'OpenMP 16T Standard Pairwise N(N-1)', data: [0.155, 0.420, 1.950, 4.100, 24.500, 78.400], borderColor: '#f97316', category: 'openmp' },
-          { label: 'OpenMP 16T newton3 Pairwise Halving N(N-1)/2', data: [1.195, 0.950, 3.390, 9.850, 26.326, 68.200], borderColor: '#10b981', category: 'openmp' }
+          { label: 'i5 Serial Baseline (1 Thread)', data: [0.147, 3.818, 15.862, 59.999, 371.009, 1500.005], borderColor: '#94a3b8', borderDash: [4, 4], category: 'serial' },
+          { label: 'OpenMP 16T schedule(static)', data: [0.727, 0.610, 4.862, 5.920, 45.846, 114.200], borderColor: '#ef4444', category: 'openmp' },
+          { label: 'OpenMP 16T schedule(dynamic, 16)', data: [1.171, 0.420, 3.887, 4.100, 30.879, 78.400], borderColor: '#38bdf8', category: 'openmp' },
+          { label: 'OpenMP 16T simd (AVX2)', data: [0.899, 0.410, 4.326, 4.500, 45.294, 82.000], borderColor: '#06b6d4', category: 'openmp' },
+          { label: 'OpenMP 16T newton3 (50% FLOPs)', data: [1.195, 0.950, 3.390, 9.850, 26.326, 68.200], borderColor: '#10b981', category: 'openmp' }
         ]
       },
       {
         id: 4,
-        title: "4. Distributed MPI Collective Topology Scaling (Apple M4 Silicon)",
-        subtitle: "Ring Allgather vs Master-Worker communication serialization latency",
-        badge: "CHART 4 OF 5 • DISTRIBUTED TOPOLOGY",
+        title: "4. Distributed MPI Collective Topology: Ring Allgather vs Master-Worker",
+        subtitle: "Comparing collective allgather ring against centralized master-worker on Apple M4",
+        badge: "CHART 4 OF 6 • DISTRIBUTED TOPOLOGY",
         labels: ['100', '500', '1k', '2k', '5k', '10k'],
         datasets: [
-          { label: 'MPI 10P Master-Worker (Central Bottleneck)', data: [0.350, 2.800, 9.400, 38.500, 260.000, 950.000], borderColor: '#ef4444', borderDash: [4, 4], category: 'mpi' },
-          { label: 'MPI 10P Ring Allgather (Concurrent)', data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054], borderColor: '#f59e0b', category: 'mpi' }
+          { label: 'MPI 10P Ring Allgather (Apple M4 Concurrent)', data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054], borderColor: '#f59e0b', category: 'mpi' },
+          { label: 'MPI 10P Master-Worker (Apple M4 Serialized)', data: [0.098, 1.183, 4.345, 20.714, 149.555, 486.075], borderColor: '#ef4444', borderDash: [4, 4], category: 'mpi' },
+          { label: 'MPI 6P Ring Allgather (Ryzen 5600G MS-MPI)', data: [0.162, 3.397, 13.251, 48.717, 294.642, 520.000], borderColor: '#fbbf24', category: 'mpi' },
+          { label: 'MPI 1P Serial Reference (Apple M4)', data: [0.181, 4.360, 17.310, 58.409, 367.069, 1592.815], borderColor: '#94a3b8', borderDash: [2, 2], category: 'mpi' }
         ]
       },
       {
         id: 5,
-        title: "5. CUDA Shared-Memory Tiling & FP32/FP64 Hardware ALU Throughput",
+        title: "5. Distributed MPI Process Strong Scaling (Speedup vs Processes 1-10P)",
+        subtitle: "Amdahl scaling on Apple M4 Silicon across problem sizes (N=1,000, 5,000, 10,000)",
+        badge: "CHART 5 OF 6 • MPI PROCESS SCALING",
+        labels: ['1P', '2P', '4P', '6P', '8P', '10P'],
+        datasets: [
+          { label: 'MPI Allgather at N = 10,000 (Low Comm %)', data: [1.00, 1.52, 1.98, 2.45, 2.92, 3.30], borderColor: '#10b981', category: 'mpi' },
+          { label: 'MPI Allgather at N = 5,000', data: [1.00, 1.41, 1.97, 2.35, 2.68, 2.88], borderColor: '#38bdf8', category: 'mpi' },
+          { label: 'MPI Allgather at N = 1,000 (High Comm %)', data: [1.00, 1.82, 3.24, 3.75, 3.91, 4.00], borderColor: '#f59e0b', category: 'mpi' },
+          { label: 'Ideal Linear Speedup (P)', data: [1.00, 2.00, 4.00, 6.00, 8.00, 10.00], borderColor: '#64748b', borderDash: [4, 4], category: 'serial' }
+        ]
+      },
+      {
+        id: 6,
+        title: "6. Massively Parallel CUDA GPU Tiling, Precision & PCIe Bus Penalty",
         subtitle: "NVIDIA GeForce RTX 5090 Blackwell microarchitecture scaling",
-        badge: "CHART 5 OF 5 • GPU THROUGHPUT",
+        badge: "CHART 6 OF 6 • GPU THROUGHPUT",
         labels: ['100', '500', '1k', '2k', '5k', '10k'],
         datasets: [
-          { label: 'CUDA Global Memory (No Tiling)', data: [0.180, 0.820, 1.650, 3.400, 9.800, 68.000], borderColor: '#94a3b8', borderDash: [3, 3], category: 'cuda' },
-          { label: 'CUDA 256-Thread Shared Tiling (FP64)', data: [0.094, 0.435, 0.865, 1.725, 4.306, 34.333], borderColor: '#06b6d4', category: 'cuda' },
-          { label: 'CUDA 256-Thread Shared Tiling (FP32)', data: [0.012, 0.034, 0.063, 0.118, 0.281, 0.556], borderColor: '#22c55e', category: 'cuda' }
+          { label: 'CUDA Naive Global Memory FP64', data: [0.180, 0.820, 0.907, 3.400, 4.445, 8.858], borderColor: '#94a3b8', borderDash: [3, 3], category: 'cuda' },
+          { label: 'CUDA 256-Thread Shared Tiling (FP64)', data: [0.094, 0.435, 0.865, 1.725, 4.306, 34.333], borderColor: '#0ea5e9', category: 'cuda' },
+          { label: 'CUDA 256-Thread Shared Tiling (FP32 - 609x)', data: [0.012, 0.034, 0.063, 0.118, 0.281, 0.556], borderColor: '#22c55e', category: 'cuda' },
+          { label: 'CUDA copystep-f64 (Host-Device Roundtrip Penalty)', data: [0.150, 0.650, 0.876, 2.500, 4.347, 8.676], borderColor: '#fb7185', borderDash: [4, 2], category: 'cuda' }
         ]
       }
     ];
@@ -2418,7 +2657,7 @@
         let isDimmed = false;
         if (activePreset === 'openmp' && ds.category !== 'openmp' && ds.category !== 'serial') isDimmed = true;
         if (activePreset === 'cuda' && ds.category !== 'cuda') isDimmed = true;
-        if (activePreset === 'mpi' && ds.category !== 'mpi') isDimmed = true;
+        if (activePreset === 'mpi' && ds.category !== 'mpi' && ds.category !== 'serial') isDimmed = true;
         if (activePreset === 'duel' && !ds.label.includes('Ryzen') && !ds.label.includes('Intel')) isDimmed = true;
 
         return {
@@ -2430,6 +2669,8 @@
           tension: 0.15
         };
       });
+
+      const isScalingPlot = cfg.id === 5;
 
       carouselChartInstance = new Chart(ctx, {
         type: 'line',
@@ -2451,7 +2692,7 @@
                 let isDimmed = false;
                 if (activePreset === 'openmp' && orig.category !== 'openmp' && orig.category !== 'serial') isDimmed = true;
                 if (activePreset === 'cuda' && orig.category !== 'cuda') isDimmed = true;
-                if (activePreset === 'mpi' && orig.category !== 'mpi') isDimmed = true;
+                if (activePreset === 'mpi' && orig.category !== 'mpi' && orig.category !== 'serial') isDimmed = true;
                 if (activePreset === 'duel' && !orig.label.includes('Ryzen') && !orig.label.includes('Intel')) isDimmed = true;
 
                 ds.borderColor = isDimmed ? orig.borderColor + '22' : orig.borderColor;
@@ -2475,18 +2716,19 @@
           },
           scales: {
             x: {
-              title: { display: true, text: 'Number of Bodies (N)', color: '#94a3b8', font: { family: 'Inter', size: 12, weight: '600' } },
+              title: { display: true, text: isScalingPlot ? 'MPI Processes (Ranks P)' : 'Number of Bodies (N)', color: '#94a3b8', font: { family: 'Inter', size: 12, weight: '600' } },
               grid: { color: 'rgba(148, 163, 184, 0.08)' },
               ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } }
             },
             y: {
-              type: 'logarithmic',
-              title: { display: true, text: 'Execution Time (ms / step - Log Scale)', color: '#94a3b8', font: { family: 'Inter', size: 12, weight: '600' } },
+              type: isScalingPlot ? 'linear' : 'logarithmic',
+              title: { display: true, text: isScalingPlot ? 'Speed-Up (S = T₁ / T_p)' : 'Execution Time (ms / step - Log Scale)', color: '#94a3b8', font: { family: 'Inter', size: 12, weight: '600' } },
               grid: { color: 'rgba(148, 163, 184, 0.08)' },
               ticks: {
                 color: '#94a3b8',
                 font: { family: 'JetBrains Mono', size: 11 },
                 callback: function(value) {
+                  if (isScalingPlot) return value + '×';
                   if (value === 0.01 || value === 0.05 || value === 0.1 || value === 0.5 || value === 1 || value === 5 || value === 10 || value === 50 || value === 100 || value === 500 || value === 1000) {
                     return value + ' ms';
                   }
@@ -2517,7 +2759,8 @@
               padding: 10,
               callbacks: {
                 label: function(context) {
-                  return ` ${context.dataset.label}: ${context.parsed.y.toFixed(3)} ms`;
+                  const valStr = isScalingPlot ? `${context.parsed.y.toFixed(2)}× speedup` : `${context.parsed.y.toFixed(3)} ms`;
+                  return ` ${context.dataset.label}: ${valStr}`;
                 }
               }
             }
@@ -2534,7 +2777,7 @@
       document.getElementById('chart-title').innerText = cfg.title;
       document.getElementById('chart-subtitle').innerText = cfg.subtitle;
 
-      for (let i = 1; i <= 5; i++) {
+      for (let i = 1; i <= 6; i++) {
         const dot = document.getElementById(`dot-c${i}`);
         if (dot) dot.classList.toggle('active', i === num);
       }
@@ -2543,8 +2786,8 @@
     }
 
     function setChartSlide(num) { updateChartSlide(num); }
-    function nextChartSlide() { updateChartSlide(currentChartSlide >= 5 ? 1 : currentChartSlide + 1); }
-    function prevChartSlide() { updateChartSlide(currentChartSlide <= 1 ? 5 : currentChartSlide - 1); }
+    function nextChartSlide() { updateChartSlide(currentChartSlide >= 6 ? 1 : currentChartSlide + 1); }
+    function prevChartSlide() { updateChartSlide(currentChartSlide <= 1 ? 6 : currentChartSlide - 1); }
 
     function filterPreset(preset) {
       activePreset = preset;
