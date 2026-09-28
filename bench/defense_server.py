@@ -44,6 +44,21 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
             return
         return super().do_GET()
 
+    def do_POST(self):
+        url = urllib.parse.urlparse(self.path)
+        if url.path == "/api/run":
+            content_length = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_length).decode("utf-8")
+            try:
+                params_dict = json.loads(body) if body else {}
+                # Convert dict to single-element lists for handle_api_run compatibility
+                params = {k: [str(v)] for k, v in params_dict.items()}
+            except Exception:
+                params = urllib.parse.parse_qs(body)
+            self.handle_api_run(params)
+            return
+        self.send_error(404, "Endpoint not found")
+
     def handle_api_run(self, params):
         backend = params.get("backend", ["openmp"])[0]
         n_bodies = int(params.get("n", ["1000"])[0])
@@ -109,10 +124,12 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
 
         res = {
             "success": proc.returncode == 0,
+            "status": "ok" if proc.returncode == 0 else "error",
             "cmd": " ".join(cmd),
             "stdout": proc.stdout,
             "stderr": proc.stderr,
-            "elapsed_s": elapsed,
+            "elapsed_sec": round(elapsed, 3),
+            "loop_ms": round(telemetry.get("median_ms", 0.0), 4) if telemetry else None,
             "telemetry": telemetry
         }
 
