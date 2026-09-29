@@ -73,11 +73,23 @@ def init_omp_engine():
         if engine_src.exists() and shutil.which("g++"):
             try:
                 BUILD_DIR.mkdir(parents=True, exist_ok=True)
-                print("[ENGINE] Compiling native OpenMP engine DLL with -static -fopenmp...")
+                print(
+                    "[ENGINE] Compiling native OpenMP engine DLL with -static -fopenmp..."
+                )
                 subprocess.run(
-                    ["g++", "-O3", "-fopenmp", "-shared", "-static", "-std=c++17",
-                     "-o", str(ENGINE_DLL), str(engine_src)],
-                    check=True, cwd=str(ROOT)
+                    [
+                        "g++",
+                        "-O3",
+                        "-fopenmp",
+                        "-shared",
+                        "-static",
+                        "-std=c++17",
+                        "-o",
+                        str(ENGINE_DLL),
+                        str(engine_src),
+                    ],
+                    check=True,
+                    cwd=str(ROOT),
                 )
             except Exception as e:
                 print(f"[ENGINE WARN] Auto-compile failed: {e}")
@@ -97,11 +109,13 @@ def init_omp_engine():
                 ctypes.c_int,
                 ctypes.POINTER(ctypes.c_double),
                 ctypes.POINTER(ctypes.c_double),
-                ctypes.POINTER(ctypes.c_double)
+                ctypes.POINTER(ctypes.c_double),
             ]
             lib.run_openmp_batch.restype = ctypes.c_int
             _omp_lib = lib
-            print(f"  [ENGINE] Native C++ OpenMP Engine Active! (Max Hardware Threads: {lib.get_max_threads()})")
+            print(
+                f"  [ENGINE] Native C++ OpenMP Engine Active! (Max Hardware Threads: {lib.get_max_threads()})"
+            )
         except Exception as e:
             print(f"[ENGINE WARN] Failed to load {ENGINE_DLL}: {e}")
 
@@ -119,13 +133,15 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
             return
         elif url.path == "/api/sim/info":
             max_t = _omp_lib.get_max_threads() if _omp_lib else os.cpu_count()
-            self.send_json_response({
-                "available": _omp_lib is not None,
-                "engine": "cpp-openmp-native" if _omp_lib else "none",
-                "max_threads": max_t,
-                "variants": ["static", "dynamic", "simd", "newton3"],
-                "machine": get_machine_tag()
-            })
+            self.send_json_response(
+                {
+                    "available": _omp_lib is not None,
+                    "engine": "cpp-openmp-native" if _omp_lib else "none",
+                    "max_threads": max_t,
+                    "variants": ["static", "dynamic", "simd", "newton3"],
+                    "machine": get_machine_tag(),
+                }
+            )
             return
         elif url.path == "/api/run":
             self.handle_api_run(urllib.parse.parse_qs(url.query))
@@ -135,7 +151,11 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         url = urllib.parse.urlparse(self.path)
         content_length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(content_length).decode("utf-8") if content_length > 0 else "{}"
+        body = (
+            self.rfile.read(content_length).decode("utf-8")
+            if content_length > 0
+            else "{}"
+        )
 
         if url.path == "/api/sim/batch":
             try:
@@ -163,10 +183,13 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
             init_omp_engine()
 
         if _omp_lib is None:
-            self.send_json_response({
-                "success": False,
-                "error": "Native C++ OpenMP engine not compiled or unavailable. Falling back to browser engine."
-            }, 503)
+            self.send_json_response(
+                {
+                    "success": False,
+                    "error": "Native C++ OpenMP engine not compiled or unavailable. Falling back to browser engine.",
+                },
+                503,
+            )
             return
 
         n = int(req.get("n", 0))
@@ -176,19 +199,31 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
         dt = float(req.get("dt", 0.05))
         steps = int(req.get("steps", 60))
         variant = str(req.get("variant", "simd")).lower()
-        threads = int(req.get("threads", 0)) # 0 = max available
+        threads = int(req.get("threads", 0))  # 0 = max available
 
-        if n <= 0 or len(pos_list) < 3 * n or len(vel_list) < 3 * n or len(masses_list) < n:
-            self.send_json_response({"success": False, "error": "Invalid body arrays length"}, 400)
+        if (
+            n <= 0
+            or len(pos_list) < 3 * n
+            or len(vel_list) < 3 * n
+            or len(masses_list) < n
+        ):
+            self.send_json_response(
+                {"success": False, "error": "Invalid body arrays length"}, 400
+            )
             return
 
         variant_map = {
-            "newton3": 0, "cpp_newton3": 0, "verlet": 0,
-            "simd": 1, "cpp_simd": 1,
-            "dynamic": 2, "cpp_dynamic": 2,
-            "static": 3, "cpp_static": 3
+            "newton3": 0,
+            "cpp_newton3": 0,
+            "verlet": 0,
+            "simd": 1,
+            "cpp_simd": 1,
+            "dynamic": 2,
+            "cpp_dynamic": 2,
+            "static": 3,
+            "cpp_static": 3,
         }
-        variant_id = variant_map.get(variant, 0) # default to Newton3 Verlet
+        variant_id = variant_map.get(variant, 0)  # default to Newton3 Verlet
 
         c_masses = (ctypes.c_double * n)(*masses_list)
         c_pos = (ctypes.c_double * (3 * n))(*pos_list)
@@ -200,32 +235,46 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
         c_elapsed_ms = ctypes.c_double(0.0)
 
         ret = _omp_lib.run_openmp_batch(
-            n, c_masses, c_pos, c_vel, ctypes.c_double(dt), steps, variant_id, threads,
-            c_out_pos, c_out_vel, c_out_drifts, ctypes.byref(c_elapsed_ms)
+            n,
+            c_masses,
+            c_pos,
+            c_vel,
+            ctypes.c_double(dt),
+            steps,
+            variant_id,
+            threads,
+            c_out_pos,
+            c_out_vel,
+            c_out_drifts,
+            ctypes.byref(c_elapsed_ms),
         )
 
         if ret != 0:
-            self.send_json_response({"success": False, "error": f"OpenMP engine returned code {ret}"}, 500)
+            self.send_json_response(
+                {"success": False, "error": f"OpenMP engine returned code {ret}"}, 500
+            )
             return
 
         max_t = _omp_lib.get_max_threads()
         active_t = threads if (threads > 0 and threads <= max_t) else max_t
 
-        self.send_json_response({
-            "success": True,
-            "engine": "cpp-openmp-native",
-            "variant": variant,
-            "threads": active_t,
-            "steps": steps,
-            "dt": dt,
-            "cpp_elapsed_ms": round(c_elapsed_ms.value, 3),
-            "cpp_ms_per_step": round(c_elapsed_ms.value / steps, 5),
-            "positions": list(c_out_pos),
-            "velocities": list(c_out_vel),
-            "drifts": list(c_out_drifts),
-            "final_pos": list(c_pos),
-            "final_vel": list(c_vel)
-        })
+        self.send_json_response(
+            {
+                "success": True,
+                "engine": "cpp-openmp-native",
+                "variant": variant,
+                "threads": active_t,
+                "steps": steps,
+                "dt": dt,
+                "cpp_elapsed_ms": round(c_elapsed_ms.value, 3),
+                "cpp_ms_per_step": round(c_elapsed_ms.value / steps, 5),
+                "positions": list(c_out_pos),
+                "velocities": list(c_out_vel),
+                "drifts": list(c_out_drifts),
+                "final_pos": list(c_pos),
+                "final_vel": list(c_vel),
+            }
+        )
 
     def handle_api_run(self, params):
         backend = params.get("backend", ["openmp"])[0].lower()
@@ -243,13 +292,18 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
                 try:
                     subprocess.run(
                         [str(PYTHON_EXE), str(export_script), "--n", str(n_bodies)],
-                        check=True, cwd=str(ROOT)
+                        check=True,
+                        cwd=str(ROOT),
                     )
                 except Exception as e:
-                    self.send_json_response({
-                        "success": False, "status": "error",
-                        "error": f"Failed to generate IC file for N={n_bodies}: {e}"
-                    }, 500)
+                    self.send_json_response(
+                        {
+                            "success": False,
+                            "status": "error",
+                            "error": f"Failed to generate IC file for N={n_bodies}: {e}",
+                        },
+                        500,
+                    )
                     return
 
         temp_json = ROOT / "bench" / "results" / "live_defense_run.json"
@@ -261,49 +315,80 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
 
         if backend == "openmp":
             if not OMP_EXE.exists():
-                self.send_json_response({
-                    "success": False, "status": "error",
-                    "error": f"Executable not found: {OMP_EXE}."
-                }, 400)
+                self.send_json_response(
+                    {
+                        "success": False,
+                        "status": "error",
+                        "error": f"Executable not found: {OMP_EXE}.",
+                    },
+                    400,
+                )
                 return
             cmd = [
                 str(OMP_EXE),
-                "--input", str(ic_file),
-                "--steps", str(steps),
-                "--dt", "0.1",
-                "--workers", str(workers),
-                "--variant", variant,
-                "--machine", machine_tag,
-                "--output-json", str(temp_json)
+                "--input",
+                str(ic_file),
+                "--steps",
+                str(steps),
+                "--dt",
+                "0.1",
+                "--workers",
+                str(workers),
+                "--variant",
+                variant,
+                "--machine",
+                machine_tag,
+                "--output-json",
+                str(temp_json),
             ]
         elif backend == "mpi":
             mpiexec_bin = find_mpiexec()
             cmd = [
-                str(mpiexec_bin), "-n", str(workers),
-                str(PYTHON_EXE), str(MPI_SCRIPT),
-                "--input", str(ic_file),
-                "--steps", str(steps),
-                "--dt", "0.1",
-                "--variant", variant,
-                "--machine", machine_tag,
-                "--output-json", str(temp_json)
+                str(mpiexec_bin),
+                "-n",
+                str(workers),
+                str(PYTHON_EXE),
+                str(MPI_SCRIPT),
+                "--input",
+                str(ic_file),
+                "--steps",
+                str(steps),
+                "--dt",
+                "0.1",
+                "--variant",
+                variant,
+                "--machine",
+                machine_tag,
+                "--output-json",
+                str(temp_json),
             ]
-        else: # serial
+        else:  # serial
             if not SERIAL_EXE.exists():
-                self.send_json_response({
-                    "success": False, "status": "error",
-                    "error": f"Executable not found: {SERIAL_EXE}."
-                }, 400)
+                self.send_json_response(
+                    {
+                        "success": False,
+                        "status": "error",
+                        "error": f"Executable not found: {SERIAL_EXE}.",
+                    },
+                    400,
+                )
                 return
             cmd = [
                 str(SERIAL_EXE),
-                "--input", str(ic_file),
-                "--steps", str(steps),
-                "--dt", "0.1",
-                "--workers", "1",
-                "--variant", "static",
-                "--machine", machine_tag,
-                "--output-json", str(temp_json)
+                "--input",
+                str(ic_file),
+                "--steps",
+                str(steps),
+                "--dt",
+                "0.1",
+                "--workers",
+                "1",
+                "--variant",
+                "static",
+                "--machine",
+                machine_tag,
+                "--output-json",
+                str(temp_json),
             ]
 
         t0 = time.time()
@@ -314,14 +399,19 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
                 stderr=subprocess.PIPE,
                 text=True,
                 cwd=str(ROOT),
-                env=env
+                env=env,
             )
             elapsed = time.time() - t0
         except Exception as e:
-            self.send_json_response({
-                "success": False, "status": "error",
-                "cmd": " ".join(cmd), "error": str(e)
-            }, 500)
+            self.send_json_response(
+                {
+                    "success": False,
+                    "status": "error",
+                    "cmd": " ".join(cmd),
+                    "error": str(e),
+                },
+                500,
+            )
             return
 
         telemetry = {}
@@ -340,7 +430,7 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
             "stderr": proc.stderr,
             "elapsed_sec": round(elapsed, 3),
             "loop_ms": round(telemetry.get("median_ms", 0.0), 4) if telemetry else None,
-            "telemetry": telemetry
+            "telemetry": telemetry,
         }
         self.send_json_response(res)
 
@@ -364,7 +454,9 @@ def main():
         print(f"  Root Directory: {ROOT}")
         print(f"  Machine Tag:    {get_machine_tag()}")
         if _omp_lib:
-            print(f"  OpenMP Engine:  ACTIVE ({_omp_lib.get_max_threads()} Hardware Threads MAX)")
+            print(
+                f"  OpenMP Engine:  ACTIVE ({_omp_lib.get_max_threads()} Hardware Threads MAX)"
+            )
         else:
             print(f"  OpenMP Engine:  INACTIVE (Client-side Fallback)")
         print(f"  Open in browser: {url}")

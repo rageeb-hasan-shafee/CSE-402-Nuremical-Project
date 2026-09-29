@@ -21,7 +21,11 @@ data/ic/*
 
 # Build outputs & executables
 backends/*/build/
+!backends/openmp/build/
+backends/openmp/build/*
+!backends/openmp/build/nbody_omp_engine.dll
 backends/serial/nbody_serial
+scratch/
 py-mpi.zip
 *.npy
 *.npz
@@ -81,6 +85,7 @@ htmlcov/
 *.lib
 *.dylib
 *.dll
+!backends/openmp/build/nbody_omp_engine.dll
 *.exe
 *.out
 *.app

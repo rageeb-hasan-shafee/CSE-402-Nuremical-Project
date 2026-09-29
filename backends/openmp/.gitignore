@@ -1,4 +1,5 @@
 build/
+!build/nbody_omp_engine.dll
 *.exe
 *.o
 *.obj
