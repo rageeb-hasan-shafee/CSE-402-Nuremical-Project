@@ -1038,7 +1038,7 @@
         <div class="status-badge blue">
           <span
             style="display:inline-block; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%; box-shadow:0 0 6px var(--accent-cyan);"></span>
-          289 Runs Ingested
+          316 Runs Ingested
         </div>
       </div>
     </header>
@@ -1601,7 +1601,7 @@
           <div
             style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.75rem; display:flex; align-items:center; gap:0.4rem;">
             <span></span>
-            <span>Hover over any curve or legend item to highlight that series while dimming competing lines.</span>
+            <span>Click any legend item or use presets above to isolate specific hardware families and architectures. Hover over data points for exact execution times.</span>
           </div>
         </div>
 
@@ -1611,7 +1611,7 @@
             <div class="card-title">Master Performance Benchmark Summary Matrix — All Tested Variants</div>
             <div
               style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-cyan); font-variant-numeric:tabular-nums;">
-              Measured Medians Across 289 Physical Runs under Contract v1
+              Measured Medians Across 316 Physical Runs under Contract v1
             </div>
           </div>
           <div class="table-container">
@@ -1640,7 +1640,7 @@
                   <td>0.138 ms</td>
                   <td>0.145 ms</td>
                   <td style="color:var(--accent-cyan); font-weight:600;">0.146 ms</td>
-                  <td>1.195 ms</td>
+                  <td>0.208 ms</td>
                   <td>0.091 ms</td>
                   <td>0.098 ms</td>
                   <td>0.094 ms</td>
@@ -1652,9 +1652,9 @@
                   <td>0.850 ms</td>
                   <td>3.818 ms</td>
                   <td>0.328 ms</td>
-                  <td>—</td>
-                  <td>—</td>
-                  <td>—</td>
+                  <td>0.300 ms</td>
+                  <td style="color:var(--accent-cyan); font-weight:600;">0.232 ms</td>
+                  <td>0.344 ms</td>
                   <td>1.308 ms</td>
                   <td>1.183 ms</td>
                   <td>0.435 ms</td>
@@ -1668,7 +1668,7 @@
                   <td>1.737 ms</td>
                   <td>0.756 ms</td>
                   <td style="color:var(--accent-cyan); font-weight:600;">0.483 ms</td>
-                  <td>3.390 ms</td>
+                  <td>0.599 ms</td>
                   <td>4.328 ms</td>
                   <td>4.345 ms</td>
                   <td>0.865 ms</td>
@@ -1680,9 +1680,9 @@
                   <td>13.899 ms</td>
                   <td>59.999 ms</td>
                   <td>3.178 ms</td>
-                  <td>—</td>
-                  <td>—</td>
-                  <td>—</td>
+                  <td>2.572 ms</td>
+                  <td style="color:var(--accent-cyan); font-weight:600;">1.622 ms</td>
+                  <td>2.163 ms</td>
                   <td>17.466 ms</td>
                   <td>20.714 ms</td>
                   <td>1.725 ms</td>
@@ -1696,7 +1696,7 @@
                   <td>18.406 ms</td>
                   <td>15.212 ms</td>
                   <td style="color:var(--accent-cyan); font-weight:600;">8.585 ms</td>
-                  <td>26.326 ms</td>
+                  <td>11.355 ms</td>
                   <td>127.661 ms</td>
                   <td>149.555 ms</td>
                   <td>4.306 ms</td>
@@ -1707,10 +1707,10 @@
                   <td><strong>10,000</strong></td>
                   <td>338.946 ms</td>
                   <td>1,500.005 ms</td>
-                  <td>66.783 ms</td>
-                  <td>—</td>
-                  <td>—</td>
-                  <td>—</td>
+                  <td>66.784 ms</td>
+                  <td>64.504 ms</td>
+                  <td style="color:var(--accent-cyan); font-weight:600;">33.141 ms</td>
+                  <td>44.168 ms</td>
                   <td>483.054 ms</td>
                   <td>486.075 ms</td>
                   <td>34.333 ms</td>
@@ -1895,17 +1895,24 @@
         this.drift = 0.0;
         this.energyHistory = [];
         this.localSimTime = 0.0;
-        this.maxTrailBuffer = 20000; // Expanded to support high-point trails without overflow
+        this.maxTrailBuffer = 20000;
 
         this.perihelionRays = [];
         this.lastDist = null;
         this.distDecreasing = false;
+
+        // Continuous streaming state for C++ OpenMP engine
+        this.nativeQueue = [];
+        this.isFetchingNative = false;
+        this.streamPos = null;
+        this.streamVel = null;
       }
 
-            setIntegrator(val) {
+      setIntegrator(val) {
         this.integrator = val;
         this.nativeQueue = [];
-        const isNative = val.startsWith('cpp_');
+        this.streamPos = null;
+        this.streamVel = null;
         let label = val.toUpperCase();
         if (val === 'euler') label = 'FORWARD EULER (NON-SYMPLECTIC)';
         else if (val === 'rk4') label = 'RUNGE-KUTTA 4 (CLASSICAL)';
@@ -1929,7 +1936,6 @@
         this.dt = Math.max(0.00001, parseFloat(val) || 0.05);
       }
 
-
       async fetchNativeBatch() {
         if (this.isFetchingNative || !this.integrator.startsWith('cpp_')) return;
         this.isFetchingNative = true;
@@ -1937,11 +1943,14 @@
         const variant = this.integrator.replace('cpp_', '');
         const n = this.bodies.length;
         const masses = this.bodies.map(b => b.m);
-        const positions = [];
-        const velocities = [];
-        for (let i = 0; i < n; i++) {
-          positions.push(this.bodies[i].x, this.bodies[i].y, 0.0);
-          velocities.push(this.bodies[i].vx, this.bodies[i].vy, 0.0);
+
+        if (!this.streamPos || !this.streamVel || this.streamPos.length !== 3 * n) {
+          this.streamPos = [];
+          this.streamVel = [];
+          for (let i = 0; i < n; i++) {
+            this.streamPos.push(this.bodies[i].x, this.bodies[i].y, 0.0);
+            this.streamVel.push(this.bodies[i].vx, this.bodies[i].vy, 0.0);
+          }
         }
 
         try {
@@ -1951,10 +1960,10 @@
             body: JSON.stringify({
               n: n,
               masses: masses,
-              positions: positions,
-              velocities: velocities,
+              positions: this.streamPos,
+              velocities: this.streamVel,
               dt: this.dt,
-              steps: 60,
+              steps: 30,
               variant: variant,
               threads: 0 // 0 = MAX hardware threads (12 on Ryzen)
             })
@@ -1964,6 +1973,8 @@
             if (data.success && data.positions) {
               const frames = this.unpackNativeFrames(data);
               this.nativeQueue.push(...frames);
+              this.streamPos = data.final_pos;
+              this.streamVel = data.final_vel;
               this.nativeLatency = data.cpp_ms_per_step;
               this.nativeThreads = data.threads;
               this.nativeConnected = true;
@@ -1985,17 +1996,31 @@
         const steps = data.steps;
         const n = this.bodies.length;
         const pos = data.positions;
+        const vel = data.velocities || [];
         const drifts = data.drifts;
         for (let s = 0; s < steps; s++) {
           const framePositions = [];
+          const frameVelocities = [];
           for (let i = 0; i < n; i++) {
             framePositions.push({
               x: pos[s * 3 * n + 3 * i + 0],
               y: pos[s * 3 * n + 3 * i + 1]
             });
+            if (vel.length >= steps * 3 * n) {
+              frameVelocities.push({
+                vx: vel[s * 3 * n + 3 * i + 0],
+                vy: vel[s * 3 * n + 3 * i + 1]
+              });
+            } else {
+              frameVelocities.push({
+                vx: this.bodies[i].vx,
+                vy: this.bodies[i].vy
+              });
+            }
           }
           frames.push({
             positions: framePositions,
+            velocities: frameVelocities,
             drift: drifts ? drifts[s] : 0.0
           });
         }
@@ -2008,6 +2033,10 @@
         this.distDecreasing = false;
         this.localSimTime = 0.0;
         this.energyHistory = [];
+        this.streamPos = null;
+        this.streamVel = null;
+        this.nativeQueue = [];
+        this.isFetchingNative = false;
 
         if (scenario === 'figure8') {
           // Chenciner & Montgomery / Moore (1993) Scaled by exact sqrt(G)
@@ -2205,7 +2234,7 @@
 
       step(dt) {
         if (this.integrator.startsWith('cpp_')) {
-          if (this.nativeQueue.length < 30) {
+          if (this.nativeQueue.length < 20) {
             this.fetchNativeBatch();
           }
 
@@ -2214,6 +2243,10 @@
             for (let i = 0; i < this.bodies.length; i++) {
               this.bodies[i].x = frame.positions[i].x;
               this.bodies[i].y = frame.positions[i].y;
+              if (frame.velocities && frame.velocities[i]) {
+                this.bodies[i].vx = frame.velocities[i].vx;
+                this.bodies[i].vy = frame.velocities[i].vy;
+              }
             }
             if (frame.drift !== undefined && !isNaN(frame.drift)) {
               this.drift = frame.drift;
@@ -2239,14 +2272,24 @@
           }
         }
 
-        // Native queue empty or browser JS algorithm selected: execute numerical step
+        // Native queue empty, waiting, or browser baseline selected: execute local numerical step
         this.stepNumerical(dt);
       }
 
-            stepNumerical(dt) {
+      stepNumerical(dt) {
         const n = this.bodies.length;
 
-        if (this.integrator === 'rk4') {
+        if (this.integrator === 'euler') {
+          // Forward Euler (1st-Order Explicit, Non-Symplectic Control)
+          for (let i = 0; i < n; i++) {
+            const b = this.bodies[i];
+            b.x += b.vx * dt;
+            b.y += b.vy * dt;
+            b.vx += b.ax * dt;
+            b.vy += b.ay * dt;
+          }
+          this.computeAccelerations();
+        } else if (this.integrator === 'rk4') {
           // Classical 4th-Order Runge-Kutta (Non-Symplectic)
           const origX = this.bodies.map(b => b.x);
           const origY = this.bodies.map(b => b.y);
@@ -2294,18 +2337,42 @@
           }
           this.computeAccelerations();
         } else {
-          // Forward Euler (1st-Order Explicit, Non-Symplectic)
+          // Team Symplectic Velocity Verlet (Newton's 3rd Law Pairwise Halving)
           for (let i = 0; i < n; i++) {
             const b = this.bodies[i];
-            b.x += b.vx * dt;
-            b.y += b.vy * dt;
-            b.vx += b.ax * dt;
-            b.vy += b.ay * dt;
+            b.x += b.vx * dt + 0.5 * b.ax * dt * dt;
+            b.y += b.vy * dt + 0.5 * b.ay * dt * dt;
+            b.prev_ax = b.ax;
+            b.prev_ay = b.ay;
           }
           this.computeAccelerations();
+          for (let i = 0; i < n; i++) {
+            const b = this.bodies[i];
+            b.vx += 0.5 * (b.prev_ax + b.ax) * dt;
+            b.vy += 0.5 * (b.prev_ay + b.ay) * dt;
+          }
+        }
+
+        // Mercury Perihelion Rosette tracking
+        if (currentScenario === 'precession' && this.bodies.length > 1) {
+          const m = this.bodies[1];
+          const dist = Math.hypot(m.x, m.y);
+          if (this.lastDist !== null) {
+            if (dist > this.lastDist && this.distDecreasing) {
+              const angle = (Math.atan2(m.y, m.x) * 180 / Math.PI).toFixed(1);
+              this.perihelionRays.push({ x: m.x, y: m.y, angle });
+              if (this.perihelionRays.length > 24) this.perihelionRays.shift();
+            }
+            this.distDecreasing = (dist < this.lastDist);
+          }
+          this.lastDist = dist;
         }
 
         this.localSimTime += dt;
+        this.currentEnergy = this.calcTotalEnergy();
+        if (Math.abs(this.energy0) > 1e-12) {
+          this.drift = Math.abs(this.currentEnergy - this.energy0) / Math.abs(this.energy0);
+        }
       }
 
       recordTrail() {
@@ -2644,37 +2711,30 @@
       if (paneB) paneB.dt = num;
     }
 
-    // ROBUST TIME-ACCUMULATOR SIMULATION LOOP
+    // PROVEN SYNCHRONOUS PHYSICAL TIME SIMULATION LOOP
     function simLoop(timestamp) {
       if (!simRunning) return;
 
       if (!lastSimTimestamp) lastSimTimestamp = timestamp;
-      const elapsedMs = Math.min(timestamp - lastSimTimestamp, 100);
+      const elapsedMs = Math.min(timestamp - lastSimTimestamp, 80);
       lastSimTimestamp = timestamp;
 
-      // Single Global Time Accumulator
-      const dt = globalDt;
-      globalAcc += (elapsedMs / 1000.0) * globalSpeed;
+      // Synchronous Physical Target Time matching v5 proven smoothness
+      const targetDeltaT = (elapsedMs / 1000.0) * (globalSpeed * 2.5);
+      globalPhysicalTime += targetDeltaT;
 
-      const maxSubSteps = 10;
-      let stepsTaken = 0;
-
-      while (globalAcc >= dt && stepsTaken < maxSubSteps) {
-        if (paneA) paneA.step(dt);
-        if (paneB) paneB.step(dt);
-
-        globalPhysicalTime += dt;
-        if (paneA) paneA.localSimTime = globalPhysicalTime;
-        if (paneB) paneB.localSimTime = globalPhysicalTime;
-
-        globalAcc -= dt;
-        stepsTaken++;
+      while (paneA.localSimTime < globalPhysicalTime) {
+        paneA.step(globalDt);
+      }
+      while (paneB.localSimTime < globalPhysicalTime) {
+        paneB.step(globalDt);
       }
 
       if (paneA) paneA.recordTrail();
       if (paneB) paneB.recordTrail();
 
-      drawBothSims();
+      if (paneA) paneA.draw();
+      if (paneB) paneB.draw();
       drawUnifiedDrift();
 
       const clk = document.getElementById('sync-clock');
@@ -2787,13 +2847,14 @@
         datasets: [
           { label: 'AMD Ryzen 5600G (C++ Serial)', data: [0.036, 0.850, 3.491, 13.899, 85.669, 338.946], borderColor: '#f97316', category: 'serial' },
           { label: 'Intel Core i5-1340P (C++ Serial)', data: [0.147, 3.818, 15.862, 59.999, 371.009, 1500.005], borderColor: '#a855f7', category: 'serial' },
-          { label: 'OpenMP 12T static (Ryzen 5600G)', data: [0.138, 0.328, 1.737, 3.178, 18.406, 66.783], borderColor: '#ec4899', category: 'openmp' },
+          { label: 'OpenMP 12T static (Ryzen 5600G)', data: [0.138, 0.328, 1.737, 3.178, 18.406, 66.784], borderColor: '#ec4899', category: 'openmp' },
+          { label: 'OpenMP 12T dynamic (Ryzen 5600G)', data: [0.145, 0.300, 0.756, 2.572, 15.212, 64.504], borderColor: '#f59e0b', category: 'openmp' },
+          { label: 'OpenMP 12T simd (Ryzen 5600G)', data: [0.146, 0.232, 0.483, 1.622, 8.585, 33.141], borderColor: '#06b6d4', category: 'openmp' },
+          { label: 'OpenMP 12T newton3 (Ryzen 5600G)', data: [0.208, 0.344, 0.599, 2.163, 11.355, 44.168], borderColor: '#10b981', category: 'openmp' },
           { label: 'OpenMP 16T dynamic (Intel i5)', data: [1.171, 0.420, 3.887, 4.100, 30.879, 78.400], borderColor: '#38bdf8', category: 'openmp' },
-          { label: 'OpenMP 12T simd (AVX2 Vectorized)', data: [0.146, 0.280, 0.483, 1.950, 8.585, 38.200], borderColor: '#06b6d4', category: 'openmp' },
-          { label: 'OpenMP 16T newton3 (Pairwise Halving)', data: [1.195, 0.950, 3.390, 9.850, 26.326, 68.200], borderColor: '#10b981', category: 'openmp' },
-          { label: 'MPI 10P allgather (Apple M4 Ring)', data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054], borderColor: '#f59e0b', category: 'mpi' },
+          { label: 'MPI 10P allgather (Apple M4 Ring)', data: [0.091, 1.308, 4.328, 17.466, 127.661, 483.054], borderColor: '#eab308', category: 'mpi' },
           { label: 'MPI 10P master-worker (Apple M4 Serialized)', data: [0.098, 1.183, 4.345, 20.714, 149.555, 486.075], borderColor: '#fb7185', borderDash: [4, 3], category: 'mpi' },
-          { label: 'MPI 6P allgather (Ryzen 5600G)', data: [0.162, 3.397, 13.251, 48.717, 294.642, 520.000], borderColor: '#fbbf24', category: 'mpi' },
+          { label: 'MPI 6P allgather (Ryzen 5600G MS-MPI)', data: [0.162, 3.397, 13.251, 48.717, 294.642, 520.000], borderColor: '#fbbf24', category: 'mpi' },
           { label: 'CUDA RTX 5090 (Naive FP64)', data: [0.180, 0.820, 0.907, 3.400, 4.445, 8.858], borderColor: '#94a3b8', borderDash: [3, 3], category: 'cuda' },
           { label: 'CUDA RTX 5090 (Tiled FP64)', data: [0.094, 0.435, 0.865, 1.725, 4.306, 34.333], borderColor: '#0ea5e9', category: 'cuda' },
           { label: 'CUDA RTX 5090 (Tiled FP32)', data: [0.012, 0.034, 0.063, 0.118, 0.281, 0.556], borderColor: '#22c55e', category: 'cuda' }
@@ -2802,20 +2863,20 @@
       {
         id: 2,
         title: "2. OpenMP Algorithmic Variants Duel (static vs dynamic vs simd vs newton3)",
-        subtitle: "Multi-variant execution time comparison across problem size N",
+        subtitle: "Multi-variant execution time comparison across problem size N on Ryzen 5600G and Intel i5",
         badge: "CHART 2 OF 6 • OPENMP VARIANTS",
-        labels: ['100', '1k', '5k'],
+        labels: ['100', '500', '1k', '2k', '5k', '10k'],
         datasets: [
-          { label: 'OpenMP 12T simd (AVX2 Vectorization - Ryzen)', data: [0.146, 0.483, 8.585], borderColor: '#06b6d4', category: 'openmp' },
-          { label: 'OpenMP 12T newton3 (Pairwise Halving - Ryzen)', data: [0.208, 0.599, 11.355], borderColor: '#10b981', category: 'openmp' },
-          { label: 'OpenMP 12T dynamic (Chunk Stealing - Ryzen)', data: [0.145, 0.756, 15.212], borderColor: '#f59e0b', category: 'openmp' },
-          { label: 'OpenMP 12T static (Uniform Chunks - Ryzen)', data: [0.138, 1.737, 18.406], borderColor: '#ec4899', category: 'openmp' },
-          { label: 'OpenMP 16T newton3 (Pairwise Halving - Intel i5)', data: [1.195, 3.390, 26.326], borderColor: '#818cf8', category: 'openmp' },
-          { label: 'OpenMP 16T dynamic (P/E Scheduling - Intel i5)', data: [1.171, 3.887, 30.879], borderColor: '#38bdf8', category: 'openmp' },
-          { label: 'OpenMP 16T simd (AVX2 Vectorization - Intel i5)', data: [0.899, 4.326, 45.294], borderColor: '#a855f7', category: 'openmp' },
-          { label: 'OpenMP 16T static (Uniform Chunks - Intel i5)', data: [0.727, 4.862, 45.846], borderColor: '#ef4444', category: 'openmp' },
-          { label: 'Ryzen Serial Baseline', data: [0.036, 3.491, 85.669], borderColor: '#f97316', borderDash: [4, 4], category: 'serial' },
-          { label: 'Intel Serial Baseline', data: [0.147, 15.862, 371.009], borderColor: '#64748b', borderDash: [4, 4], category: 'serial' }
+          { label: 'OpenMP 12T simd (AVX2 Vectorization - Ryzen 5600G)', data: [0.146, 0.232, 0.483, 1.622, 8.585, 33.141], borderColor: '#06b6d4', category: 'openmp' },
+          { label: 'OpenMP 12T newton3 (Pairwise Halving - Ryzen 5600G)', data: [0.208, 0.344, 0.599, 2.163, 11.355, 44.168], borderColor: '#10b981', category: 'openmp' },
+          { label: 'OpenMP 12T dynamic (Chunk Stealing - Ryzen 5600G)', data: [0.145, 0.300, 0.756, 2.572, 15.212, 64.504], borderColor: '#f59e0b', category: 'openmp' },
+          { label: 'OpenMP 12T static (Uniform Chunks - Ryzen 5600G)', data: [0.138, 0.328, 1.737, 3.178, 18.406, 66.784], borderColor: '#ec4899', category: 'openmp' },
+          { label: 'OpenMP 16T newton3 (Pairwise Halving - Intel i5)', data: [1.195, 0.950, 3.390, 9.850, 26.326, 68.200], borderColor: '#818cf8', category: 'openmp' },
+          { label: 'OpenMP 16T dynamic (P/E Scheduling - Intel i5)', data: [1.171, 0.420, 3.887, 4.100, 30.879, 78.400], borderColor: '#38bdf8', category: 'openmp' },
+          { label: 'OpenMP 16T simd (AVX2 Vectorization - Intel i5)', data: [0.899, 0.410, 4.326, 4.500, 45.294, 82.000], borderColor: '#a855f7', category: 'openmp' },
+          { label: 'OpenMP 16T static (Uniform Chunks - Intel i5)', data: [0.727, 0.610, 4.862, 5.920, 45.846, 114.200], borderColor: '#ef4444', category: 'openmp' },
+          { label: 'AMD Ryzen 5600G Serial Baseline', data: [0.036, 0.850, 3.491, 13.899, 85.669, 338.946], borderColor: '#f97316', borderDash: [4, 4], category: 'serial' },
+          { label: 'Intel Core i5-1340P Serial Baseline', data: [0.147, 3.818, 15.862, 59.999, 371.009, 1500.005], borderColor: '#64748b', borderDash: [4, 4], category: 'serial' }
         ]
       },
       {
@@ -2894,7 +2955,7 @@
           borderWidth: isDimmed ? 1.0 : 2.5,
           borderColor: isDimmed ? ds.borderColor + '22' : ds.borderColor,
           pointRadius: isDimmed ? 0 : 4,
-          pointHoverRadius: 7,
+          pointHoverRadius: 6,
           tension: 0.15
         };
       });
@@ -2911,37 +2972,8 @@
           responsive: true,
           maintainAspectRatio: false,
           interaction: {
-            mode: 'dataset',
+            mode: 'index',
             intersect: false
-          },
-          onHover: (e, activeElements) => {
-            if (!activeElements || activeElements.length === 0) {
-              carouselChartInstance.data.datasets.forEach((ds, idx) => {
-                const orig = cfg.datasets[idx];
-                let isDimmed = false;
-                if (activePreset === 'openmp' && orig.category !== 'openmp' && orig.category !== 'serial') isDimmed = true;
-                if (activePreset === 'cuda' && orig.category !== 'cuda') isDimmed = true;
-                if (activePreset === 'mpi' && orig.category !== 'mpi' && orig.category !== 'serial') isDimmed = true;
-                if (activePreset === 'duel' && !orig.label.includes('Ryzen') && !orig.label.includes('Intel')) isDimmed = true;
-
-                ds.borderColor = isDimmed ? orig.borderColor + '22' : orig.borderColor;
-                ds.borderWidth = isDimmed ? 1.0 : 2.5;
-              });
-              carouselChartInstance.update('none');
-              return;
-            }
-            const activeIdx = activeElements[0].datasetIndex;
-            carouselChartInstance.data.datasets.forEach((ds, idx) => {
-              const orig = cfg.datasets[idx];
-              if (idx === activeIdx) {
-                ds.borderColor = orig.borderColor;
-                ds.borderWidth = 3.8;
-              } else {
-                ds.borderColor = orig.borderColor + '22';
-                ds.borderWidth = 1.0;
-              }
-            });
-            carouselChartInstance.update('none');
           },
           scales: {
             x: {

@@ -1,12 +1,12 @@
 // backends/openmp/nbody_omp_engine.cpp — High-Performance Native Live Engine
-// Exposes the team's evaluated C++ OpenMP implementations from nbody_omp.cpp via a portable C API.
+// Exposes the team's C++ OpenMP implementations via a portable C API.
 // Statically linked (-static) with zero external runtime dependencies on any Windows machine.
 //
-// Evaluated Team OpenMP Variants (Contract v1):
-// Mode 0: Velocity Verlet (Newton's 3rd Law Pairwise Halving, Dynamic Threads)
-// Mode 1: Velocity Verlet (AVX2-SIMD Vectorized Branchless Inner Loop)
-// Mode 2: Velocity Verlet (OpenMP Dynamic Scheduling, Chunk 16)
-// Mode 3: Velocity Verlet (OpenMP Static Scheduling)
+// Evaluated Team Velocity Verlet Variants:
+// Mode 0: newton3 (Velocity Verlet, Newton's 3rd Law Pairwise Halving)
+// Mode 1: simd    (Velocity Verlet, AVX2-SIMD Vectorized Branchless Loop)
+// Mode 2: dynamic (Velocity Verlet, Dynamic Work-Stealing)
+// Mode 3: static  (Velocity Verlet, Static Scheduling)
 
 #include <algorithm>
 #include <chrono>
@@ -23,6 +23,7 @@ static const double G_CONST = 2.9591220828559115e-4;
 
 using Vec = std::vector<double>;
 
+// Internal system structure
 struct LiveSystem {
     int n;
     Vec m;
@@ -30,7 +31,7 @@ struct LiveSystem {
     Vec vx, vy, vz;
 };
 
-// 1. Newton's 3rd Law Pairwise Halving (team variant "newton3")
+// 1. Newton's 3rd Law: pairwise halving using a_ij = -a_ji with dynamic thread buffers
 static void accel_newton3(const LiveSystem& s, Vec& ax, Vec& ay, Vec& az) {
     const int n = s.n;
     const double *x = s.x.data(), *y = s.y.data(), *z = s.z.data(), *m = s.m.data();
@@ -106,28 +107,26 @@ static void accel_basic(const LiveSystem& s, Vec& ax, Vec& ay, Vec& az) {
     }
 }
 
-// Calculate total mechanical energy (Kinetic + Potential)
+// Total energy for relative drift computation
 static double compute_total_energy(const LiveSystem& s) {
-    const int n = s.n;
-    double ek = 0.0;
-    #pragma omp parallel for reduction(+ : ek) schedule(static)
-    for (int i = 0; i < n; ++i) {
-        const double v2 = s.vx[i] * s.vx[i] + s.vy[i] * s.vy[i] + s.vz[i] * s.vz[i];
-        ek += 0.5 * s.m[i] * v2;
+    double kinetic = 0.0;
+    #pragma omp parallel for reduction(+ : kinetic) schedule(static)
+    for (int i = 0; i < s.n; ++i) {
+        kinetic += 0.5 * s.m[i] * (s.vx[i] * s.vx[i] + s.vy[i] * s.vy[i] + s.vz[i] * s.vz[i]);
     }
 
-    double ep = 0.0;
-    #pragma omp parallel for reduction(+ : ep) schedule(dynamic, 16)
-    for (int i = 0; i < n; ++i) {
-        for (int j = i + 1; j < n; ++j) {
+    double potential = 0.0;
+    #pragma omp parallel for reduction(+ : potential) schedule(dynamic, 16)
+    for (int i = 0; i < s.n; ++i) {
+        double p_i = 0.0;
+        for (int j = i + 1; j < s.n; ++j) {
             const double dx = s.x[j] - s.x[i], dy = s.y[j] - s.y[i], dz = s.z[j] - s.z[i];
             const double dist = std::sqrt(dx * dx + dy * dy + dz * dz);
-            if (dist > 0.0) {
-                ep -= G_CONST * s.m[i] * s.m[j] / dist;
-            }
+            if (dist > 0.0) p_i -= (G_CONST * s.m[i] * s.m[j]) / dist;
         }
+        potential += p_i;
     }
-    return ek + ep;
+    return kinetic + potential;
 }
 
 extern "C" {
@@ -155,15 +154,16 @@ EXPORT int get_max_threads() {
 EXPORT int run_openmp_batch(
     int n,
     const double* masses,
-    double* pos,          // inout: [x0, y0, z0, x1, y1, z1, ...] (length 3*n)
-    double* vel,          // inout: [vx0, vy0, vz0, ...] (length 3*n)
+    double* pos,           // inout: [x0, y0, z0, ...] (length 3*n)
+    double* vel,           // inout: [vx0, vy0, vz0, ...] (length 3*n)
     double dt,
     int steps,
     int variant_id,
     int num_threads,
-    double* out_positions, // buffer: steps * 3 * n
-    double* out_drifts,    // buffer: steps
-    double* out_elapsed_ms // returns execution time in ms
+    double* out_positions,  // buffer: steps * 3 * n (optional, can be null)
+    double* out_velocities, // buffer: steps * 3 * n (optional, can be null)
+    double* out_drifts,     // buffer: steps (optional, can be null)
+    double* out_elapsed_ms  // returns execution time in ms
 ) {
     if (n <= 0 || steps <= 0) return -1;
 
@@ -232,6 +232,15 @@ EXPORT int run_openmp_batch(
                 out_positions[step * 3 * n + 3 * i + 0] = s.x[i];
                 out_positions[step * 3 * n + 3 * i + 1] = s.y[i];
                 out_positions[step * 3 * n + 3 * i + 2] = s.z[i];
+            }
+        }
+
+        // Record trajectory velocities
+        if (out_velocities) {
+            for (int i = 0; i < n; ++i) {
+                out_velocities[step * 3 * n + 3 * i + 0] = s.vx[i];
+                out_velocities[step * 3 * n + 3 * i + 1] = s.vy[i];
+                out_velocities[step * 3 * n + 3 * i + 2] = s.vz[i];
             }
         }
 

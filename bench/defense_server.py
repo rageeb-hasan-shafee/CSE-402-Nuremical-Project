@@ -195,12 +195,13 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
         c_vel = (ctypes.c_double * (3 * n))(*vel_list)
 
         c_out_pos = (ctypes.c_double * (steps * 3 * n))()
+        c_out_vel = (ctypes.c_double * (steps * 3 * n))()
         c_out_drifts = (ctypes.c_double * steps)()
         c_elapsed_ms = ctypes.c_double(0.0)
 
         ret = _omp_lib.run_openmp_batch(
-            n, c_masses, c_pos, c_vel, dt, steps, variant_id, threads,
-            c_out_pos, c_out_drifts, ctypes.byref(c_elapsed_ms)
+            n, c_masses, c_pos, c_vel, ctypes.c_double(dt), steps, variant_id, threads,
+            c_out_pos, c_out_vel, c_out_drifts, ctypes.byref(c_elapsed_ms)
         )
 
         if ret != 0:
@@ -220,6 +221,7 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
             "cpp_elapsed_ms": round(c_elapsed_ms.value, 3),
             "cpp_ms_per_step": round(c_elapsed_ms.value / steps, 5),
             "positions": list(c_out_pos),
+            "velocities": list(c_out_vel),
             "drifts": list(c_out_drifts),
             "final_pos": list(c_pos),
             "final_vel": list(c_vel)
