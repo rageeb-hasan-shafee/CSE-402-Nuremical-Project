@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "backend": "cpp-openmp",
+  "variant": "newton3",
+  "lang": "cpp",
+  "n_bodies": 10000,
+  "workers": 6,
+  "steps": 50,
+  "dt": 0.10000000000000001,
+  "t_setup_s": 0.061221100,
+  "t_loop_s": 3.043898600,
+  "t_force_s": 3.039266100,
+  "t_comm_s": 0.000000000,
+  "t_transfer_s": 0.000000000,
+  "machine": "fahad-ryzen-5600g",
+  "extra": {}
+}

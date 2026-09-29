@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "backend": "py-loop",
+  "variant": "loop",
+  "lang": "python",
+  "n_bodies": 500,
+  "workers": 1,
+  "steps": 5,
+  "dt": 0.1,
+  "t_setup_s": 0.07539140000153566,
+  "t_loop_s": 0.3788821000016469,
+  "t_force_s": 0.3786696999959531,
+  "t_comm_s": 0.0,
+  "t_transfer_s": 0.0,
+  "machine": "fahad-ryzen-5600g",
+  "extra": {}
+}

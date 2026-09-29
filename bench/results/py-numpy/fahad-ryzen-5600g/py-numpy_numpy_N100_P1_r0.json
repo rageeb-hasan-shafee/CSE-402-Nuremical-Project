@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "backend": "py-numpy",
+  "variant": "numpy",
+  "lang": "python",
+  "n_bodies": 100,
+  "workers": 1,
+  "steps": 100,
+  "dt": 0.1,
+  "t_setup_s": 0.0259461999994528,
+  "t_loop_s": 0.07397910000145203,
+  "t_force_s": 0.07299069998771301,
+  "t_comm_s": 0.0,
+  "t_transfer_s": 0.0,
+  "machine": "fahad-ryzen-5600g",
+  "extra": {}
+}
