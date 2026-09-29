@@ -182,8 +182,13 @@ class DefenseHandler(http.server.SimpleHTTPRequestHandler):
             self.send_json_response({"success": False, "error": "Invalid body arrays length"}, 400)
             return
 
-        variant_map = {"static": 0, "dynamic": 1, "simd": 2, "newton3": 3}
-        variant_id = variant_map.get(variant, 2) # default to SIMD
+        variant_map = {
+            "newton3": 0, "cpp_newton3": 0, "verlet": 0,
+            "simd": 1, "cpp_simd": 1,
+            "dynamic": 2, "cpp_dynamic": 2,
+            "static": 3, "cpp_static": 3
+        }
+        variant_id = variant_map.get(variant, 0) # default to Newton3 Verlet
 
         c_masses = (ctypes.c_double * n)(*masses_list)
         c_pos = (ctypes.c_double * (3 * n))(*pos_list)

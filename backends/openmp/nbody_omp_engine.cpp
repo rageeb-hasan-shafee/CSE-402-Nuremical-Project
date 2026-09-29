@@ -1,6 +1,12 @@
 // backends/openmp/nbody_omp_engine.cpp — High-Performance Native Live Engine
-// Exposes the team's C++ OpenMP implementations (SIMD, Newton3, Dynamic, Static)
-// via a portable C API callable on any Windows machine with zero external runtime dependencies (-static).
+// Exposes the team's evaluated C++ OpenMP implementations from nbody_omp.cpp via a portable C API.
+// Statically linked (-static) with zero external runtime dependencies on any Windows machine.
+//
+// Evaluated Team OpenMP Variants (Contract v1):
+// Mode 0: Velocity Verlet (Newton's 3rd Law Pairwise Halving, Dynamic Threads)
+// Mode 1: Velocity Verlet (AVX2-SIMD Vectorized Branchless Inner Loop)
+// Mode 2: Velocity Verlet (OpenMP Dynamic Scheduling, Chunk 16)
+// Mode 3: Velocity Verlet (OpenMP Static Scheduling)
 
 #include <algorithm>
 #include <chrono>
@@ -17,7 +23,6 @@ static const double G_CONST = 2.9591220828559115e-4;
 
 using Vec = std::vector<double>;
 
-// Internal system structure
 struct LiveSystem {
     int n;
     Vec m;
@@ -25,27 +30,34 @@ struct LiveSystem {
     Vec vx, vy, vz;
 };
 
-// 1. basic (static / dynamic)
-static void accel_basic(const LiveSystem& s, Vec& ax, Vec& ay, Vec& az) {
+// 1. Newton's 3rd Law Pairwise Halving (team variant "newton3")
+static void accel_newton3(const LiveSystem& s, Vec& ax, Vec& ay, Vec& az) {
     const int n = s.n;
     const double *x = s.x.data(), *y = s.y.data(), *z = s.z.data(), *m = s.m.data();
-    #pragma omp parallel for schedule(runtime)
-    for (int p = 0; p < n; ++p) {
-        const double xp = x[p], yp = y[p], zp = z[p];
-        double sx = 0.0, sy = 0.0, sz = 0.0;
-        for (int j = 0; j < n; ++j) {
-            if (j == p) continue;
-            const double dx = x[j] - xp, dy = y[j] - yp, dz = z[j] - zp;
-            const double r2 = dx * dx + dy * dy + dz * dz;
-            if (r2 <= 0.0) continue;
-            const double f = G_CONST * m[j] / (r2 * std::sqrt(r2));
-            sx += f * dx; sy += f * dy; sz += f * dz;
+    std::fill(ax.begin(), ax.end(), 0.0);
+    std::fill(ay.begin(), ay.end(), 0.0);
+    std::fill(az.begin(), az.end(), 0.0);
+    #pragma omp parallel
+    {
+        Vec lx(n, 0.0), ly(n, 0.0), lz(n, 0.0);
+        #pragma omp for schedule(dynamic, 16)
+        for (int p = 0; p < n; ++p) {
+            for (int j = p + 1; j < n; ++j) {
+                const double dx = x[j] - x[p], dy = y[j] - y[p], dz = z[j] - z[p];
+                const double r2 = dx * dx + dy * dy + dz * dz;
+                if (r2 <= 0.0) continue;
+                const double inv3 = G_CONST / (r2 * std::sqrt(r2));
+                const double fp = m[j] * inv3, fj = m[p] * inv3;
+                lx[p] += fp * dx; ly[p] += fp * dy; lz[p] += fp * dz;
+                lx[j] -= fj * dx; ly[j] -= fj * dy; lz[j] -= fj * dz;
+            }
         }
-        ax[p] = sx; ay[p] = sy; az[p] = sz;
+        #pragma omp critical
+        for (int i = 0; i < n; ++i) { ax[i] += lx[i]; ay[i] += ly[i]; az[i] += lz[i]; }
     }
 }
 
-// 2. simd: split around p to avoid branches and leverage AVX2/FMA vector registers
+// 2. AVX2-SIMD Vectorization (team variant "simd")
 static inline void accum_range(const double* x, const double* y, const double* z, const double* m,
                                int j0, int j1, double xp, double yp, double zp,
                                double& sx, double& sy, double& sz) {
@@ -74,30 +86,23 @@ static void accel_simd(const LiveSystem& s, Vec& ax, Vec& ay, Vec& az) {
     }
 }
 
-// 3. newton3: pairwise halving using a_ij = -a_ji with dynamic thread buffers
-static void accel_newton3(const LiveSystem& s, Vec& ax, Vec& ay, Vec& az) {
+// 3. Basic loop (team variants "static" and "dynamic")
+static void accel_basic(const LiveSystem& s, Vec& ax, Vec& ay, Vec& az) {
     const int n = s.n;
     const double *x = s.x.data(), *y = s.y.data(), *z = s.z.data(), *m = s.m.data();
-    std::fill(ax.begin(), ax.end(), 0.0);
-    std::fill(ay.begin(), ay.end(), 0.0);
-    std::fill(az.begin(), az.end(), 0.0);
-    #pragma omp parallel
-    {
-        Vec lx(n, 0.0), ly(n, 0.0), lz(n, 0.0);
-        #pragma omp for schedule(dynamic, 16)
-        for (int p = 0; p < n; ++p) {
-            for (int j = p + 1; j < n; ++j) {
-                const double dx = x[j] - x[p], dy = y[j] - y[p], dz = z[j] - z[p];
-                const double r2 = dx * dx + dy * dy + dz * dz;
-                if (r2 <= 0.0) continue;
-                const double inv3 = G_CONST / (r2 * std::sqrt(r2));
-                const double fp = m[j] * inv3, fj = m[p] * inv3;
-                lx[p] += fp * dx; ly[p] += fp * dy; lz[p] += fp * dz;
-                lx[j] -= fj * dx; ly[j] -= fj * dy; lz[j] -= fj * dz;
-            }
+    #pragma omp parallel for schedule(runtime)
+    for (int p = 0; p < n; ++p) {
+        const double xp = x[p], yp = y[p], zp = z[p];
+        double sx = 0.0, sy = 0.0, sz = 0.0;
+        for (int j = 0; j < n; ++j) {
+            if (j == p) continue;
+            const double dx = x[j] - xp, dy = y[j] - yp, dz = z[j] - zp;
+            const double r2 = dx * dx + dy * dy + dz * dz;
+            if (r2 <= 0.0) continue;
+            const double f = G_CONST * m[j] / (r2 * std::sqrt(r2));
+            sx += f * dx; sy += f * dy; sz += f * dz;
         }
-        #pragma omp critical
-        for (int i = 0; i < n; ++i) { ax[i] += lx[i]; ay[i] += ly[i]; az[i] += lz[i]; }
+        ax[p] = sx; ay[p] = sy; az[p] = sz;
     }
 }
 
@@ -133,7 +138,6 @@ extern "C" {
 #define EXPORT
 #endif
 
-// Returns the maximum hardware threads available on the host machine
 EXPORT int get_max_threads() {
 #ifdef _OPENMP
     return omp_get_num_procs();
@@ -142,8 +146,12 @@ EXPORT int get_max_threads() {
 #endif
 }
 
-// Simulates a batch of steps using our C++ OpenMP implementation
-// variant_id: 0 = static, 1 = dynamic, 2 = simd, 3 = newton3
+// Simulates a batch of steps using our team's C++ OpenMP Velocity Verlet implementation
+// variant_id:
+//   0 = newton3 (Velocity Verlet, Newton's 3rd Law Pairwise Halving)
+//   1 = simd    (Velocity Verlet, AVX2-SIMD Vectorized)
+//   2 = dynamic (Velocity Verlet, Dynamic Work-Stealing)
+//   3 = static  (Velocity Verlet, Static Scheduling)
 EXPORT int run_openmp_batch(
     int n,
     const double* masses,
@@ -153,8 +161,8 @@ EXPORT int run_openmp_batch(
     int steps,
     int variant_id,
     int num_threads,
-    double* out_positions, // buffer: steps * 3 * n (can be null if not dumping every step)
-    double* out_drifts,    // buffer: steps (can be null)
+    double* out_positions, // buffer: steps * 3 * n
+    double* out_drifts,    // buffer: steps
     double* out_elapsed_ms // returns execution time in ms
 ) {
     if (n <= 0 || steps <= 0) return -1;
@@ -163,12 +171,8 @@ EXPORT int run_openmp_batch(
     int max_t = omp_get_num_procs();
     int threads = (num_threads > 0 && num_threads <= max_t) ? num_threads : max_t;
     omp_set_num_threads(threads);
-
-    if (variant_id == 1) { // dynamic
-        omp_set_schedule(omp_sched_dynamic, 16);
-    } else {
-        omp_set_schedule(omp_sched_static, 0);
-    }
+    if (variant_id == 2) omp_set_schedule(omp_sched_dynamic, 16);
+    else omp_set_schedule(omp_sched_static, 0);
 #endif
 
     LiveSystem s;
@@ -186,9 +190,9 @@ EXPORT int run_openmp_batch(
         s.vz[i] = vel[3 * i + 2];
     }
 
-    auto accel = accel_basic;
-    if (variant_id == 2) accel = accel_simd;
-    else if (variant_id == 3) accel = accel_newton3;
+    auto accel = accel_newton3;
+    if (variant_id == 1) accel = accel_simd;
+    else if (variant_id == 2 || variant_id == 3) accel = accel_basic;
 
     double e0 = compute_total_energy(s);
 
@@ -201,7 +205,7 @@ EXPORT int run_openmp_batch(
     auto t_start = std::chrono::high_resolution_clock::now();
 
     for (int step = 0; step < steps; ++step) {
-        // Drift
+        // Symplectic Velocity Verlet
         #pragma omp parallel for schedule(static)
         for (int p = 0; p < n; ++p) {
             s.x[p] += s.vx[p] * dt + ax[p] * half_dt2;
@@ -209,10 +213,8 @@ EXPORT int run_openmp_batch(
             s.z[p] += s.vz[p] * dt + az[p] * half_dt2;
         }
 
-        // Force
         accel(s, bx, by, bz);
 
-        // Kick
         #pragma omp parallel for schedule(static)
         for (int p = 0; p < n; ++p) {
             s.vx[p] += (ax[p] + bx[p]) * half_dt;
@@ -224,7 +226,7 @@ EXPORT int run_openmp_batch(
         std::swap(ay, by);
         std::swap(az, bz);
 
-        // Record trajectory frame if requested
+        // Record trajectory positions
         if (out_positions) {
             for (int i = 0; i < n; ++i) {
                 out_positions[step * 3 * n + 3 * i + 0] = s.x[i];
@@ -233,7 +235,7 @@ EXPORT int run_openmp_batch(
             }
         }
 
-        // Record energy drift if requested
+        // Record energy drift
         if (out_drifts) {
             double current_e = compute_total_energy(s);
             double drift = (std::abs(e0) > 1e-15) ? (std::abs(current_e - e0) / std::abs(e0)) : 0.0;
@@ -245,7 +247,7 @@ EXPORT int run_openmp_batch(
     double elapsed_ms = std::chrono::duration<double, std::milli>(t_end - t_start).count();
     if (out_elapsed_ms) *out_elapsed_ms = elapsed_ms;
 
-    // Write final state back to pos and vel
+    // Output updated position and velocity arrays
     for (int i = 0; i < n; ++i) {
         pos[3 * i + 0] = s.x[i];
         pos[3 * i + 1] = s.y[i];

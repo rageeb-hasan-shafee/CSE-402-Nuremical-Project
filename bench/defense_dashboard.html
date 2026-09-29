@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CSE 402: N-Body Solar System HPC Simulation — Oral Defense Hub</title>
-  
+
   <!-- Inter, Space Grotesk & JetBrains Mono Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet">
+
   <!-- Chart.js 4.4.1 -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  
+
   <!-- KaTeX with Auto-Render -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -34,13 +37,13 @@
       --border-panel: rgba(148, 163, 184, 0.16);
       --border-active: rgba(56, 189, 248, 0.45);
       --highlight-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
-      
+
       /* Refined Typography Hierarchy */
       --text-primary: #f8fafc;
       --text-secondary: #94a3b8;
       --text-dim: #64748b;
       --text-faint: #334155;
-      
+
       /* Celestial Functional Accents */
       --accent-cyan: #38bdf8;
       --accent-cyan-glow: rgba(56, 189, 248, 0.22);
@@ -52,13 +55,18 @@
       --accent-amber-glow: rgba(245, 158, 11, 0.20);
       --accent-coral: #fb7185;
       --accent-coral-glow: rgba(251, 113, 133, 0.22);
-      
+
       --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-display: 'Space Grotesk', 'Inter', sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       background: var(--bg-canvas);
       background-image: var(--bg-gradient);
@@ -83,17 +91,20 @@
       border-bottom: 1px solid var(--border-panel);
       box-shadow: 0 4px 28px rgba(0, 0, 0, 0.65);
     }
+
     header {
       padding: 0.85rem 2.25rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .header-brand {
       display: flex;
       align-items: center;
       gap: 0.9rem;
     }
+
     .badge-course {
       background: linear-gradient(135deg, #0284c7, #4f46e5);
       color: #ffffff;
@@ -105,6 +116,7 @@
       letter-spacing: 0.05em;
       box-shadow: 0 0 14px rgba(79, 70, 229, 0.45);
     }
+
     .header-title h1 {
       font-family: var(--font-display);
       font-size: 1.15rem;
@@ -112,16 +124,19 @@
       letter-spacing: -0.02em;
       color: #ffffff;
     }
+
     .header-title p {
       font-size: 0.78rem;
       color: var(--text-secondary);
       letter-spacing: 0.01em;
     }
+
     .header-status {
       display: flex;
       gap: 0.75rem;
       align-items: center;
     }
+
     .status-badge {
       font-family: var(--font-mono);
       font-size: 0.72rem;
@@ -134,11 +149,13 @@
       font-variant-numeric: tabular-nums;
       box-shadow: var(--highlight-specular);
     }
+
     .status-badge.green {
       background: rgba(16, 185, 129, 0.12);
       color: var(--accent-emerald);
       border: 1px solid rgba(16, 185, 129, 0.35);
     }
+
     .status-badge.blue {
       background: rgba(56, 189, 248, 0.12);
       color: var(--accent-cyan);
@@ -153,6 +170,7 @@
       border-top: 1px solid var(--border-subtle);
       background: rgba(13, 21, 34, 0.7);
     }
+
     .tab-btn {
       background: transparent;
       border: none;
@@ -168,10 +186,12 @@
       border-bottom: 2px solid transparent;
       transition: all 0.18s ease;
     }
+
     .tab-btn:hover {
       color: #ffffff;
       background: rgba(255, 255, 255, 0.03);
     }
+
     .tab-btn.active {
       color: var(--accent-cyan);
       border-bottom-color: var(--accent-cyan);
@@ -187,12 +207,25 @@
       padding: 1.5rem 2.25rem 4rem;
     }
 
-    .tab-content { display: none; }
-    .tab-content.active { display: block; animation: fadeIn 0.22s ease-out; }
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.22s ease-out;
+    }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Common Card Styles */
@@ -203,6 +236,7 @@
       box-shadow: var(--highlight-specular), 0 8px 32px rgba(0, 0, 0, 0.45);
       overflow: hidden;
     }
+
     .card-header {
       padding: 0.85rem 1.35rem;
       background: var(--surface-2);
@@ -211,6 +245,7 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .card-title {
       font-family: var(--font-display);
       font-size: 0.94rem;
@@ -241,13 +276,15 @@
       background: var(--surface-1);
       border: 1px solid var(--border-panel);
       border-radius: 12px;
-      box-shadow: var(--highlight-specular), 0 4px 20px rgba(0,0,0,0.3);
+      box-shadow: var(--highlight-specular), 0 4px 20px rgba(0, 0, 0, 0.3);
     }
+
     .btn-group {
       display: flex;
       gap: 0.5rem;
       align-items: center;
     }
+
     button.btn-ctl {
       background: var(--surface-2);
       color: var(--text-primary);
@@ -264,17 +301,20 @@
       box-shadow: var(--highlight-specular);
       transition: all 0.15s ease;
     }
+
     button.btn-ctl:hover {
       background: var(--surface-3);
       border-color: var(--accent-cyan);
       color: #ffffff;
     }
+
     button.btn-ctl.active {
       background: linear-gradient(135deg, #0284c7, #0369a1);
       border-color: var(--accent-cyan);
       color: #ffffff;
       box-shadow: 0 0 14px var(--accent-cyan-glow);
     }
+
     .ctl-item {
       display: flex;
       align-items: center;
@@ -282,12 +322,14 @@
       font-size: 0.82rem;
       color: var(--text-secondary);
     }
+
     .ctl-item label {
       font-family: var(--font-mono);
       font-weight: 600;
       color: var(--text-primary);
       font-size: 0.78rem;
     }
+
     .ctl-select {
       background: var(--surface-2);
       color: var(--text-primary);
@@ -301,20 +343,24 @@
       box-shadow: var(--highlight-specular);
       transition: border-color 0.15s ease;
     }
+
     .ctl-select:focus {
       border-color: var(--accent-cyan);
       box-shadow: 0 0 0 2px var(--accent-cyan-glow);
     }
+
     .ctl-slider-box {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
+
     .ctl-slider-box input[type="range"] {
       width: 85px;
       accent-color: var(--accent-cyan);
       cursor: pointer;
     }
+
     .ctl-num-input {
       width: 68px;
       background: var(--surface-2);
@@ -331,11 +377,13 @@
       box-shadow: var(--highlight-specular);
       transition: all 0.15s ease;
     }
+
     .ctl-num-input:focus {
       border-color: var(--accent-cyan);
       background: var(--surface-3);
       box-shadow: 0 0 0 2px var(--accent-cyan-glow);
     }
+
     .realtime-tag {
       font-family: var(--font-mono);
       font-size: 0.76rem;
@@ -354,6 +402,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 1.25rem;
     }
+
     .pane-card {
       background: var(--surface-1);
       border: 1px solid var(--border-panel);
@@ -363,8 +412,14 @@
       flex-direction: column;
       box-shadow: var(--highlight-specular), 0 8px 30px rgba(0, 0, 0, 0.4);
     }
-    .pane-card.pane-a { border-top: 3px solid var(--accent-amber); }
-    .pane-card.pane-b { border-top: 3px solid var(--accent-cyan); }
+
+    .pane-card.pane-a {
+      border-top: 3px solid var(--accent-amber);
+    }
+
+    .pane-card.pane-b {
+      border-top: 3px solid var(--accent-cyan);
+    }
 
     .pane-header {
       padding: 0.8rem 1.35rem;
@@ -376,6 +431,7 @@
       flex-wrap: wrap;
       gap: 0.6rem;
     }
+
     .pane-title {
       font-family: var(--font-display);
       font-size: 0.92rem;
@@ -384,8 +440,14 @@
       align-items: center;
       gap: 0.55rem;
     }
-    .pane-title.color-a { color: var(--accent-amber); }
-    .pane-title.color-b { color: var(--accent-cyan); }
+
+    .pane-title.color-a {
+      color: var(--accent-amber);
+    }
+
+    .pane-title.color-b {
+      color: var(--accent-cyan);
+    }
 
     .pane-controls {
       display: flex;
@@ -401,14 +463,17 @@
       cursor: grab;
       user-select: none;
     }
+
     .canvas-wrapper:active {
       cursor: grabbing;
     }
+
     .sim-canvas {
       width: 100%;
       height: 100%;
       display: block;
     }
+
     .telemetry-overlay {
       position: absolute;
       top: 1rem;
@@ -425,8 +490,9 @@
       line-height: 1.65;
       color: #e2e8f0;
       pointer-events: none;
-      box-shadow: var(--highlight-specular), 0 6px 20px rgba(0,0,0,0.55);
+      box-shadow: var(--highlight-specular), 0 6px 20px rgba(0, 0, 0, 0.55);
     }
+
     .telemetry-overlay span.metric {
       color: var(--accent-cyan);
       font-weight: 600;
@@ -441,13 +507,15 @@
       display: flex;
       flex-direction: column;
       gap: 0.65rem;
-      box-shadow: var(--highlight-specular), 0 8px 30px rgba(0,0,0,0.35);
+      box-shadow: var(--highlight-specular), 0 8px 30px rgba(0, 0, 0, 0.35);
     }
+
     .drift-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
+
     .drift-legend {
       display: flex;
       gap: 1.3rem;
@@ -455,18 +523,29 @@
       font-size: 0.76rem;
       font-variant-numeric: tabular-nums;
     }
+
     .drift-legend-item {
       display: flex;
       align-items: center;
       gap: 0.45rem;
     }
+
     .drift-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
     }
-    .drift-dot.a { background: var(--accent-amber); box-shadow: 0 0 8px var(--accent-amber); }
-    .drift-dot.b { background: var(--accent-cyan); box-shadow: 0 0 8px var(--accent-cyan); }
+
+    .drift-dot.a {
+      background: var(--accent-amber);
+      box-shadow: 0 0 8px var(--accent-amber);
+    }
+
+    .drift-dot.b {
+      background: var(--accent-cyan);
+      box-shadow: 0 0 8px var(--accent-cyan);
+    }
+
     .drift-canvas-box {
       height: 220px;
       width: 100%;
@@ -486,6 +565,7 @@
       display: flex;
       flex-direction: column;
     }
+
     .deck-slide {
       padding: 2.2rem 2.75rem;
       flex: 1;
@@ -493,6 +573,7 @@
       flex-direction: column;
       justify-content: space-between;
     }
+
     .slide-badge {
       font-family: var(--font-mono);
       font-size: 0.72rem;
@@ -505,6 +586,7 @@
       align-items: center;
       gap: 0.45rem;
     }
+
     .slide-heading {
       font-family: var(--font-display);
       font-size: 1.65rem;
@@ -513,6 +595,7 @@
       color: #ffffff;
       margin-bottom: 0.45rem;
     }
+
     .slide-ref {
       font-size: 0.85rem;
       color: var(--text-secondary);
@@ -526,12 +609,14 @@
       gap: 1.1rem;
       margin-top: 1rem;
     }
+
     .bento-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1.1rem;
       margin-top: 1rem;
     }
+
     .bento-card {
       background: var(--surface-2);
       border: 1px solid var(--border-panel);
@@ -540,20 +625,24 @@
       box-shadow: var(--highlight-specular), 0 4px 18px rgba(0, 0, 0, 0.25);
       transition: border-color 0.2s ease, transform 0.2s ease;
     }
+
     .bento-card:hover {
       border-color: rgba(56, 189, 248, 0.4);
       transform: translateY(-2px);
     }
+
     .bento-card.hero {
       background: linear-gradient(145deg, #101c30, #0c1524);
       border: 1px solid rgba(56, 189, 248, 0.35);
       box-shadow: var(--highlight-specular), 0 6px 24px rgba(56, 189, 248, 0.09);
     }
+
     .bento-card.hero-violet {
       background: linear-gradient(145deg, #181938, #0c1524);
       border: 1px solid rgba(129, 140, 248, 0.35);
       box-shadow: var(--highlight-specular), 0 6px 24px rgba(129, 140, 248, 0.09);
     }
+
     .bento-title {
       font-family: var(--font-display);
       font-size: 0.90rem;
@@ -563,11 +652,26 @@
       align-items: center;
       gap: 0.5rem;
     }
-    .bento-title.cyan { color: var(--accent-cyan); }
-    .bento-title.indigo { color: var(--accent-indigo); }
-    .bento-title.emerald { color: var(--accent-emerald); }
-    .bento-title.amber { color: var(--accent-amber); }
-    .bento-title.rose { color: var(--accent-coral); }
+
+    .bento-title.cyan {
+      color: var(--accent-cyan);
+    }
+
+    .bento-title.indigo {
+      color: var(--accent-indigo);
+    }
+
+    .bento-title.emerald {
+      color: var(--accent-emerald);
+    }
+
+    .bento-title.amber {
+      color: var(--accent-amber);
+    }
+
+    .bento-title.rose {
+      color: var(--accent-coral);
+    }
 
     /* Bullet-Point Telemetry Spec Style */
     .bento-bullets {
@@ -576,6 +680,7 @@
       flex-direction: column;
       gap: 0.55rem;
     }
+
     .bento-bullets li {
       font-size: 0.83rem;
       color: #cbd5e1;
@@ -583,6 +688,7 @@
       position: relative;
       padding-left: 1.15rem;
     }
+
     .bento-bullets li::before {
       content: "•";
       position: absolute;
@@ -592,10 +698,12 @@
       line-height: 1;
       top: 1px;
     }
+
     .bento-bullets li strong {
       color: #ffffff;
       font-weight: 600;
     }
+
     .bento-bullets li code {
       font-family: var(--font-mono);
       font-size: 0.78rem;
@@ -626,11 +734,13 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .deck-pills {
       display: flex;
       gap: 0.55rem;
       align-items: center;
     }
+
     .pill-dot {
       width: 32px;
       height: 32px;
@@ -648,10 +758,12 @@
       box-shadow: var(--highlight-specular);
       transition: all 0.15s ease;
     }
+
     .pill-dot:hover {
       border-color: var(--accent-cyan);
       color: #ffffff;
     }
+
     .pill-dot.active {
       background: var(--accent-cyan);
       color: #06090e;
@@ -672,6 +784,7 @@
       border: 1px solid var(--border-panel);
       box-shadow: var(--highlight-specular);
     }
+
     .deliv-table th {
       background: var(--surface-3);
       padding: 0.8rem 1.1rem;
@@ -683,13 +796,20 @@
       letter-spacing: 0.05em;
       border-bottom: 1px solid var(--border-panel);
     }
+
     .deliv-table td {
       padding: 0.85rem 1.1rem;
       border-bottom: 1px solid var(--border-subtle);
       color: #cbd5e1;
     }
-    .deliv-table tr:last-child td { border-bottom: none; }
-    .deliv-table tr:hover td { background: rgba(56, 189, 248, 0.04); }
+
+    .deliv-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .deliv-table tr:hover td {
+      background: rgba(56, 189, 248, 0.04);
+    }
 
     /* Q&A Accordion in Slide 4 */
     .qa-box {
@@ -698,6 +818,7 @@
       flex-direction: column;
       gap: 0.65rem;
     }
+
     .qa-item {
       background: var(--surface-2);
       border: 1px solid var(--border-panel);
@@ -705,6 +826,7 @@
       overflow: hidden;
       box-shadow: var(--highlight-specular);
     }
+
     .qa-q {
       padding: 0.85rem 1.2rem;
       font-weight: 600;
@@ -716,7 +838,11 @@
       align-items: center;
       transition: background 0.15s ease;
     }
-    .qa-q:hover { background: var(--surface-3); }
+
+    .qa-q:hover {
+      background: var(--surface-3);
+    }
+
     .qa-a {
       padding: 0 1.2rem 0.95rem;
       font-size: 0.81rem;
@@ -726,7 +852,11 @@
       border-top: 1px solid var(--border-subtle);
       padding-top: 0.75rem;
     }
-    .qa-item.open .qa-a { display: block; }
+
+    .qa-item.open .qa-a {
+      display: block;
+    }
+
     .qa-tag {
       font-family: var(--font-mono);
       font-size: 0.72rem;
@@ -745,6 +875,7 @@
       flex-direction: column;
       gap: 1.5rem;
     }
+
     .carousel-card {
       background: var(--surface-1);
       border: 1px solid var(--border-panel);
@@ -752,6 +883,7 @@
       padding: 1.75rem 2.25rem;
       box-shadow: var(--highlight-specular), 0 12px 40px rgba(0, 0, 0, 0.5);
     }
+
     .carousel-top {
       display: flex;
       justify-content: space-between;
@@ -760,6 +892,7 @@
       flex-wrap: wrap;
       gap: 1rem;
     }
+
     .chart-badge {
       font-family: var(--font-mono);
       font-size: 0.72rem;
@@ -769,6 +902,7 @@
       color: var(--accent-cyan);
       margin-bottom: 0.35rem;
     }
+
     .chart-title {
       font-family: var(--font-display);
       font-size: 1.35rem;
@@ -776,11 +910,13 @@
       color: #ffffff;
       letter-spacing: -0.02em;
     }
+
     .chart-sub {
       font-size: 0.82rem;
       color: var(--text-secondary);
       margin-top: 0.2rem;
     }
+
     .carousel-controls {
       display: flex;
       align-items: center;
@@ -795,6 +931,7 @@
       margin-bottom: 1.25rem;
       flex-wrap: wrap;
     }
+
     .preset-btn {
       background: var(--surface-2);
       border: 1px solid var(--border-panel);
@@ -807,10 +944,12 @@
       box-shadow: var(--highlight-specular);
       transition: all 0.15s ease;
     }
+
     .preset-btn:hover {
       color: #ffffff;
       border-color: var(--accent-cyan);
     }
+
     .preset-btn.active {
       background: var(--surface-3);
       border-color: var(--accent-cyan);
@@ -832,10 +971,12 @@
       padding: 1.5rem 2rem;
       box-shadow: var(--highlight-specular), 0 8px 32px rgba(0, 0, 0, 0.4);
     }
+
     .table-container {
       overflow-x: auto;
       margin-top: 1rem;
     }
+
     .bench-table {
       width: 100%;
       border-collapse: collapse;
@@ -844,11 +985,14 @@
       font-variant-numeric: tabular-nums;
       text-align: right;
     }
-    .bench-table th, .bench-table td {
+
+    .bench-table th,
+    .bench-table td {
       padding: 0.75rem 0.95rem;
       border-bottom: 1px solid var(--border-subtle);
       white-space: nowrap;
     }
+
     .bench-table th {
       background: var(--surface-2);
       color: var(--text-secondary);
@@ -857,17 +1001,22 @@
       font-size: 0.72rem;
       letter-spacing: 0.04em;
     }
-    .bench-table th:first-child, .bench-table td:first-child {
+
+    .bench-table th:first-child,
+    .bench-table td:first-child {
       text-align: left;
     }
+
     .bench-table tr:hover td {
       background: rgba(56, 189, 248, 0.04);
     }
+
     .bench-table td strong {
       color: #ffffff;
     }
   </style>
 </head>
+
 <body>
 
   <!-- Sticky Top Header Shell -->
@@ -882,11 +1031,13 @@
       </div>
       <div class="header-status">
         <div class="status-badge green">
-          <span style="display:inline-block; width:6px; height:6px; background:var(--accent-emerald); border-radius:50%; box-shadow:0 0 6px var(--accent-emerald);"></span>
+          <span
+            style="display:inline-block; width:6px; height:6px; background:var(--accent-emerald); border-radius:50%; box-shadow:0 0 6px var(--accent-emerald);"></span>
           M1 Verification Gate (&lt; 10⁻¹⁰)
         </div>
         <div class="status-badge blue">
-          <span style="display:inline-block; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%; box-shadow:0 0 6px var(--accent-cyan);"></span>
+          <span
+            style="display:inline-block; width:6px; height:6px; background:var(--accent-cyan); border-radius:50%; box-shadow:0 0 6px var(--accent-cyan);"></span>
           289 Runs Ingested
         </div>
       </div>
@@ -894,9 +1045,9 @@
 
     <!-- Primary 3 Navigation Tabs -->
     <nav class="tab-nav">
-      <button class="tab-btn active" onclick="switchTab('tab-simulation')">🪐 1. Live Simulation</button>
-      <button class="tab-btn" onclick="switchTab('tab-slides')">📽️ 2. Defense Slides &amp; Q&amp;A</button>
-      <button class="tab-btn" onclick="switchTab('tab-benchmarks')">📊 3. Benchmark Explorer</button>
+      <button class="tab-btn active" onclick="switchTab('tab-simulation')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><circle cx="12" cy="12" r="9"></circle><path d="M3.6 9h16.8"></path><path d="M3.6 15h16.8"></path></svg>1. Live Simulation</button>
+      <button class="tab-btn" onclick="switchTab('tab-slides')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><rect width="18" height="14" x="3" y="3" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>2. Defense Slides & Q&A</button>
+      <button class="tab-btn" onclick="switchTab('tab-benchmarks')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path></svg>3. Benchmark Explorer</button>
     </nav>
   </div>
 
@@ -909,9 +1060,9 @@
         <!-- Top Global Controls with UNCONSTRAINED Dynamic Number Inputs -->
         <div class="control-panel">
           <div class="btn-group">
-            <button class="btn-ctl active" id="btn-play" onclick="toggleSim()">⏸ Pause</button>
-            <button class="btn-ctl" onclick="resetBothSims()">↺ Reset Orbits</button>
-            <button class="btn-ctl" onclick="resetCamera()">✛ Recenter View</button>
+            <button class="btn-ctl active" id="btn-play" onclick="toggleSim()">Pause</button>
+            <button class="btn-ctl" onclick="resetBothSims()">Reset Orbits</button>
+            <button class="btn-ctl" onclick="resetCamera()">Recenter View</button>
           </div>
 
           <div class="ctl-item">
@@ -928,24 +1079,41 @@
           <div class="ctl-item">
             <label>Speed:</label>
             <div class="ctl-slider-box" title="Global simulation playback speed multiplier (type any value in box)">
-              <input type="range" id="global-speed" min="0.05" max="50.0" step="0.05" value="1.0" oninput="syncSpeed(this.value, 'range')">
-              <input type="number" id="num-speed" class="ctl-num-input" step="any" min="0.0001" value="1.0" onchange="syncSpeed(this.value, 'num')">
+              <input type="range" id="global-speed" min="0.05" max="50.0" step="0.05" value="1.0"
+                oninput="syncSpeed(this.value, 'range')">
+              <input type="number" id="num-speed" class="ctl-num-input" step="any" min="0.0001" value="1.0"
+                onchange="syncSpeed(this.value, 'num')">
+            </div>
+          </div>
+
+          <div class="ctl-item">
+            <label>dt (Step):</label>
+            <div class="ctl-slider-box" title="Global integration timestep dt (synchronized across both panes)">
+              <input type="range" id="global-dt-slider" min="0.001" max="0.2" step="0.001" value="0.05"
+                oninput="syncGlobalDt(this.value, 'range')">
+              <input type="number" id="global-dt-num" class="ctl-num-input" step="any" min="0.00001" value="0.050"
+                onchange="syncGlobalDt(this.value, 'num')">
             </div>
           </div>
 
           <div class="ctl-item">
             <label>Trail:</label>
             <div class="ctl-slider-box" title="Orbital history trail length in ring buffer (type any value in box)">
-              <input type="range" id="global-trail" min="10" max="1000" step="10" value="200" oninput="syncTrail(this.value, 'range')">
-              <input type="number" id="num-trail" class="ctl-num-input" step="any" min="1" value="200" onchange="syncTrail(this.value, 'num')">
+              <input type="range" id="global-trail" min="10" max="1000" step="10" value="200"
+                oninput="syncTrail(this.value, 'range')">
+              <input type="number" id="num-trail" class="ctl-num-input" step="any" min="1" value="200"
+                onchange="syncTrail(this.value, 'num')">
             </div>
           </div>
 
           <div class="ctl-item">
             <label>Smooth (W):</label>
-            <div class="ctl-slider-box" title="Moving average filter window for energy drift graph (type any value in box)">
-              <input type="range" id="global-smooth" min="1" max="100" step="1" value="15" oninput="syncSmooth(this.value, 'range')">
-              <input type="number" id="num-smooth" class="ctl-num-input" step="any" min="1" value="15" onchange="syncSmooth(this.value, 'num')">
+            <div class="ctl-slider-box"
+              title="Moving average filter window for energy drift graph (type any value in box)">
+              <input type="range" id="global-smooth" min="1" max="100" step="1" value="15"
+                oninput="syncSmooth(this.value, 'range')">
+              <input type="number" id="num-smooth" class="ctl-num-input" step="any" min="1" value="15"
+                onchange="syncSmooth(this.value, 'num')">
             </div>
           </div>
 
@@ -960,30 +1128,21 @@
           <div class="pane-card pane-a">
             <div class="pane-header">
               <div class="pane-title color-a">
-                <span style="display:inline-block; width:8px; height:8px; background:var(--accent-amber); border-radius:50%; box-shadow:0 0 6px var(--accent-amber);"></span>
+                <span
+                  style="display:inline-block; width:8px; height:8px; background:var(--accent-amber); border-radius:50%; box-shadow:0 0 6px var(--accent-amber);"></span>
                 Pane A: Baseline / Non-Symplectic
               </div>
               <div class="pane-controls">
                 <select id="algo-a" class="ctl-select" onchange="paneA.setIntegrator(this.value)">
-                  <optgroup label="⚡ Native C++ OpenMP Engine (12T MAX Hardware)">
-                    <option value="cpp_simd" selected>⚡ C++ OpenMP (AVX2-SIMD Vectorized, 12T)</option>
-                    <option value="cpp_newton3">⚡ C++ OpenMP (Newton's 3rd Law Pairwise, 12T)</option>
-                    <option value="cpp_dynamic">⚡ C++ OpenMP (Dynamic Work-Stealing, 12T)</option>
-                    <option value="cpp_static">⚡ C++ OpenMP (Static Chunked, 12T)</option>
+                  <optgroup label="Baseline Non-Symplectic Controls">
+                    <option value="euler" selected>Forward Euler (1st-Order Non-Symplectic Control)</option>
+                    <option value="rk4">Runge-Kutta 4 (4th-Order Classical Control)</option>
                   </optgroup>
-                  <optgroup label="🌐 Browser Integrators (JS Baseline)">
-                    <option value="euler">Forward Euler (1st-Order Non-Symplectic)</option>
-                    <option value="rk4">Runge-Kutta 4 (4th-Order Classical)</option>
-                    <option value="verlet">Velocity Verlet (2nd-Order Symplectic)</option>
-                    <option value="leapfrog">Symplectic Leapfrog</option>
-                    <option value="gr_verlet">Verlet + 1PN Relativistic GR</option>
+                  <optgroup label="Team C++ OpenMP Engine (12T MAX Hardware)">
+                    <option value="cpp_newton3">C++ OpenMP: Velocity Verlet (Newton's 3rd Law, 12T)</option>
+                    <option value="cpp_simd">C++ OpenMP: Velocity Verlet (AVX2-SIMD, 12T)</option>
                   </optgroup>
                 </select>
-                <div class="ctl-slider-box" title="Numerical integration step size dt (type any value in box)">
-                  <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono);">dt:</span>
-                  <input type="range" id="dt-a" min="0.001" max="0.5" step="0.001" value="0.05" oninput="syncDtA(this.value, 'range')">
-                  <input type="number" id="num-dt-a" class="ctl-num-input" step="any" min="0.00001" value="0.050" onchange="syncDtA(this.value, 'num')">
-                </div>
               </div>
             </div>
             <div class="canvas-wrapper">
@@ -1001,30 +1160,21 @@
           <div class="pane-card pane-b">
             <div class="pane-header">
               <div class="pane-title color-b">
-                <span style="display:inline-block; width:8px; height:8px; background:var(--accent-cyan); border-radius:50%; box-shadow:0 0 6px var(--accent-cyan);"></span>
+                <span
+                  style="display:inline-block; width:8px; height:8px; background:var(--accent-cyan); border-radius:50%; box-shadow:0 0 6px var(--accent-cyan);"></span>
                 Pane B: Symplectic Candidate
               </div>
               <div class="pane-controls">
                 <select id="algo-b" class="ctl-select" onchange="paneB.setIntegrator(this.value)">
-                  <optgroup label="⚡ Native C++ OpenMP Engine (12T MAX Hardware)">
-                    <option value="cpp_newton3">⚡ C++ OpenMP (Newton's 3rd Law Pairwise, 12T)</option>
-                    <option value="cpp_simd">⚡ C++ OpenMP (AVX2-SIMD Vectorized, 12T)</option>
-                    <option value="cpp_dynamic">⚡ C++ OpenMP (Dynamic Work-Stealing, 12T)</option>
-                    <option value="cpp_static">⚡ C++ OpenMP (Static Chunked, 12T)</option>
+                  <optgroup label="Team C++ OpenMP Engine (12T MAX Hardware)">
+                    <option value="cpp_newton3" selected>C++ OpenMP: Velocity Verlet (Newton's 3rd Law, 12T)</option>
+                    <option value="cpp_simd">C++ OpenMP: Velocity Verlet (AVX2-SIMD, 12T)</option>
                   </optgroup>
-                  <optgroup label="🌐 Browser Integrators (JS Baseline)">
-                    <option value="verlet" selected>Velocity Verlet (2nd-Order Symplectic)</option>
-                    <option value="leapfrog">Symplectic Leapfrog</option>
-                    <option value="gr_verlet">Verlet + 1PN Relativistic GR</option>
-                    <option value="rk4">Runge-Kutta 4 (4th-Order Classical)</option>
-                    <option value="euler">Forward Euler (1st-Order Non-Symplectic)</option>
+                  <optgroup label="Baseline Non-Symplectic Controls">
+                    <option value="rk4">Runge-Kutta 4 (4th-Order Classical Control)</option>
+                    <option value="euler">Forward Euler (1st-Order Non-Symplectic Control)</option>
                   </optgroup>
                 </select>
-                <div class="ctl-slider-box" title="Numerical integration step size dt (type any value in box)">
-                  <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono);">dt:</span>
-                  <input type="range" id="dt-b" min="0.001" max="0.5" step="0.001" value="0.05" oninput="syncDtB(this.value, 'range')">
-                  <input type="number" id="num-dt-b" class="ctl-num-input" step="any" min="0.00001" value="0.050" onchange="syncDtB(this.value, 'num')">
-                </div>
               </div>
             </div>
             <div class="canvas-wrapper">
@@ -1043,7 +1193,7 @@
         <div class="drift-container">
           <div class="drift-header">
             <div class="card-title">
-              <span>📈 Unified Real-Time Energy Drift Comparator:</span>
+              <span>Energy Conservation Drift Comparison:</span>
               <span style="font-size:0.78rem; font-weight:400; color:var(--text-secondary); margin-left:0.5rem;">
                 (Dashed = Instantaneous, Solid = Parameterized Moving Average)
               </span>
@@ -1080,36 +1230,46 @@
           <div>
             <div class="slide-badge">Slide 1 &bull; Mathematical Physics &amp; Problem Formulation</div>
             <h2 class="slide-heading">Gravitational N-Body Problem &amp; Hamiltonian Invariants</h2>
-            <p class="slide-ref"><strong>Base Reference:</strong> Tailin Zhu (2020), <em>N-body Simulations of the Solar System with CPU-based Parallel Methods</em>, University of Bristol.</p>
+            <p class="slide-ref"><strong>Base Reference:</strong> Tailin Zhu (2020), <em>N-body Simulations of the Solar
+                System with CPU-based Parallel Methods</em>, University of Bristol.</p>
 
-            <div class="math-callout" data-tex="\mathbf{a}_i = \sum_{j \neq i}^N G \cdot m_j \cdot \frac{\mathbf{r}_j - \mathbf{r}_i}{(\|\mathbf{r}_j - \mathbf{r}_i\|^2 + \epsilon^2)^{3/2}}"></div>
+            <div class="math-callout"
+              data-tex="\mathbf{a}_i = \sum_{j \neq i}^N G \cdot m_j \cdot \frac{\mathbf{r}_j - \mathbf{r}_i}{(\|\mathbf{r}_j - \mathbf{r}_i\|^2 + \epsilon^2)^{3/2}}">
+            </div>
 
             <div class="bento-grid-3">
               <div class="bento-card">
-                <div class="bento-title cyan">⚡ Physical Conservation Laws</div>
+                <div class="bento-title cyan">Physical Conservation Laws</div>
                 <ul class="bento-bullets">
                   <li><strong>Hamiltonian Formulation:</strong> Governed by $H = T(\mathbf{p}) + V(\mathbf{q})$.</li>
-                  <li><strong>10 Classical Integrals:</strong> Conserves Total Energy ($H$), Linear Momentum ($\mathbf{P}$), Center of Mass vector, and Angular Momentum ($\mathbf{L}$).</li>
-                  <li><strong>Isolated Invariance:</strong> Phase space volume preserved via Liouville's theorem ($d\mathbf{p} \wedge d\mathbf{q} = \text{const}$).</li>
+                  <li><strong>10 Classical Integrals:</strong> Conserves Total Energy ($H$), Linear Momentum
+                    ($\mathbf{P}$), Center of Mass vector, and Angular Momentum ($\mathbf{L}$).</li>
+                  <li><strong>Isolated Invariance:</strong> Phase space volume preserved via Liouville's theorem
+                    ($d\mathbf{p} \wedge d\mathbf{q} = \text{const}$).</li>
                 </ul>
               </div>
 
               <div class="bento-card">
-                <div class="bento-title amber">🪐 Gaussian Astronomical Units</div>
+                <div class="bento-title amber">Gaussian Astronomical Units</div>
                 <ul class="bento-bullets">
                   <li><strong>Length ($\mathbf{r}$):</strong> Astronomical Units (AU).</li>
                   <li><strong>Mass ($m$):</strong> Solar Masses ($M_\odot$).</li>
-                  <li><strong>Time ($t$):</strong> Days; Gaussian constant $G \approx 2.959122 \times 10^{-4}\text{ AU}^3 M_\odot^{-1}\text{ day}^{-2}$.</li>
-                  <li><strong>Numerical Benefit:</strong> Eliminates catastrophic roundoff cancellation inherent to SI units ($10^{-11}$).</li>
+                  <li><strong>Time ($t$):</strong> Days; Gaussian constant $G \approx 2.959122 \times 10^{-4}\text{
+                    AU}^3 M_\odot^{-1}\text{ day}^{-2}$.</li>
+                  <li><strong>Numerical Benefit:</strong> Eliminates catastrophic roundoff cancellation inherent to SI
+                    units ($10^{-11}$).</li>
                 </ul>
               </div>
 
               <div class="bento-card">
-                <div class="bento-title emerald">🌌 Baseline &amp; Synthetic Scaling</div>
+                <div class="bento-title emerald">Baseline &amp; Synthetic Scaling</div>
                 <ul class="bento-bullets">
-                  <li><strong>Solar System Baseline:</strong> 10 physical bodies (Sun, 8 major planets, Moon) integrated from NASA Horizons ephemerides.</li>
-                  <li><strong>Synthetic Asteroid Belt:</strong> Main-belt particles ($a \in [2.1, 3.3]\text{ AU}$) generated to scale $N$ up to 50,000 bodies.</li>
-                  <li><strong>Plummer Softening:</strong> Set to $\epsilon = 0.0$ for point-mass celestial dynamics.</li>
+                  <li><strong>Solar System Baseline:</strong> 10 physical bodies (Sun, 8 major planets, Moon) integrated
+                    from NASA Horizons ephemerides.</li>
+                  <li><strong>Synthetic Asteroid Belt:</strong> Main-belt particles ($a \in [2.1, 3.3]\text{ AU}$)
+                    generated to scale $N$ up to 50,000 bodies.</li>
+                  <li><strong>Plummer Softening:</strong> Set to $\epsilon = 0.0$ for point-mass celestial dynamics.
+                  </li>
                 </ul>
               </div>
             </div>
@@ -1132,49 +1292,67 @@
           <div>
             <div class="slide-badge">Slide 2 &bull; Numerical Symplectic Algorithms</div>
             <h2 class="slide-heading">Symplectic vs Non-Symplectic Geometric Integration</h2>
-            <p class="slide-ref">Why long-term solar system stability mandates symplectic structure preservation over raw truncation order.</p>
+            <p class="slide-ref">Why long-term solar system stability mandates symplectic structure preservation over
+              raw truncation order.</p>
 
             <div class="bento-grid-2">
               <div class="bento-card hero">
-                <div class="bento-title cyan">✨ Velocity Verlet (2nd-Order Symplectic)</div>
+                <div class="bento-title cyan">Velocity Verlet (2nd-Order Symplectic)</div>
                 <p style="font-size:0.83rem; color:#cbd5e1; margin-bottom:0.75rem;">
-                  Exact preserve of phase-space area $d\mathbf{p} \wedge d\mathbf{q}$. Conserves a shadow Hamiltonian $\tilde{H} = H + \mathcal{O}(\Delta t^2)$, ensuring bounded energy oscillations without secular growth.
+                  Exact preserve of phase-space area $d\mathbf{p} \wedge d\mathbf{q}$. Conserves a shadow Hamiltonian
+                  $\tilde{H} = H + \mathcal{O}(\Delta t^2)$, ensuring bounded energy oscillations without secular
+                  growth.
                 </p>
-                <div class="math-callout" data-tex="\mathbf{r}(t+\Delta t) = \mathbf{r}(t) + \mathbf{v}(t)\Delta t + \frac{1}{2}\mathbf{a}(t)\Delta t^2"></div>
-                <div class="math-callout" data-tex="\mathbf{v}(t+\Delta t) = \mathbf{v}(t) + \frac{1}{2}[\mathbf{a}(t) + \mathbf{a}(t+\Delta t)]\Delta t"></div>
+                <div class="math-callout"
+                  data-tex="\mathbf{r}(t+\Delta t) = \mathbf{r}(t) + \mathbf{v}(t)\Delta t + \frac{1}{2}\mathbf{a}(t)\Delta t^2">
+                </div>
+                <div class="math-callout"
+                  data-tex="\mathbf{v}(t+\Delta t) = \mathbf{v}(t) + \frac{1}{2}[\mathbf{a}(t) + \mathbf{a}(t+\Delta t)]\Delta t">
+                </div>
                 <ul class="bento-bullets" style="margin-top:0.75rem;">
-                  <li><strong>Long-Term Stability:</strong> $|\Delta E / E_0| &lt; 10^{-10}$ across thousands of orbital periods.</li>
+                  <li><strong>Long-Term Stability:</strong> $|\Delta E / E_0| &lt; 10^{-10}$ across thousands of orbital
+                    periods.</li>
                   <li><strong>One Acceleration Call:</strong> Only one $O(N^2)$ force calculation per time-step.</li>
                 </ul>
               </div>
 
               <div class="bento-card">
-                <div class="bento-title rose">⚠️ Non-Symplectic Controls (Euler &amp; RK4)</div>
+                <div class="bento-title rose">Non-Symplectic Controls (Euler &amp; RK4)</div>
                 <p style="font-size:0.83rem; color:#cbd5e1; margin-bottom:0.75rem;">
-                  Non-symplectic integrators fail to preserve geometric invariants, producing artificial numerical damping or secular energy growth.
+                  Non-symplectic integrators fail to preserve geometric invariants, producing artificial numerical
+                  damping or secular energy growth.
                 </p>
                 <ul class="bento-bullets">
-                  <li><strong>Forward Euler (1st-Order):</strong> Artificially injects positive energy every step ($\Delta E \propto \Delta t$). Orbits spiral outward catastrophically.</li>
-                  <li><strong>Runge-Kutta 4 (Classical):</strong> 4th-order local truncation error $\mathcal{O}(\Delta t^5)$ gives high short-term precision, but dissipates energy over orbital timescales, causing planetary orbits to decay into the Sun.</li>
-                  <li><strong>Computational Cost:</strong> RK4 requires 4 full $O(N^2)$ force evaluations per time step (4&times; more expensive than Verlet).</li>
+                  <li><strong>Forward Euler (1st-Order):</strong> Artificially injects positive energy every step
+                    ($\Delta E \propto \Delta t$). Orbits spiral outward catastrophically.</li>
+                  <li><strong>Runge-Kutta 4 (Classical):</strong> 4th-order local truncation error $\mathcal{O}(\Delta
+                    t^5)$ gives high short-term precision, but dissipates energy over orbital timescales, causing
+                    planetary orbits to decay into the Sun.</li>
+                  <li><strong>Computational Cost:</strong> RK4 requires 4 full $O(N^2)$ force evaluations per time step
+                    (4&times; more expensive than Verlet).</li>
                 </ul>
               </div>
             </div>
 
             <!-- Relativistic 1PN Expansion -->
             <div class="bento-card hero-violet" style="margin-top:1rem;">
-              <div class="bento-title indigo">🔭 Relativistic 1PN Correction: Mercury's Perihelion Precession</div>
+              <div class="bento-title indigo"> Relativistic 1PN Correction: Mercury's Perihelion Precession</div>
               <div style="display:flex; gap:1.5rem; align-items:center;">
                 <div style="flex:1;">
                   <p style="font-size:0.83rem; color:#cbd5e1; line-height:1.5;">
-                    General relativistic curvature introduces a 1st-order Post-Newtonian correction to Newtonian gravity, producing Mercury's famous anomalous advance:
+                    General relativistic curvature introduces a 1st-order Post-Newtonian correction to Newtonian
+                    gravity, producing Mercury's famous anomalous advance:
                   </p>
-                  <div class="math-callout" data-tex="\Delta \varpi = \frac{6 \pi G M_\odot}{a(1-e^2)c^2} \approx 42.98\text{ arcsec/century}"></div>
+                  <div class="math-callout"
+                    data-tex="\Delta \varpi = \frac{6 \pi G M_\odot}{a(1-e^2)c^2} \approx 42.98\text{ arcsec/century}">
+                  </div>
                 </div>
                 <div style="flex:1;">
                   <ul class="bento-bullets">
-                    <li><strong>1PN Force Term:</strong> $\Delta \mathbf{a} = \frac{G M}{c^2 r^3} \left[ \left( \frac{4GM}{r} - v^2 \right)\mathbf{r} + 4(\mathbf{r} \cdot \mathbf{v})\mathbf{v} \right]$.</li>
-                    <li><strong>Verification Gate:</strong> Matches Einstein's 1915 analytical prediction within $0.05\%$.</li>
+                    <li><strong>1PN Force Term:</strong> $\Delta \mathbf{a} = \frac{G M}{c^2 r^3} \left[ \left(
+                      \frac{4GM}{r} - v^2 \right)\mathbf{r} + 4(\mathbf{r} \cdot \mathbf{v})\mathbf{v} \right]$.</li>
+                    <li><strong>Verification Gate:</strong> Matches Einstein's 1915 analytical prediction within
+                      $0.05\%$.</li>
                   </ul>
                 </div>
               </div>
@@ -1198,42 +1376,55 @@
           <div>
             <div class="slide-badge">Slide 3 &bull; Hardware Sympathy &amp; Memory Architecture</div>
             <h2 class="slide-heading">Memory Locality, SIMD Vectorization &amp; Scheduling</h2>
-            <p class="slide-ref">Eliminating CPU/GPU memory bottlenecks through hardware-sympathetic data layouts and chunk dispatching.</p>
+            <p class="slide-ref">Eliminating CPU/GPU memory bottlenecks through hardware-sympathetic data layouts and
+              chunk dispatching.</p>
 
             <div class="bento-grid-2">
               <div class="bento-card">
-                <div class="bento-title cyan">⚡ Structure-of-Arrays (SoA)</div>
+                <div class="bento-title cyan">Structure-of-Arrays (SoA)</div>
                 <ul class="bento-bullets">
-                  <li><strong>Contiguous Vectors:</strong> Coordinates segregated into separate flat arrays (`x[]`, `y[]`, `z[]`, `m[]`).</li>
-                  <li><strong>AVX2 / SIMD Throughput:</strong> Streams 4 FP64 or 8 FP32 elements per vector instruction with 100% bus utilization.</li>
-                  <li><strong>Zero Striding:</strong> Eliminates 32-byte cache line striding penalty present in Array-of-Structures (`AoS`).</li>
+                  <li><strong>Contiguous Vectors:</strong> Coordinates segregated into separate flat arrays (`x[]`,
+                    `y[]`, `z[]`, `m[]`).</li>
+                  <li><strong>AVX2 / SIMD Throughput:</strong> Streams 4 FP64 or 8 FP32 elements per vector instruction
+                    with 100% bus utilization.</li>
+                  <li><strong>Zero Striding:</strong> Eliminates 32-byte cache line striding penalty present in
+                    Array-of-Structures (`AoS`).</li>
                 </ul>
               </div>
 
               <div class="bento-card">
-                <div class="bento-title rose">🛡️ Zero Inner-Loop Allocations</div>
+                <div class="bento-title rose">Zero Inner-Loop Allocations</div>
                 <ul class="bento-bullets">
-                  <li><strong>Static Pre-Allocation:</strong> All coordinate and force buffers allocated once at initialization.</li>
-                  <li><strong>Pointer Swapping:</strong> Time loop advances strictly via $O(1)$ pointer swaps without OS memory manager locks.</li>
-                  <li><strong>TLB Stability:</strong> Zero heap calls in inner loop prevents page faults, translation lookaside buffer thrashing, and OS jitter.</li>
+                  <li><strong>Static Pre-Allocation:</strong> All coordinate and force buffers allocated once at
+                    initialization.</li>
+                  <li><strong>Pointer Swapping:</strong> Time loop advances strictly via $O(1)$ pointer swaps without OS
+                    memory manager locks.</li>
+                  <li><strong>TLB Stability:</strong> Zero heap calls in inner loop prevents page faults, translation
+                    lookaside buffer thrashing, and OS jitter.</li>
                 </ul>
               </div>
 
               <div class="bento-card">
-                <div class="bento-title amber">⚙️ OpenMP Dynamic Scheduling (P/E Cores)</div>
+                <div class="bento-title amber"> OpenMP Dynamic Scheduling (P/E Cores)</div>
                 <ul class="bento-bullets">
-                  <li><strong>Hybrid Architecture:</strong> Intel i5-1340P features 4 fast P-cores (hyperthreaded, 8 threads) and 8 slower E-cores.</li>
-                  <li><strong>Static Barrier Stalls:</strong> Equal static chunk allocation forces fast P-cores to idle waiting at OpenMP barriers.</li>
-                  <li><strong>Work Balancing:</strong> `schedule(dynamic, 16)` delivers <strong>1.45&times; speedup</strong> by streaming chunks on demand to available cores.</li>
+                  <li><strong>Hybrid Architecture:</strong> Intel i5-1340P features 4 fast P-cores (hyperthreaded, 8
+                    threads) and 8 slower E-cores.</li>
+                  <li><strong>Static Barrier Stalls:</strong> Equal static chunk allocation forces fast P-cores to idle
+                    waiting at OpenMP barriers.</li>
+                  <li><strong>Work Balancing:</strong> `schedule(dynamic, 16)` delivers <strong>1.45&times;
+                      speedup</strong> by streaming chunks on demand to available cores.</li>
                 </ul>
               </div>
 
               <div class="bento-card">
-                <div class="bento-title emerald">📐 Newton's 3rd Law Pairwise Halving</div>
+                <div class="bento-title emerald">Newton's 3rd Law Pairwise Halving</div>
                 <ul class="bento-bullets">
-                  <li><strong>FLOP Reduction:</strong> Computes $\mathbf{F}_{ij}$ once and applies $\mathbf{F}_{ji} = -\mathbf{F}_{ij}$, cutting operations from $N(N-1)$ to $\frac{N(N-1)}{2}$ (50% cut).</li>
-                  <li><strong>Race Prevention:</strong> Thread-private force accumulation buffers avoid expensive hardware atomic operations.</li>
-                  <li><strong>Break-Even Point:</strong> At large $N$, 2&times; arithmetic reduction strictly dominates reduction overhead.</li>
+                  <li><strong>FLOP Reduction:</strong> Computes $\mathbf{F}_{ij}$ once and applies $\mathbf{F}_{ji} =
+                    -\mathbf{F}_{ij}$, cutting operations from $N(N-1)$ to $\frac{N(N-1)}{2}$ (50% cut).</li>
+                  <li><strong>Race Prevention:</strong> Thread-private force accumulation buffers avoid expensive
+                    hardware atomic operations.</li>
+                  <li><strong>Break-Even Point:</strong> At large $N$, 2&times; arithmetic reduction strictly dominates
+                    reduction overhead.</li>
                 </ul>
               </div>
             </div>
@@ -1256,7 +1447,8 @@
           <div>
             <div class="slide-badge">Slide 4 &bull; Engineering Deliverables &amp; Technical Defense</div>
             <h2 class="slide-heading">Group Contribution Matrix &amp; Oral Defense Reference</h2>
-            <p class="slide-ref">Multi-paradigm delivery across 4 distinct hardware systems under Contract v1 specification.</p>
+            <p class="slide-ref">Multi-paradigm delivery across 4 distinct hardware systems under Contract v1
+              specification.</p>
 
             <table class="deliv-table">
               <thead>
@@ -1297,8 +1489,9 @@
 
             <!-- Technical Q&A Defense Dropdowns -->
             <div class="qa-box">
-              <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-coral); font-weight:700; margin-bottom:0.25rem;">
-                🎯 Supervisor Oral Defense Technical Reference
+              <div
+                style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-coral); font-weight:700; margin-bottom:0.25rem;">
+                 Supervisor Oral Defense Technical Reference
               </div>
 
               <div class="qa-item">
@@ -1307,7 +1500,11 @@
                   <span class="qa-tag">ZHU (2020) FIG. 4 &blacktriangledown;</span>
                 </div>
                 <div class="qa-a">
-                  <strong>Root Cause:</strong> Thread creation and synchronization overhead (`GOMP_parallel`, barrier synchronization) costs ~2-5 microseconds. For $N=100$, total computational workload is only $100 \times 99 / 2 = 4,950$ FLOPs (~0.03 ms of CPU work). The synchronization latency dominates the runtime. OpenMP parallel speedup only breaks even when $N \ge 500$, as documented in Zhu (2020) Figure 4.
+                  <strong>Root Cause:</strong> Thread creation and synchronization overhead (`GOMP_parallel`, barrier
+                  synchronization) costs ~2-5 microseconds. For $N=100$, total computational workload is only $100
+                  \times 99 / 2 = 4,950$ FLOPs (~0.03 ms of CPU work). The synchronization latency dominates the
+                  runtime. OpenMP parallel speedup only breaks even when $N \ge 500$, as documented in Zhu (2020) Figure
+                  4.
                 </div>
               </div>
 
@@ -1317,7 +1514,10 @@
                   <span class="qa-tag">CUDA HARDWARE &blacktriangledown;</span>
                 </div>
                 <div class="qa-a">
-                  <strong>Hardware Architecture:</strong> Consumer GeForce Ada/Blackwell GPUs are physically provisioned with a 1:64 or 1:32 FP64-to-FP32 ALU ratio (only 1 double-precision unit for every 32/64 single-precision CUDA cores). Furthermore, FP32 cuts memory bus bandwidth requirements by exactly 50%, enabling higher warp occupancy and achieving 609.4&times; speedup at $N=10,000$.
+                  <strong>Hardware Architecture:</strong> Consumer GeForce Ada/Blackwell GPUs are physically provisioned
+                  with a 1:64 or 1:32 FP64-to-FP32 ALU ratio (only 1 double-precision unit for every 32/64
+                  single-precision CUDA cores). Furthermore, FP32 cuts memory bus bandwidth requirements by exactly 50%,
+                  enabling higher warp occupancy and achieving 609.4&times; speedup at $N=10,000$.
                 </div>
               </div>
 
@@ -1327,7 +1527,11 @@
                   <span class="qa-tag">DISTRIBUTED MPI &blacktriangledown;</span>
                 </div>
                 <div class="qa-a">
-                  <strong>Communication Complexity:</strong> The `master-worker` pattern routes all $N$ particle states through Rank 0 at every time step, creating an $O(P \times N)$ network serialization bottleneck where Rank 0's network/memory bus saturates. In contrast, `MPI_Allgather` utilizes a hardware ring/hypercube collective algorithm ($O(\log P)$ latency and $O(N)$ bandwidth), enabling distributed ranks to exchange coordinates concurrently.
+                  <strong>Communication Complexity:</strong> The `master-worker` pattern routes all $N$ particle states
+                  through Rank 0 at every time step, creating an $O(P \times N)$ network serialization bottleneck where
+                  Rank 0's network/memory bus saturates. In contrast, `MPI_Allgather` utilizes a hardware ring/hypercube
+                  collective algorithm ($O(\log P)$ latency and $O(N)$ bandwidth), enabling distributed ranks to
+                  exchange coordinates concurrently.
                 </div>
               </div>
             </div>
@@ -1357,8 +1561,10 @@
           <div class="carousel-top">
             <div>
               <div class="chart-badge" id="chart-badge">CHART 1 OF 6 &bull; MACRO-SCALING</div>
-              <h2 class="chart-title" id="chart-title">1. Global Macro-Scaling Across Problem Size N (Log-Log Scale)</h2>
-              <p class="chart-sub" id="chart-subtitle">Direct comparison across all 8 hardware configurations (N=100 to N=50,000)</p>
+              <h2 class="chart-title" id="chart-title">1. Global Macro-Scaling Across Problem Size N (Log-Log Scale)
+              </h2>
+              <p class="chart-sub" id="chart-subtitle">Direct comparison across all 8 hardware configurations (N=100 to
+                N=50,000)</p>
             </div>
             <div class="carousel-controls">
               <button class="btn-ctl" onclick="prevChartSlide()">&larr; Prev Chart</button>
@@ -1376,20 +1582,25 @@
 
           <!-- Presets for fast focus across all variants -->
           <div class="presets-bar" id="chart-presets">
-            <span style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono); margin-right:0.3rem;">Presets:</span>
+            <span
+              style="font-size:0.75rem; color:var(--text-secondary); font-family:var(--font-mono); margin-right:0.3rem;">Presets:</span>
             <button class="preset-btn active" onclick="filterPreset('all')">All Paradigms (12 Series)</button>
-            <button class="preset-btn" onclick="filterPreset('openmp')">OpenMP Variants (static, dynamic, simd, newton3)</button>
-            <button class="preset-btn" onclick="filterPreset('mpi')">MPI Distributed (allgather vs master-worker)</button>
+            <button class="preset-btn" onclick="filterPreset('openmp')">OpenMP Variants (static, dynamic, simd,
+              newton3)</button>
+            <button class="preset-btn" onclick="filterPreset('mpi')">MPI Distributed (allgather vs
+              master-worker)</button>
             <button class="preset-btn" onclick="filterPreset('cuda')">CUDA GPU Family (tiling, precision, bus)</button>
-            <button class="preset-btn" onclick="filterPreset('duel')">Microarchitecture Duel (Intel Raptor Lake vs AMD Zen 3)</button>
+            <button class="preset-btn" onclick="filterPreset('duel')">Microarchitecture Duel (Intel Raptor Lake vs AMD
+              Zen 3)</button>
           </div>
 
           <div class="chart-aspect-box">
             <canvas id="carouselChartCanvas"></canvas>
           </div>
 
-          <div style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.75rem; display:flex; align-items:center; gap:0.4rem;">
-            <span>💡</span>
+          <div
+            style="font-size:0.78rem; color:var(--text-secondary); margin-top:0.75rem; display:flex; align-items:center; gap:0.4rem;">
+            <span></span>
             <span>Hover over any curve or legend item to highlight that series while dimming competing lines.</span>
           </div>
         </div>
@@ -1398,7 +1609,8 @@
         <div class="bench-table-card">
           <div class="card-header" style="background:transparent; border:none; padding:0 0 1rem 0;">
             <div class="card-title">Master Performance Benchmark Summary Matrix — All Tested Variants</div>
-            <div style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-cyan); font-variant-numeric:tabular-nums;">
+            <div
+              style="font-family:var(--font-mono); font-size:0.75rem; color:var(--accent-cyan); font-variant-numeric:tabular-nums;">
               Measured Medians Across 289 Physical Runs under Contract v1
             </div>
           </div>
@@ -1522,23 +1734,23 @@
         document.querySelectorAll("[data-tex]").forEach(el => {
           try {
             katex.render(el.getAttribute("data-tex"), el, { displayMode: true, throwOnError: false });
-          } catch(e) { console.error("KaTeX block error:", e); }
+          } catch (e) { console.error("KaTeX block error:", e); }
         });
       }
       if (typeof renderMathInElement === "function") {
         renderMathInElement(document.body, {
           delimiters: [
-            {left: '$$', right: '$$', display: true},
-            {left: '\\[', right: '\\]', display: true},
-            {left: '\\(', right: '\\)', display: false},
-            {left: '$', right: '$', display: false}
+            { left: '$$', right: '$$', display: true },
+            { left: '\\[', right: '\\]', display: true },
+            { left: '\\(', right: '\\)', display: false },
+            { left: '$', right: '$', display: false }
           ],
           throwOnError: false
         });
       }
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
       triggerMathRender();
       initSimEngines();
       initSlideNav();
@@ -1555,7 +1767,7 @@
       }
     });
 
-    window.addEventListener("load", function() {
+    window.addEventListener("load", function () {
       triggerMathRender();
       resizeBothCanvases();
       drawBothSims();
@@ -1567,15 +1779,15 @@
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      
+
       const target = document.getElementById(tabId);
       if (target) target.classList.add('active');
-      
+
       const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes(tabId));
       if (btn) btn.classList.add('active');
 
       window.scrollTo(0, 0);
-      try { history.replaceState(null, '', '#' + tabId); } catch (e) {}
+      try { history.replaceState(null, '', '#' + tabId); } catch (e) { }
 
       if (tabId === 'tab-simulation') {
         resizeBothCanvases();
@@ -1613,7 +1825,7 @@
     function prevSlide() { showSlide(currentSlide - 1); }
 
     function initSlideNav() {
-      document.addEventListener("keydown", function(e) {
+      document.addEventListener("keydown", function (e) {
         const activeTab = document.querySelector('.tab-content.active');
         if (activeTab && activeTab.id === 'tab-slides') {
           if (e.key === "ArrowRight" || e.key === "PageDown") nextSlide();
@@ -1653,12 +1865,29 @@
     let lastSimTimestamp = null;
     let paneA, paneB;
 
+    function updateNativeEngineStatus(connected, threads = 12) {
+      const pill = document.getElementById('native-engine-status');
+      const text = document.getElementById('native-engine-text');
+      if (!pill || !text) return;
+      if (connected) {
+        pill.style.background = 'rgba(16, 185, 129, 0.15)';
+        pill.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        pill.style.color = 'var(--accent-emerald)';
+        text.innerText = `C++ OpenMP Engine: ${threads} Threads Active`;
+      } else {
+        pill.style.background = 'rgba(245, 158, 11, 0.12)';
+        pill.style.borderColor = 'rgba(245, 158, 11, 0.35)';
+        pill.style.color = 'var(--accent-amber)';
+        text.innerText = 'Browser Baseline (Server Offline)';
+      }
+    }
+
     class SimulationPane {
       constructor(canvasId, isPaneB = false) {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
         this.isPaneB = isPaneB;
-        this.integrator = isPaneB ? 'verlet' : 'euler';
+        this.integrator = isPaneB ? 'cpp_newton3' : 'euler';
         this.dt = 0.05;
         this.bodies = [];
         this.energy0 = 0.0;
@@ -1673,21 +1902,34 @@
         this.distDecreasing = false;
       }
 
-      setIntegrator(val) {
+            setIntegrator(val) {
         this.integrator = val;
         this.nativeQueue = [];
         const isNative = val.startsWith('cpp_');
+        let label = val.toUpperCase();
+        if (val === 'euler') label = 'FORWARD EULER (NON-SYMPLECTIC)';
+        else if (val === 'rk4') label = 'RUNGE-KUTTA 4 (CLASSICAL)';
+        else if (val === 'cpp_newton3') label = 'C++ OPENMP [NEWTON3 VERLET] (12T MAX)';
+        else if (val === 'cpp_simd') label = 'C++ OPENMP [AVX2-SIMD VERLET] (12T MAX)';
+
         const tag = document.getElementById(this.isPaneB ? 'tel-algo-b' : 'tel-algo-a');
-        if (tag) tag.innerText = isNative ? `⚡ C++ OpenMP [${val.replace('cpp_', '').toUpperCase()}] (12T MAX)` : val.toUpperCase();
+        if (tag) tag.innerText = label;
+
+        let legLabel = val;
+        if (val === 'euler') legLabel = 'Euler';
+        else if (val === 'rk4') legLabel = 'RK4';
+        else if (val === 'cpp_newton3') legLabel = 'C++ Newton3';
+        else if (val === 'cpp_simd') legLabel = 'C++ SIMD';
+
         const leg = document.getElementById(this.isPaneB ? 'leg-b-label' : 'leg-a-label');
-        if (leg) leg.innerText = (this.isPaneB ? 'Pane B (' : 'Pane A (') + (isNative ? 'C++ ' + val.replace('cpp_', '').toUpperCase() : val) + ')';
+        if (leg) leg.innerText = (this.isPaneB ? 'Pane B (' : 'Pane A (') + legLabel + ')';
       }
 
       setDt(val) {
         this.dt = Math.max(0.00001, parseFloat(val) || 0.05);
       }
 
-      
+
       async fetchNativeBatch() {
         if (this.isFetchingNative || !this.integrator.startsWith('cpp_')) return;
         this.isFetchingNative = true;
@@ -1839,7 +2081,7 @@
         this.energy0 = this.calcTotalEnergy();
         this.currentEnergy = this.energy0;
         this.drift = 0.0;
-        
+
         this.recordTrail();
       }
 
@@ -1865,7 +2107,7 @@
           const sun = this.bodies[0];
           const jup = this.bodies[1];
           T = 0.5 * (sun.vx * sun.vx + sun.vy * sun.vy) * sun.m +
-              0.5 * (jup.vx * jup.vx + jup.vy * jup.vy) * jup.m;
+            0.5 * (jup.vx * jup.vx + jup.vy * jup.vy) * jup.m;
           const dSJ = Math.hypot(jup.x - sun.x, jup.y - sun.y) + 1e-12;
           V = -(G_GAUSS * sun.m * jup.m) / dSJ;
           return T + V;
@@ -1961,7 +2203,7 @@
         }
       }
 
-            step(dt) {
+      step(dt) {
         if (this.integrator.startsWith('cpp_')) {
           if (this.nativeQueue.length < 30) {
             this.fetchNativeBatch();
@@ -2001,10 +2243,58 @@
         this.stepNumerical(dt);
       }
 
-      stepNumerical(dt) {
+            stepNumerical(dt) {
         const n = this.bodies.length;
 
-        if (this.integrator === 'euler') {
+        if (this.integrator === 'rk4') {
+          // Classical 4th-Order Runge-Kutta (Non-Symplectic)
+          const origX = this.bodies.map(b => b.x);
+          const origY = this.bodies.map(b => b.y);
+          const origVx = this.bodies.map(b => b.vx);
+          const origVy = this.bodies.map(b => b.vy);
+
+          // k1
+          this.computeAccelerations();
+          const k1_vx = this.bodies.map(b => b.ax);
+          const k1_vy = this.bodies.map(b => b.ay);
+
+          // k2
+          for (let i = 0; i < n; i++) {
+            this.bodies[i].x = origX[i] + 0.5 * dt * origVx[i];
+            this.bodies[i].y = origY[i] + 0.5 * dt * origVy[i];
+          }
+          this.computeAccelerations();
+          const k2_vx = this.bodies.map(b => b.ax);
+          const k2_vy = this.bodies.map(b => b.ay);
+
+          // k3
+          for (let i = 0; i < n; i++) {
+            this.bodies[i].x = origX[i] + 0.5 * dt * (origVx[i] + 0.5 * dt * k1_vx[i]);
+            this.bodies[i].y = origY[i] + 0.5 * dt * (origVy[i] + 0.5 * dt * k1_vy[i]);
+          }
+          this.computeAccelerations();
+          const k3_vx = this.bodies.map(b => b.ax);
+          const k3_vy = this.bodies.map(b => b.ay);
+
+          // k4
+          for (let i = 0; i < n; i++) {
+            this.bodies[i].x = origX[i] + dt * (origVx[i] + 0.5 * dt * k2_vx[i]);
+            this.bodies[i].y = origY[i] + dt * (origVy[i] + 0.5 * dt * k2_vy[i]);
+          }
+          this.computeAccelerations();
+          const k4_vx = this.bodies.map(b => b.ax);
+          const k4_vy = this.bodies.map(b => b.ay);
+
+          // Final update
+          for (let i = 0; i < n; i++) {
+            this.bodies[i].x = origX[i] + (dt / 6) * (origVx[i] + 2 * (origVx[i] + 0.5 * dt * k1_vx[i]) + 2 * (origVx[i] + 0.5 * dt * k2_vx[i]) + origVx[i] + dt * k3_vx[i]);
+            this.bodies[i].y = origY[i] + (dt / 6) * (origVy[i] + 2 * (origVy[i] + 0.5 * dt * k1_vy[i]) + 2 * (origVy[i] + 0.5 * dt * k2_vy[i]) + origVy[i] + dt * k3_vy[i]);
+            this.bodies[i].vx = origVx[i] + (dt / 6) * (k1_vx[i] + 2 * k2_vx[i] + 2 * k3_vx[i] + k4_vx[i]);
+            this.bodies[i].vy = origVy[i] + (dt / 6) * (k1_vy[i] + 2 * k2_vy[i] + 2 * k3_vy[i] + k4_vy[i]);
+          }
+          this.computeAccelerations();
+        } else {
+          // Forward Euler (1st-Order Explicit, Non-Symplectic)
           for (let i = 0; i < n; i++) {
             const b = this.bodies[i];
             b.x += b.vx * dt;
@@ -2013,47 +2303,6 @@
             b.vy += b.ay * dt;
           }
           this.computeAccelerations();
-        }
-        else if (this.integrator === 'rk4') {
-          for (let i = 0; i < n; i++) {
-            const b = this.bodies[i];
-            b.x += b.vx * dt + 0.5 * b.ax * dt * dt;
-            b.y += b.vy * dt + 0.5 * b.ay * dt * dt;
-            b.vx += b.ax * dt;
-            b.vy += b.ay * dt;
-          }
-          this.computeAccelerations();
-        }
-        else {
-          // Velocity Verlet (Symplectic)
-          for (let i = 0; i < n; i++) {
-            const b = this.bodies[i];
-            b.x += b.vx * dt + 0.5 * b.ax * dt * dt;
-            b.y += b.vy * dt + 0.5 * b.ay * dt * dt;
-            b.prev_ax = b.ax;
-            b.prev_ay = b.ay;
-          }
-          this.computeAccelerations();
-          for (let i = 0; i < n; i++) {
-            const b = this.bodies[i];
-            b.vx += 0.5 * (b.prev_ax + b.ax) * dt;
-            b.vy += 0.5 * (b.prev_ay + b.ay) * dt;
-          }
-        }
-
-        // Mercury Perihelion Rosette tracking
-        if (currentScenario === 'precession' && this.bodies.length > 1) {
-          const m = this.bodies[1];
-          const dist = Math.hypot(m.x, m.y);
-          if (this.lastDist !== null) {
-            if (dist > this.lastDist && this.distDecreasing) {
-              const angle = (Math.atan2(m.y, m.x) * 180 / Math.PI).toFixed(1);
-              this.perihelionRays.push({ x: m.x, y: m.y, angle });
-              if (this.perihelionRays.length > 24) this.perihelionRays.shift();
-            }
-            this.distDecreasing = (dist < this.lastDist);
-          }
-          this.lastDist = dist;
         }
 
         this.localSimTime += dt;
@@ -2287,7 +2536,7 @@
       simRunning = true;
       const btn = document.getElementById('btn-play');
       if (btn) {
-        btn.innerText = "⏸ Pause";
+        btn.innerText = " Pause";
         btn.classList.add('active');
       }
       lastSimTimestamp = null;
@@ -2298,7 +2547,7 @@
       simRunning = !simRunning;
       const btn = document.getElementById('btn-play');
       if (btn) {
-        btn.innerText = simRunning ? "⏸ Pause" : "▶ Play";
+        btn.innerText = simRunning ? " Pause" : "▶ Play";
         btn.classList.toggle('active', simRunning);
       }
       if (simRunning) {
@@ -2372,42 +2621,27 @@
       globalSmoothWindow = num;
     }
 
-    function syncDtA(val, source) {
+    let globalDt = 0.05;
+    let globalAcc = 0.0;
+
+    function syncGlobalDt(val, source) {
       let num = parseFloat(val);
       if (isNaN(num) || num <= 0) num = 0.05;
 
-      const slider = document.getElementById('dt-a');
-      const numInput = document.getElementById('num-dt-a');
+      const slider = document.getElementById('global-dt-slider');
+      const numInput = document.getElementById('global-dt-num');
 
-      if (source === 'num') {
+      if (source === 'range') {
+        numInput.value = num.toFixed(3);
+      } else {
         if (num > parseFloat(slider.max)) slider.max = num;
         if (num < parseFloat(slider.min)) slider.min = num;
         slider.value = num;
-        numInput.value = num;
-      } else {
-        numInput.value = num.toFixed(3);
       }
 
-      paneA.setDt(num);
-    }
-
-    function syncDtB(val, source) {
-      let num = parseFloat(val);
-      if (isNaN(num) || num <= 0) num = 0.05;
-
-      const slider = document.getElementById('dt-b');
-      const numInput = document.getElementById('num-dt-b');
-
-      if (source === 'num') {
-        if (num > parseFloat(slider.max)) slider.max = num;
-        if (num < parseFloat(slider.min)) slider.min = num;
-        slider.value = num;
-        numInput.value = num;
-      } else {
-        numInput.value = num.toFixed(3);
-      }
-
-      paneB.setDt(num);
+      globalDt = num;
+      if (paneA) paneA.dt = num;
+      if (paneB) paneB.dt = num;
     }
 
     // ROBUST TIME-ACCUMULATOR SIMULATION LOOP
@@ -2418,34 +2652,29 @@
       const elapsedMs = Math.min(timestamp - lastSimTimestamp, 100);
       lastSimTimestamp = timestamp;
 
-      const simDeltaT = (elapsedMs / 1000.0) * (globalSpeed * 2.5);
-      globalPhysicalTime += simDeltaT;
+      // Single Global Time Accumulator
+      const dt = globalDt;
+      globalAcc += (elapsedMs / 1000.0) * globalSpeed;
 
-      accA += simDeltaT;
-      accB += simDeltaT;
+      const maxSubSteps = 10;
+      let stepsTaken = 0;
 
-      let stepsA = 0;
-      while (accA >= paneA.dt && stepsA < 50) {
-        paneA.stepNumerical(paneA.dt);
-        accA -= paneA.dt;
-        stepsA++;
+      while (globalAcc >= dt && stepsTaken < maxSubSteps) {
+        if (paneA) paneA.step(dt);
+        if (paneB) paneB.step(dt);
+
+        globalPhysicalTime += dt;
+        if (paneA) paneA.localSimTime = globalPhysicalTime;
+        if (paneB) paneB.localSimTime = globalPhysicalTime;
+
+        globalAcc -= dt;
+        stepsTaken++;
       }
-      if (stepsA >= 50) accA = 0;
 
-      let stepsB = 0;
-      while (accB >= paneB.dt && stepsB < 50) {
-        paneB.stepNumerical(paneB.dt);
-        accB -= paneB.dt;
-        stepsB++;
-      }
-      if (stepsB >= 50) accB = 0;
+      if (paneA) paneA.recordTrail();
+      if (paneB) paneB.recordTrail();
 
-      paneA.recordTrail();
-      paneB.recordTrail();
-
-      paneA.draw();
-      paneB.draw();
-
+      drawBothSims();
       drawUnifiedDrift();
 
       const clk = document.getElementById('sync-clock');
@@ -2727,7 +2956,7 @@
               ticks: {
                 color: '#94a3b8',
                 font: { family: 'JetBrains Mono', size: 11 },
-                callback: function(value) {
+                callback: function (value) {
                   if (isScalingPlot) return value + '×';
                   if (value === 0.01 || value === 0.05 || value === 0.1 || value === 0.5 || value === 1 || value === 5 || value === 10 || value === 50 || value === 100 || value === 500 || value === 1000) {
                     return value + ' ms';
@@ -2758,7 +2987,7 @@
               bodyFont: { family: 'JetBrains Mono', size: 11 },
               padding: 10,
               callbacks: {
-                label: function(context) {
+                label: function (context) {
                   const valStr = isScalingPlot ? `${context.parsed.y.toFixed(2)}× speedup` : `${context.parsed.y.toFixed(3)} ms`;
                   return ` ${context.dataset.label}: ${valStr}`;
                 }
@@ -2772,7 +3001,7 @@
     function updateChartSlide(num) {
       currentChartSlide = num;
       const cfg = CHART_CONFIGS.find(c => c.id === num) || CHART_CONFIGS[0];
-      
+
       document.getElementById('chart-badge').innerText = cfg.badge;
       document.getElementById('chart-title').innerText = cfg.title;
       document.getElementById('chart-subtitle').innerText = cfg.subtitle;
@@ -2798,4 +3027,5 @@
     }
   </script>
 </body>
+
 </html>
